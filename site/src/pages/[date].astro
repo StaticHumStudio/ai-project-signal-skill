@@ -41,6 +41,8 @@ const descSignals = signals.slice(0, 3).map((s: any) => s.title).join(', ');
 const metaDescription = `${signals.length} curated software demand signals: ${descSignals}. With competitive landscape analysis and builder notes.`;
 
 // JSON-LD
+const publisherUrl = Astro.site ? Astro.site.origin : Astro.url.origin;
+
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Article",
@@ -53,7 +55,7 @@ const jsonLd = {
   "publisher": {
     "@type": "Organization",
     "name": "Static Hum Studio",
-    "url": "https://statichum.studio",
+    "url": publisherUrl,
   },
 };
 ---
@@ -61,7 +63,6 @@ const jsonLd = {
 <SignalLayout
   title={`Software Demand Signals — ${formattedDate} | Signal`}
   description={metaDescription}
-  canonical={`https://statichum.studio/signal/${date}/`}
   signalCount={totalSignals}
   jsonLd={jsonLd}
 >

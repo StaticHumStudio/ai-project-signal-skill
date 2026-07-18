@@ -6,7 +6,7 @@ import '../styles/signal.css';
 interface Props {
   title: string;
   description: string;
-  canonical: string;
+  canonical?: string;
   ogImage?: string;
   jsonLd?: object;
   signalCount?: number;
@@ -20,6 +20,20 @@ const {
   jsonLd,
   signalCount = 0,
 } = Astro.props;
+
+// Derive the canonical URL from the configured `site` so forks get correct,
+// self-referential canonicals just by setting `site` in astro.config.mjs.
+// Falls back to any explicitly-passed canonical when `site` is unset.
+const canonicalHref = Astro.site
+  ? new URL(Astro.url.pathname, Astro.site).href
+  : canonical;
+
+// Escape "<" before injecting JSON-LD via set:html so a "</script>" inside
+// user-supplied signal fields can't break out of the script element (XSS).
+// The result is still valid JSON (< decodes back to "<").
+const jsonLdHtml = jsonLd
+  ? JSON.stringify(jsonLd).replace(/</g, '\\u003c')
+  : null;
 ---
 
 <!doctype html>
@@ -29,12 +43,12 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
+    <link rel="canonical" href={canonicalHref} />
 
     <!-- Open Graph -->
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical} />
+    <meta property="og:url" content={canonicalHref} />
     <meta property="og:type" content="website" />
     {ogImage && <meta property="og:image" content={ogImage} />}
 
@@ -55,8 +69,8 @@ const {
     <link rel="alternate" type="application/rss+xml" title="Signal RSS" href="/signal/rss.xml" />
 
     <!-- JSON-LD -->
-    {jsonLd && (
-      <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    {jsonLdHtml && (
+      <script type="application/ld+json" set:html={jsonLdHtml} />
     )}
   </head>
   <body>
