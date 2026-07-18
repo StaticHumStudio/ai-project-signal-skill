@@ -13,6 +13,10 @@ in its reply. There is no file to write and no repository to read.
 Hold yourself to the quality bar in [`RUBRIC.md`](./RUBRIC.md). It is not
 optional — it is what separates a real signal from a plausible-sounding guess.
 
+Hunting something other than software? The same method retargets to content
+gaps, physical products, local business, competitor intel, and more — see
+[`RECIPES.md`](./RECIPES.md) for drop-in swaps.
+
 ## How to run this
 
 1. (Optional) Set a `FOCUS` — a category or theme to bias toward. Leave it
