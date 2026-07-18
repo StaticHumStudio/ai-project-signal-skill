@@ -26,7 +26,7 @@ const {
 // Falls back to any explicitly-passed canonical when `site` is unset.
 const canonicalHref = Astro.site
   ? new URL(Astro.url.pathname, Astro.site).href
-  : canonical;
+  : (canonical ?? Astro.url.pathname);
 
 // Escape "<" before injecting JSON-LD via set:html so a "</script>" inside
 // user-supplied signal fields can't break out of the script element (XSS).
