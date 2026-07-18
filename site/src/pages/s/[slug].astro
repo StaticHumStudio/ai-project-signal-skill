@@ -1,0 +1,456 @@
+---
+import SignalLayout from '../../layouts/SignalLayout.astro';
+import SignalDivider from '../../components/SignalDivider.astro';
+import { getAllSignals, getTotalSignals } from '../../utils/signals';
+
+export function getStaticPaths() {
+  const allSignals = getAllSignals();
+  const totalSignals = getTotalSignals();
+
+  return allSignals.map((signal, index) => {
+    const prev = index < allSignals.length - 1 ? allSignals[index + 1] : null;
+    const next = index > 0 ? allSignals[index - 1] : null;
+
+    return {
+      params: { slug: signal._slug },
+      props: { signal, prev, next, totalSignals },
+    };
+  });
+}
+
+const { signal, prev, next, totalSignals } = Astro.props;
+
+// Format the signal's date for display
+const dateObj = new Date(signal._date + 'T12:00:00');
+const formattedDate = dateObj.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+// SEO
+const metaDescription = signal.summary.length > 155
+  ? signal.summary.slice(0, 152) + '...'
+  : signal.summary;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": signal.title,
+  "datePublished": signal._date,
+  "author": {
+    "@type": "Organization",
+    "name": "Static Hum Studio",
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Static Hum Studio",
+    "url": "https://statichum.studio",
+  },
+};
+
+// Badge helpers
+const difficultyLabel: Record<string, string> = {
+  weekend_hack: 'weekend hack',
+  real_project: 'real project',
+  venture_scale: 'venture scale',
+};
+
+const strengthLabel: Record<string, string> = {
+  single_request: 'single request',
+  multiple_requests: 'multiple requests',
+  trending: 'trending',
+};
+
+const difficultyColor: Record<string, string> = {
+  weekend_hack: 'var(--teal)',
+  real_project: 'var(--gold)',
+  venture_scale: 'var(--text-dim)',
+};
+
+const strengthDots: Record<string, string> = {
+  single_request: '\u2022',
+  multiple_requests: '\u2022\u2022',
+  trending: '\u2022\u2022\u2022',
+};
+---
+
+<SignalLayout
+  title={`${signal.title} | Signal`}
+  description={metaDescription}
+  canonical={`https://statichum.studio/signal/s/${signal._slug}/`}
+  signalCount={totalSignals}
+  jsonLd={jsonLd}
+>
+
+  <!-- Navigation -->
+  <header class="page-header">
+    <nav class="page-nav">
+      {prev ? (
+        <a href={`/signal/s/${prev._slug}/`} class="nav-arrow nav-prev" title={prev.title}>&larr; prev</a>
+      ) : (
+        <span class="nav-arrow nav-disabled">&larr; prev</span>
+      )}
+      <a href="/signal/" class="nav-hub">all signals</a>
+      {next ? (
+        <a href={`/signal/s/${next._slug}/`} class="nav-arrow nav-next" title={next.title}>next &rarr;</a>
+      ) : (
+        <span class="nav-arrow nav-disabled">next &rarr;</span>
+      )}
+    </nav>
+    <p class="page-date-link">
+      <a href={`/signal/${signal._date}/`}>{formattedDate}</a>
+    </p>
+  </header>
+
+  <SignalDivider />
+
+  <!-- Signal content -->
+  <article class="signal-detail">
+    <h1 class="signal-title">{signal.title}</h1>
+
+    <div class="signal-meta">
+      <span class="meta-badge meta-category">{signal.category.replace(/_/g, ' ')}</span>
+      <span class="meta-badge meta-difficulty" style={`border-color: ${difficultyColor[signal.difficulty] || 'var(--text-dim)'}`}>
+        {difficultyLabel[signal.difficulty] || signal.difficulty}
+      </span>
+      <span class="meta-badge meta-strength" title={strengthLabel[signal.demand_strength]}>
+        {strengthDots[signal.demand_strength] || '\u2022'} {strengthLabel[signal.demand_strength] || signal.demand_strength}
+      </span>
+    </div>
+
+    <p class="signal-summary">{signal.summary}</p>
+
+    {signal.builder_note && (
+      <div class="signal-builder-note">
+        <span class="note-label">builder note</span>
+        <p>{signal.builder_note}</p>
+      </div>
+    )}
+
+    <SignalDivider />
+
+    <!-- Landscape -->
+    <section class="signal-section">
+      <h2 class="section-heading">landscape ({signal.landscape.existing_solutions.length} existing solutions)</h2>
+      <p class="landscape-summary">{signal.landscape.landscape_summary}</p>
+      <div class="landscape-list">
+        {signal.landscape.existing_solutions.map((sol: any) => (
+          <div class="landscape-item">
+            <a href={sol.url} target="_blank" rel="noopener">{sol.name}</a>
+            <span class="landscape-gap">{sol.gap}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <SignalDivider />
+
+    <!-- Sources -->
+    <section class="signal-section">
+      <h2 class="section-heading">sources ({signal.sources.length})</h2>
+      <div class="sources-list">
+        {signal.sources.map((src: any) => (
+          <div class="source-item">
+            <span class="source-platform">{src.platform}</span>
+            <a href={src.url} target="_blank" rel="noopener" class="source-link">
+              {src.url.length > 60 ? src.url.substring(0, 60) + '...' : src.url}
+            </a>
+            {src.quote && <span class="source-quote">"{src.quote}"</span>}
+            {src.date && <span class="source-date">{src.date}</span>}
+          </div>
+        ))}
+      </div>
+    </section>
+
+    {signal.tags && signal.tags.length > 0 && (
+      <div class="signal-tags">
+        {signal.tags.map((tag: string) => (
+          <span class="tag">{tag}</span>
+        ))}
+      </div>
+    )}
+  </article>
+
+  <SignalDivider />
+
+  <!-- Bottom nav -->
+  <nav class="bottom-nav-bar">
+    {prev ? (
+      <a href={`/signal/s/${prev._slug}/`} class="btn btn--ghost">&larr; prev signal</a>
+    ) : (
+      <span></span>
+    )}
+    <a href={`/signal/${signal._date}/`} class="btn btn--primary">back to {formattedDate}</a>
+    {next ? (
+      <a href={`/signal/s/${next._slug}/`} class="btn btn--ghost">next signal &rarr;</a>
+    ) : (
+      <span></span>
+    )}
+  </nav>
+
+</SignalLayout>
+
+<style>
+  .page-header {
+    text-align: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .page-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .nav-arrow {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    color: var(--teal);
+    letter-spacing: 0.06em;
+    transition: color 0.2s;
+  }
+
+  .nav-arrow:hover {
+    color: var(--gold-soft);
+  }
+
+  .nav-disabled {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    color: var(--dim);
+    letter-spacing: 0.06em;
+  }
+
+  .nav-hub {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.6rem;
+    border: 1px solid var(--ghost);
+    transition: all 0.2s;
+  }
+
+  .nav-hub:hover {
+    color: var(--gold-soft);
+    border-color: var(--gold-dim);
+  }
+
+  .page-date-link {
+    font-size: 0.6rem;
+    color: var(--dim);
+  }
+
+  .page-date-link a {
+    color: var(--teal-dim);
+    transition: color 0.2s;
+  }
+
+  .page-date-link a:hover {
+    color: var(--gold-soft);
+  }
+
+  /* ── Signal detail ── */
+  .signal-detail {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .signal-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.3rem, 3vw, 1.8rem);
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+    word-break: break-word;
+  }
+
+  .signal-meta {
+    display: flex;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+  }
+
+  .meta-badge {
+    font-size: 0.48rem;
+    padding: 0.08rem 0.35rem;
+    background: var(--void);
+    color: var(--dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .meta-difficulty {
+    color: var(--teal);
+  }
+
+  .meta-strength {
+    color: var(--gold-dim);
+  }
+
+  .signal-summary {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    line-height: 1.65;
+    margin-bottom: 1rem;
+  }
+
+  .signal-builder-note {
+    background: var(--gold-glow);
+    border-left: 2px solid var(--gold-dim);
+    padding: 0.6rem 0.85rem;
+    margin-bottom: 1rem;
+  }
+
+  .note-label {
+    font-size: 0.48rem;
+    color: var(--gold-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .signal-builder-note p {
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    line-height: 1.6;
+  }
+
+  /* ── Sections ── */
+  .signal-section {
+    margin-bottom: 0.5rem;
+  }
+
+  .section-heading {
+    font-size: 0.65rem;
+    color: var(--gold-soft);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .landscape-summary {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+    font-style: italic;
+  }
+
+  .landscape-list,
+  .sources-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .landscape-item {
+    padding: 0.4rem 0;
+    border-top: 1px solid var(--elevated);
+  }
+
+  .landscape-item a {
+    font-size: 0.72rem;
+    color: var(--teal);
+    display: block;
+  }
+
+  .landscape-item a:hover {
+    color: var(--gold-soft);
+  }
+
+  .landscape-gap {
+    font-size: 0.66rem;
+    color: var(--text-dim);
+    display: block;
+    margin-top: 0.15rem;
+    line-height: 1.55;
+  }
+
+  .source-item {
+    padding: 0.4rem 0;
+    border-top: 1px solid var(--elevated);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    align-items: baseline;
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  .source-platform {
+    font-size: 0.48rem;
+    color: var(--gold-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    min-width: 40px;
+  }
+
+  .source-link {
+    font-size: 0.65rem;
+    color: var(--teal);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+    display: inline-block;
+  }
+
+  .source-quote {
+    font-size: 0.66rem;
+    color: var(--gold-dim);
+    font-style: italic;
+    display: block;
+    width: 100%;
+    line-height: 1.55;
+  }
+
+  .source-date {
+    font-size: 0.48rem;
+    color: var(--dim);
+    letter-spacing: 0.08em;
+  }
+
+  .signal-tags {
+    display: flex;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+    margin-top: 0.75rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--elevated);
+  }
+
+  .tag {
+    font-size: 0.48rem;
+    color: var(--dim);
+    padding: 0.08rem 0.3rem;
+    background: var(--void);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* ── Bottom nav ── */
+  .bottom-nav-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  @media (max-width: 600px) {
+    .bottom-nav-bar {
+      flex-direction: column;
+      align-items: stretch;
+      text-align: center;
+    }
+  }
+</style>

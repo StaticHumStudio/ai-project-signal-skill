@@ -1,0 +1,255 @@
+/* ============================================
+   Signal Design System
+   Matches studio-web tokens exactly
+   ============================================ */
+
+:root {
+  /* Tonal void hierarchy */
+  --void: #0a0a0c;
+  --void-warm: #0c0b0e;
+  --surface: #111115;
+  --surface-warm: #14131a;
+  --elevated: #1a1a22;
+
+  /* Signal palette */
+  --gold: #c8a848;
+  --gold-dim: #8a7430;
+  --gold-soft: #d4b860;
+  --gold-glow: rgba(200, 168, 72, 0.15);
+  --teal: #38b2ac;
+  --teal-dim: #1a6b66;
+  --teal-soft: #4ecdc4;
+  --teal-glow: rgba(56, 178, 172, 0.12);
+
+  /* Text hierarchy */
+  --text: #f4f0e6;
+  --text-warm: #e8e2d4;
+  --text-dim: #c5bcae;
+  --muted: #a69e90;
+  --dim: #6c655a;
+
+  /* Structural */
+  --ghost: rgba(68, 71, 72, 0.12);
+  --divider-glow: rgba(56, 178, 172, 0.25);
+
+  /* Typography */
+  --font-mono: 'IBM Plex Mono', monospace;
+  --font-display: 'Oxanium', sans-serif;
+
+  /* Layout */
+  --content-max: 1080px;
+
+  /* Spacing */
+  --space-xs: 0.35rem;
+  --space-sm: 0.6rem;
+  --space-md: 0.85rem;
+  --space-lg: 1.25rem;
+  --space-xl: 1.75rem;
+}
+
+/* Reset */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 19.5px;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background: var(--void);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Scanline overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(0, 0, 0, 0.012) 3px,
+    rgba(0, 0, 0, 0.012) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Links */
+a {
+  color: var(--teal);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: var(--gold-soft);
+}
+
+/* Selection */
+::selection {
+  background: rgba(200, 168, 72, 0.2);
+  color: var(--text);
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--text);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--void); }
+::-webkit-scrollbar-thumb { background: var(--dim); }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-dim); }
+
+/* Main content */
+main {
+  flex: 1;
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 4rem 1.25rem 2rem;
+}
+
+/* Container */
+.container {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+/* Section backgrounds */
+.section-void { background: var(--void); }
+.section-warm { background: var(--void-warm); }
+.section-surface { background: var(--surface); }
+.section-deep { background: var(--surface-warm); }
+
+.section-inner {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--space-lg) var(--space-lg);
+}
+
+/* Section header pattern: $ heading */
+.section-header {
+  margin-bottom: var(--space-md);
+}
+
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.section-label .prompt {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--teal);
+}
+
+.section-label h2 {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--gold);
+  letter-spacing: 0.04em;
+}
+
+.section-sub {
+  color: var(--text-dim);
+  font-size: 0.72rem;
+  margin-top: 0.25rem;
+  padding-left: 1.2rem;
+}
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 0.45rem 1.2rem;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  transition: all 0.25s;
+  cursor: pointer;
+}
+
+.btn--primary {
+  background: transparent;
+  color: var(--gold-soft);
+  border: 1px solid var(--gold-dim);
+}
+
+.btn--primary:hover {
+  background: rgba(200, 168, 72, 0.06);
+  box-shadow: 0 0 20px rgba(200, 168, 72, 0.08);
+  color: var(--gold-soft);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--teal);
+  border: 1px solid var(--teal-dim);
+}
+
+.btn--ghost:hover {
+  background: rgba(56, 178, 172, 0.06);
+  color: var(--teal-soft);
+}
+
+/* Animations */
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+/* Blinking cursor */
+.cursor {
+  display: inline-block;
+  width: 6px;
+  height: 1em;
+  background: var(--teal);
+  margin-left: 3px;
+  vertical-align: text-bottom;
+  animation: blink 1s step-end infinite;
+  box-shadow: 0 0 6px var(--teal-glow);
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+  main {
+    padding: 4rem 0.75rem 2rem;
+  }
+
+  .section-inner {
+    padding: 1rem 0.75rem;
+  }
+}

@@ -1,0 +1,595 @@
+---
+import SignalLayout from '../layouts/SignalLayout.astro';
+import SignalCard from '../components/SignalCard.astro';
+import SignalDivider from '../components/SignalDivider.astro';
+import { getAllSignals, getDateEntries, getTotalSignals } from '../utils/signals';
+
+// ── Load all published signals ──
+const allSignals = getAllSignals();
+const dateEntries = getDateEntries();
+const totalSignals = getTotalSignals();
+
+const allDates = dateEntries.map(d => d.date);
+const signalsByDate: Record<string, any[]> = {};
+for (const entry of dateEntries) {
+  signalsByDate[entry.date] = entry.signals;
+}
+
+const categoryCounts: Record<string, number> = {};
+const platforms = new Set<string>();
+for (const s of allSignals) {
+  categoryCounts[s.category] = (categoryCounts[s.category] || 0) + 1;
+  for (const src of s.sources || []) {
+    if (src.platform) platforms.add(src.platform);
+  }
+}
+
+// Latest signals (from newest file)
+const latestDate = allDates[0];
+const latestSignals = latestDate ? (signalsByDate[latestDate] || []).slice(0, 5) : [];
+
+// Recent days (last 10)
+const recentDays = allDates.slice(0, 10);
+
+// Category list sorted by count
+const categories = Object.entries(categoryCounts)
+  .sort((a, b) => b[1] - a[1]);
+
+// Format date for display
+function formatDate(dateStr: string): string {
+  const d = new Date(dateStr + 'T12:00:00');
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+function formatDateShort(dateStr: string): string {
+  const d = new Date(dateStr + 'T12:00:00');
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "name": "Signal by Static Hum Studio",
+      "url": "https://statichum.studio/signal/",
+      "description": "A free, daily-updated library of real software demand signals for developers deciding what to code next.",
+      "potentialAction": {
+        "@type": "ReadAction",
+        "target": "https://statichum.studio/signal/",
+      },
+      "keywords": [
+        "what should I code",
+        "coding projects",
+        "project ideas for developers",
+        "software ideas with demand evidence",
+      ],
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What should I code next?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Start with a real demand signal: a concrete pain point people are actively discussing. Signal curates those requests daily, adds evidence, and highlights where existing tools fall short.",
+          },
+        },
+        {
+          "@type": "Question",
+          "name": "How do I find coding projects that people actually want?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Look for repeated requests across communities, then choose projects where demand is clear but current solutions are weak. Signal tracks both demand evidence and competition for each opportunity.",
+          },
+        },
+      ],
+    },
+  ],
+};
+
+---
+
+<SignalLayout
+  title="What Should I Code? Real Coding Projects with Demand Signals | Signal"
+  description="Not random coding project ideas. Signal helps developers decide what to code next using real demand from Reddit, Hacker News, app stores, and 40+ communities."
+  canonical="https://statichum.studio/signal/"
+  signalCount={totalSignals}
+  jsonLd={jsonLd}
+>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-ambient"></div>
+    <p class="hero-overline">demand intelligence for independent builders</p>
+    <h1 class="hero-h1">What should I code?<br />Start with real demand.<span class="cursor"></span></h1>
+    <p class="hero-subtitle">
+      A free library of validated coding projects sourced from communities across the internet.
+      Each signal includes demand evidence, competitive landscape analysis, and builder notes.
+    </p>
+    <div class="hero-stats">
+      <div class="stat">
+        <span class="stat-number">{totalSignals}</span>
+        <span class="stat-label">signals indexed</span>
+      </div>
+      <div class="stat">
+        <span class="stat-number">10</span>
+        <span class="stat-label">new daily</span>
+      </div>
+      <div class="stat">
+        <span class="stat-number">{platforms.size}+</span>
+        <span class="stat-label">source communities</span>
+      </div>
+    </div>
+  </section>
+
+  <SignalDivider />
+
+  <!-- Browse by Category -->
+  {categories.length > 0 && (
+    <section class="section-void">
+      <header class="section-header">
+        <div class="section-label">
+          <span class="prompt">$</span>
+          <h2>browse by category</h2>
+        </div>
+      </header>
+      <div class="category-grid">
+        {categories.map(([cat, count]) => (
+          <a href={`/signal/category/${cat}/`} class="category-card">
+            <span class="category-name">{cat.replace(/_/g, ' ')}</span>
+            <span class="category-count">{count} signals</span>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <SignalDivider />
+
+  <!-- Latest Signals -->
+  {latestSignals.length > 0 && (
+    <section class="section-void">
+      <header class="section-header">
+        <div class="section-label">
+          <span class="prompt">$</span>
+          <h2>latest signals</h2>
+        </div>
+        <p class="section-sub">from {formatDate(latestDate)}</p>
+      </header>
+      <div class="signal-list">
+        {latestSignals.map(signal => (
+          <SignalCard
+            signal={signal}
+            collapseBuilderNote={true}
+            compact={false}
+          />
+        ))}
+      </div>
+      <div class="section-cta">
+        <a href={`/signal/${latestDate}/`} class="btn btn--primary">view all {signalsByDate[latestDate]?.length || 0} signals from {formatDateShort(latestDate)}</a>
+      </div>
+    </section>
+  )}
+
+  <SignalDivider />
+
+  <!-- Recent Days -->
+  {recentDays.length > 0 && (
+    <section class="section-warm">
+      <header class="section-header">
+        <div class="section-label">
+          <span class="prompt">$</span>
+          <h2>recent days</h2>
+        </div>
+      </header>
+      <div class="days-list">
+        {recentDays.map(date => {
+          const signals = signalsByDate[date] || [];
+          const previewTitles = signals.slice(0, 3).map(s => s.title);
+          return (
+            <a href={`/signal/${date}/`} class="day-card">
+              <div class="day-card-header">
+                <span class="day-date">{formatDate(date)}</span>
+                <span class="day-count">{signals.length} signals</span>
+              </div>
+              <div class="day-previews">
+                {previewTitles.map(t => (
+                  <span class="day-preview-title">{t}</span>
+                ))}
+              </div>
+            </a>
+          );
+        })}
+      </div>
+    </section>
+  )}
+
+  <SignalDivider />
+
+  <!-- Developer Search Intent -->
+  <section class="section-warm">
+    <header class="section-header">
+      <div class="section-label">
+        <span class="prompt">$</span>
+        <h2>if you're searching “what should I code?”</h2>
+      </div>
+    </header>
+    <div class="about-content">
+      <p>
+        Most "coding projects" lists are random. Signal is different: every idea starts from a
+        real user request, complaint, or workflow pain point pulled from public communities.
+      </p>
+      <p>
+        If you want project ideas for developers that are genuinely useful, browse by category,
+        pick a signal with repeated demand, then build the smallest helpful version first.
+      </p>
+    </div>
+  </section>
+
+  <SignalDivider />
+
+  <!-- About Signal -->
+  <section class="section-void">
+    <header class="section-header">
+      <div class="section-label">
+        <span class="prompt">$</span>
+        <h2>about signal</h2>
+      </div>
+    </header>
+    <div class="about-content">
+      <p>
+        Signal is a curated feed of real software demand. Not brainstormed app ideas.
+        Not startup pitches. Actual problems people are posting about in communities across
+        the internet — Reddit, Hacker News, app store reviews, niche forums, and more.
+      </p>
+      <p>
+        Every signal includes competitive landscape analysis showing what already exists and
+        where it falls short, plus builder notes with opinionated advice on how to approach
+        the opportunity. Updated daily — quality over count, never padded.
+      </p>
+      <p>
+        Built for indie developers, solo founders, and small teams looking for validated
+        software ideas with demand evidence — not guesswork.
+      </p>
+    </div>
+  </section>
+
+  <SignalDivider />
+
+  <!-- How Signals Are Sourced -->
+  <section class="section-warm">
+    <header class="section-header">
+      <div class="section-label">
+        <span class="prompt">$</span>
+        <h2>how signals are sourced</h2>
+      </div>
+    </header>
+    <div class="process-grid">
+      <div class="process-step">
+        <span class="step-number">01</span>
+        <h3>source</h3>
+        <p>Scan 40+ communities daily — Reddit, HN, app stores, niche forums, Twitter — for people describing software they wish existed.</p>
+      </div>
+      <div class="process-step">
+        <span class="step-number">02</span>
+        <h3>filter</h3>
+        <p>Remove noise, duplicates, and vague wishes. Keep signals with specific, actionable demand and evidence of multiple people wanting the same thing.</p>
+      </div>
+      <div class="process-step">
+        <span class="step-number">03</span>
+        <h3>analyze</h3>
+        <p>Map the competitive landscape for each signal. Identify existing solutions and document exactly where they fall short.</p>
+      </div>
+      <div class="process-step">
+        <span class="step-number">04</span>
+        <h3>publish</h3>
+        <p>Package each signal with builder notes, difficulty assessment, and demand strength rating. Ship only what clears the bar — never padded to hit a number.</p>
+      </div>
+    </div>
+  </section>
+
+</SignalLayout>
+
+<style>
+  /* ── Hero ── */
+  .hero {
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    padding: 2rem 0 1rem;
+  }
+
+  .hero-ambient {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 420px;
+    height: 220px;
+    background: radial-gradient(
+      ellipse,
+      var(--gold-glow) 0%,
+      var(--teal-glow) 45%,
+      transparent 70%
+    );
+    pointer-events: none;
+    filter: blur(50px);
+    opacity: 0.6;
+  }
+
+  .hero-overline {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    color: var(--teal);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+    position: relative;
+  }
+
+  .hero-h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.7rem, 4vw, 2.6rem);
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.15;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.6rem;
+    position: relative;
+    animation: fadeUp 0.4s ease-out both;
+  }
+
+  .hero-subtitle {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    max-width: 520px;
+    margin: 0 auto 1.5rem;
+    line-height: 1.6;
+    position: relative;
+  }
+
+  @media (max-width: 700px) {
+    .hero-h1 {
+      max-width: 18ch;
+      margin-inline: auto;
+    }
+  }
+
+  .hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 2.5rem;
+    position: relative;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+  }
+
+  .stat-number {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--gold);
+  }
+
+  .stat-label {
+    font-size: 0.48rem;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  /* ── Signal list ── */
+  .signal-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .section-cta {
+    margin-top: var(--space-md);
+    text-align: center;
+  }
+
+  /* ── Days list ── */
+  .days-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .day-card {
+    display: block;
+    background: var(--surface-warm);
+    padding: 0.7rem 1rem;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .day-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, var(--teal-dim), var(--gold-dim));
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+
+  .day-card:hover {
+    background: var(--elevated);
+  }
+
+  .day-card:hover::before {
+    opacity: 1;
+  }
+
+  .day-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.3rem;
+  }
+
+  .day-date {
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .day-count {
+    font-size: 0.48rem;
+    color: var(--gold-dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .day-previews {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .day-preview-title {
+    font-size: 0.6rem;
+    color: var(--text-dim);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* ── About ── */
+  .about-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .about-content p {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+    max-width: 680px;
+  }
+
+  /* ── Process grid ── */
+  .process-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 3px;
+  }
+
+  .process-step {
+    background: var(--surface-warm);
+    padding: 0.85rem 0.75rem;
+  }
+
+  .step-number {
+    font-family: var(--font-display);
+    font-size: 0.55rem;
+    color: var(--teal-dim);
+    letter-spacing: 0.1em;
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+
+  .process-step h3 {
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--gold);
+    margin-bottom: 0.25rem;
+  }
+
+  .process-step p {
+    font-size: 0.6rem;
+    color: var(--text-dim);
+    line-height: 1.55;
+  }
+
+  /* ── Category grid ── */
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 3px;
+  }
+
+  .category-card {
+    background: var(--surface-warm);
+    padding: 0.6rem 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .category-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, var(--teal-dim), var(--gold-dim));
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+
+  .category-card:hover {
+    background: var(--elevated);
+  }
+
+  .category-card:hover::before {
+    opacity: 1;
+  }
+
+  .category-name {
+    font-family: var(--font-display);
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--text);
+    text-transform: capitalize;
+  }
+
+  .category-count {
+    font-size: 0.48rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 767px) {
+    .hero-stats {
+      gap: 1.5rem;
+    }
+
+    .process-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .category-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .process-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,69 @@
+---
+import SignalNav from '../components/SignalNav.astro';
+import SignalFooter from '../components/SignalFooter.astro';
+import '../styles/signal.css';
+
+interface Props {
+  title: string;
+  description: string;
+  canonical: string;
+  ogImage?: string;
+  jsonLd?: object;
+  signalCount?: number;
+}
+
+const {
+  title,
+  description,
+  canonical,
+  ogImage,
+  jsonLd,
+  signalCount = 0,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:type" content="website" />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Oxanium:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- RSS -->
+    <link rel="alternate" type="application/rss+xml" title="Signal RSS" href="/signal/rss.xml" />
+
+    <!-- JSON-LD -->
+    {jsonLd && (
+      <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    )}
+  </head>
+  <body>
+    <SignalNav signalCount={signalCount} />
+    <main>
+      <slot />
+    </main>
+    <SignalFooter />
+  </body>
+</html>

@@ -1,0 +1,53 @@
+---
+---
+
+<footer class="signal-footer">
+  <div class="footer-inner">
+    <span class="footer-left">Signal // Static Hum Studio</span>
+    <div class="footer-links">
+      <a href="/signal/rss.xml">RSS</a>
+      <a href="https://statichum.studio" target="_blank" rel="noopener">statichum.studio</a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .signal-footer {
+    background: var(--void);
+    border-top: 1px solid var(--ghost);
+  }
+
+  .footer-inner {
+    max-width: var(--content-max, 1080px);
+    margin: 0 auto;
+    padding: 1rem 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .footer-left {
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .footer-links a {
+    color: var(--muted);
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 0.3s;
+  }
+
+  .footer-links a:hover {
+    color: var(--gold-soft);
+  }
+</style>
