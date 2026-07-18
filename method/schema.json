@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Demand Signal",
+  "description": "One unmet-software-demand signal produced by a sourcing pass. A signals file is a JSON array of these objects.",
+  "type": "object",
+  "required": ["title", "summary", "sources", "landscape", "category", "difficulty", "demand_strength"],
+  "additionalProperties": false,
+  "properties": {
+    "title": { "type": "string" },
+    "summary": { "type": "string" },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["url", "platform"],
+        "additionalProperties": false,
+        "properties": {
+          "url": { "type": "string", "format": "uri" },
+          "platform": { "type": "string" },
+          "quote": { "type": "string" },
+          "date": { "type": "string" },
+          "engagement": { "type": "string" }
+        }
+      }
+    },
+    "landscape": {
+      "type": "object",
+      "required": ["existing_solutions", "landscape_summary"],
+      "additionalProperties": false,
+      "properties": {
+        "existing_solutions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "url", "gap"],
+            "additionalProperties": false,
+            "properties": {
+              "name": { "type": "string" },
+              "url": { "type": "string" },
+              "gap": { "type": "string" }
+            }
+          }
+        },
+        "landscape_summary": { "type": "string" }
+      }
+    },
+    "category": { "type": "string" },
+    "difficulty": {
+      "type": "string",
+      "description": "How hard this is to build. Free-form; common values: weekend_hack, weekend_project, real_project, venture_scale (or simply easy, medium, hard)."
+    },
+    "demand_strength": {
+      "type": "string",
+      "description": "How strong the evidenced demand is. Free-form; common values: early, single_request, multiple_requests, trending, building, moderate, strong."
+    },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "builder_note": { "type": "string" }
+  }
+}
