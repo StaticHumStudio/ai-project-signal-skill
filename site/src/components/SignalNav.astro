@@ -1,0 +1,130 @@
+---
+interface Props {
+  signalCount?: number;
+}
+
+const { signalCount = 0 } = Astro.props;
+---
+
+<div class="utility-bar">
+  <a href="https://statichum.studio" class="utility-home">&larr; statichum.studio</a>
+</div>
+<nav class="top-nav">
+  <div class="nav-brand">
+    <a href="/signal/" class="nav-signal-link">SIGNAL</a>
+    <span class="nav-divider">//</span>
+    <a href="https://statichum.studio" class="nav-hum-link">STATIC HUM</a>
+  </div>
+  <div class="nav-right">
+    <span class="nav-count">{signalCount} signals</span>
+    <span class="nav-dot"></span>
+  </div>
+</nav>
+
+<style>
+  .utility-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 101;
+    background: var(--void, #0a0a0c);
+    border-bottom: 1px solid var(--ghost, rgba(68, 71, 72, 0.12));
+    padding: 0.25rem 1.25rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .utility-home {
+    font-family: var(--font-mono, 'IBM Plex Mono', monospace);
+    font-size: 0.5rem;
+    color: var(--muted, #a69e90);
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .utility-home:hover {
+    color: var(--teal, #38b2ac);
+  }
+
+  .top-nav {
+    position: fixed;
+    top: 1.35rem;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(10, 10, 12, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 0.6rem 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .nav-brand {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  .nav-signal-link {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 0.65rem;
+    color: var(--gold);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .nav-signal-link:hover {
+    color: var(--gold-soft);
+  }
+
+  .nav-divider {
+    color: var(--text-dim);
+    font-size: 0.55rem;
+    font-family: var(--font-mono);
+  }
+
+  .nav-hum-link {
+    font-family: var(--font-mono);
+    font-weight: 400;
+    font-size: 0.55rem;
+    color: var(--text-dim);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .nav-hum-link:hover {
+    color: var(--gold-soft);
+  }
+
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .nav-count {
+    font-family: var(--font-mono);
+    font-size: 0.48rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .nav-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--teal);
+    box-shadow: 0 0 8px var(--teal-glow);
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+</style>

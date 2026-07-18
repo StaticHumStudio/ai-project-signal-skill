@@ -1,0 +1,218 @@
+---
+import SignalLayout from '../layouts/SignalLayout.astro';
+import SignalCard from '../components/SignalCard.astro';
+import SignalDivider from '../components/SignalDivider.astro';
+import { getDateEntries, getDatesAscending, getTotalSignals } from '../utils/signals';
+
+export function getStaticPaths() {
+  const dates = getDatesAscending();
+  const dateEntries = getDateEntries();
+  const totalSignals = getTotalSignals();
+
+  const signalsByDate: Record<string, any[]> = {};
+  for (const entry of dateEntries) {
+    signalsByDate[entry.date] = entry.signals;
+  }
+
+  return dates.map((date, index) => {
+    const prevDate = index > 0 ? dates[index - 1] : null;
+    const nextDate = index < dates.length - 1 ? dates[index + 1] : null;
+
+    return {
+      params: { date },
+      props: { signals: signalsByDate[date] || [], date, prevDate, nextDate, totalSignals },
+    };
+  });
+}
+
+const { signals, date, prevDate, nextDate, totalSignals } = Astro.props;
+
+// Format date
+const dateObj = new Date(date + 'T12:00:00');
+const formattedDate = dateObj.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+const dayOfWeek = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
+
+// SEO description from first 3 signal titles
+const descSignals = signals.slice(0, 3).map((s: any) => s.title).join(', ');
+const metaDescription = `${signals.length} curated software demand signals: ${descSignals}. With competitive landscape analysis and builder notes.`;
+
+// JSON-LD
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": `Software Demand Signals — ${formattedDate}`,
+  "datePublished": date,
+  "author": {
+    "@type": "Organization",
+    "name": "Static Hum Studio",
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Static Hum Studio",
+    "url": "https://statichum.studio",
+  },
+};
+---
+
+<SignalLayout
+  title={`Software Demand Signals — ${formattedDate} | Signal`}
+  description={metaDescription}
+  canonical={`https://statichum.studio/signal/${date}/`}
+  signalCount={totalSignals}
+  jsonLd={jsonLd}
+>
+
+  <!-- Page header -->
+  <header class="page-header">
+    <div class="page-nav">
+      {prevDate ? (
+        <a href={`/signal/${prevDate}/`} class="nav-arrow nav-prev" title="Previous day">&larr; prev</a>
+      ) : (
+        <span class="nav-arrow nav-disabled">&larr; prev</span>
+      )}
+      <a href="/signal/" class="nav-hub">hub</a>
+      {nextDate ? (
+        <a href={`/signal/${nextDate}/`} class="nav-arrow nav-next" title="Next day">next &rarr;</a>
+      ) : (
+        <span class="nav-arrow nav-disabled">next &rarr;</span>
+      )}
+    </div>
+    <h1 class="page-date">{formattedDate}</h1>
+    <div class="page-meta">
+      <span class="page-day">{dayOfWeek}</span>
+      <span class="page-count">{signals.length} signals</span>
+    </div>
+  </header>
+
+  <SignalDivider />
+
+  <!-- Signal list -->
+  <div class="signal-list">
+    {signals.map((signal: any) => (
+      <SignalCard signal={signal} collapseBuilderNote={false} />
+    ))}
+  </div>
+
+  <SignalDivider />
+
+  <!-- Bottom nav -->
+  <nav class="bottom-nav-bar">
+    {prevDate ? (
+      <a href={`/signal/${prevDate}/`} class="btn btn--ghost">&larr; {prevDate}</a>
+    ) : (
+      <span></span>
+    )}
+    <a href="/signal/" class="btn btn--primary">back to hub</a>
+    {nextDate ? (
+      <a href={`/signal/${nextDate}/`} class="btn btn--ghost">{nextDate} &rarr;</a>
+    ) : (
+      <span></span>
+    )}
+  </nav>
+
+</SignalLayout>
+
+<style>
+  .page-header {
+    text-align: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .page-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .nav-arrow {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    color: var(--teal);
+    letter-spacing: 0.06em;
+    transition: color 0.2s;
+  }
+
+  .nav-arrow:hover {
+    color: var(--gold-soft);
+  }
+
+  .nav-disabled {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    color: var(--dim);
+    letter-spacing: 0.06em;
+  }
+
+  .nav-hub {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.6rem;
+    border: 1px solid var(--ghost);
+    transition: all 0.2s;
+  }
+
+  .nav-hub:hover {
+    color: var(--gold-soft);
+    border-color: var(--gold-dim);
+  }
+
+  .page-date {
+    font-family: var(--font-display);
+    font-size: clamp(1.3rem, 3vw, 1.8rem);
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.25rem;
+  }
+
+  .page-meta {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .page-day {
+    font-size: 0.55rem;
+    color: var(--teal-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .page-count {
+    font-size: 0.48rem;
+    color: var(--gold-dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .signal-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .bottom-nav-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  @media (max-width: 600px) {
+    .bottom-nav-bar {
+      flex-direction: column;
+      align-items: stretch;
+      text-align: center;
+    }
+  }
+</style>

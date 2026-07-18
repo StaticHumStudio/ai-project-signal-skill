@@ -1,0 +1,374 @@
+---
+interface Props {
+  signal: {
+    title: string;
+    summary: string;
+    sources: Array<{
+      url: string;
+      platform: string;
+      quote?: string;
+      date?: string;
+      engagement?: string;
+    }>;
+    landscape: {
+      existing_solutions: Array<{
+        name: string;
+        url: string;
+        gap: string;
+      }>;
+      landscape_summary: string;
+    };
+    category: string;
+    difficulty: string;
+    demand_strength: string;
+    tags?: string[];
+    builder_note?: string;
+    _introduced?: string;
+  };
+  /** When true, builder note is inside a <details> element. Default: false (always visible). */
+  collapseBuilderNote?: boolean;
+  /** When true, renders as a compact preview card (for landing page). */
+  compact?: boolean;
+}
+
+import { slugify } from '../utils/slugify';
+
+const { signal, collapseBuilderNote = false, compact = false } = Astro.props;
+
+const slug = slugify(signal.title);
+const signalHref = `/signal/s/${signal._slug || slug}/`;
+
+const difficultyLabel: Record<string, string> = {
+  weekend_hack: 'weekend hack',
+  real_project: 'real project',
+  venture_scale: 'venture scale',
+};
+
+const strengthLabel: Record<string, string> = {
+  single_request: 'single request',
+  multiple_requests: 'multiple requests',
+  trending: 'trending',
+};
+
+const difficultyColor: Record<string, string> = {
+  weekend_hack: 'var(--teal)',
+  real_project: 'var(--gold)',
+  venture_scale: 'var(--text-dim)',
+};
+
+const strengthDots: Record<string, string> = {
+  single_request: '\u2022',
+  multiple_requests: '\u2022\u2022',
+  trending: '\u2022\u2022\u2022',
+};
+---
+
+<article class="signal-card" id={slug}>
+  <div class="card-header">
+    <a href={signalHref} class="card-title-link">
+      <h2 class="card-title">{signal.title}</h2>
+    </a>
+    <div class="card-meta">
+      <span class="meta-badge meta-category">{signal.category.replace(/_/g, ' ')}</span>
+      <span class="meta-badge meta-difficulty" style={`border-color: ${difficultyColor[signal.difficulty] || 'var(--text-dim)'}`}>
+        {difficultyLabel[signal.difficulty] || signal.difficulty}
+      </span>
+      <span class="meta-badge meta-strength" title={strengthLabel[signal.demand_strength]}>
+        {strengthDots[signal.demand_strength] || '\u2022'} {strengthLabel[signal.demand_strength] || signal.demand_strength}
+      </span>
+    </div>
+  </div>
+
+  <p class="card-summary">{signal.summary}</p>
+
+  {!compact && signal.builder_note && collapseBuilderNote && (
+    <details class="card-builder-note">
+      <summary class="note-toggle">builder note</summary>
+      <p>{signal.builder_note}</p>
+    </details>
+  )}
+
+  {!compact && signal.builder_note && !collapseBuilderNote && (
+    <div class="card-builder-note">
+      <span class="note-label">builder note</span>
+      <p>{signal.builder_note}</p>
+    </div>
+  )}
+
+  {!compact && (
+    <details class="card-landscape">
+      <summary>landscape ({signal.landscape.existing_solutions.length} existing solutions)</summary>
+      <p class="landscape-summary">{signal.landscape.landscape_summary}</p>
+      {signal.landscape.existing_solutions.map(sol => (
+        <div class="landscape-item">
+          <a href={sol.url} target="_blank" rel="noopener">{sol.name}</a>
+          <span class="landscape-gap">{sol.gap}</span>
+        </div>
+      ))}
+    </details>
+  )}
+
+  {!compact && (
+    <details class="card-sources">
+      <summary>sources ({signal.sources.length})</summary>
+      {signal.sources.map(src => (
+        <div class="source-item">
+          <span class="source-platform">{src.platform}</span>
+          <a href={src.url} target="_blank" rel="noopener" class="source-link">
+            {src.url.length > 60 ? src.url.substring(0, 60) + '...' : src.url}
+          </a>
+          {src.quote && <span class="source-quote">"{src.quote}"</span>}
+          {src.date && <span class="source-date">{src.date}</span>}
+        </div>
+      ))}
+    </details>
+  )}
+
+  {!compact && signal.tags && signal.tags.length > 0 && (
+    <div class="card-tags">
+      {signal.tags.map(tag => (
+        <span class="tag">{tag}</span>
+      ))}
+    </div>
+  )}
+</article>
+
+<style>
+  .signal-card {
+    background: var(--surface-warm);
+    padding: 0.85rem 1rem;
+    margin-bottom: 1px;
+    position: relative;
+    transition: background 0.25s;
+    overflow: hidden;
+  }
+
+  .signal-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, var(--teal-dim), var(--gold-dim));
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+
+  .signal-card:hover {
+    background: var(--elevated);
+  }
+
+  .signal-card:hover::before {
+    opacity: 1;
+  }
+
+  /* Scroll margin for anchor links */
+  .signal-card:target {
+    scroll-margin-top: 3rem;
+  }
+
+  .card-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .card-title-link {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .card-title-link:hover .card-title {
+    color: var(--gold-soft);
+  }
+
+  .card-title {
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.2;
+    word-break: break-word;
+    transition: color 0.2s;
+  }
+
+  .card-meta {
+    display: flex;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+  }
+
+  .meta-badge {
+    font-size: 0.48rem;
+    padding: 0.08rem 0.35rem;
+    background: var(--void);
+    color: var(--dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .meta-difficulty {
+    color: var(--teal);
+  }
+
+  .meta-strength {
+    color: var(--gold-dim);
+  }
+
+  .card-summary {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    margin-bottom: 0.6rem;
+    line-height: 1.55;
+  }
+
+  .card-builder-note {
+    background: var(--gold-glow);
+    border-left: 2px solid var(--gold-dim);
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .note-label,
+  .note-toggle {
+    font-size: 0.48rem;
+    color: var(--gold-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.2rem;
+  }
+
+  .note-toggle {
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+
+  .note-toggle:hover {
+    color: var(--gold-soft);
+  }
+
+  .card-builder-note p {
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    line-height: 1.55;
+  }
+
+  details {
+    margin-bottom: 0.4rem;
+  }
+
+  details summary {
+    font-size: 0.65rem;
+    color: var(--dim);
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.25rem 0;
+    transition: color 0.2s;
+  }
+
+  details summary:hover {
+    color: var(--gold-soft);
+  }
+
+  details[open] summary {
+    color: var(--gold-soft);
+    margin-bottom: 0.4rem;
+  }
+
+  .landscape-summary {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    margin-bottom: 0.4rem;
+    line-height: 1.55;
+    font-style: italic;
+  }
+
+  .landscape-item {
+    padding: 0.3rem 0;
+    border-top: 1px solid var(--elevated);
+  }
+
+  .landscape-item a {
+    font-size: 0.72rem;
+    color: var(--teal);
+    display: block;
+  }
+
+  .landscape-item a:hover {
+    color: var(--gold-soft);
+  }
+
+  .landscape-gap {
+    font-size: 0.66rem;
+    color: var(--text-dim);
+    display: block;
+    margin-top: 0.15rem;
+    line-height: 1.5;
+  }
+
+  .source-item {
+    padding: 0.3rem 0;
+    border-top: 1px solid var(--elevated);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    align-items: baseline;
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  .source-platform {
+    font-size: 0.48rem;
+    color: var(--gold-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    min-width: 40px;
+  }
+
+  .source-link {
+    font-size: 0.65rem;
+    color: var(--teal);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+    display: inline-block;
+  }
+
+  .source-quote {
+    font-size: 0.66rem;
+    color: var(--gold-dim);
+    font-style: italic;
+    display: block;
+    width: 100%;
+    line-height: 1.5;
+  }
+
+  .source-date {
+    font-size: 0.48rem;
+    color: var(--dim);
+    letter-spacing: 0.08em;
+  }
+
+  .card-tags {
+    display: flex;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+    margin-top: 0.4rem;
+    padding-top: 0.4rem;
+    border-top: 1px solid var(--elevated);
+  }
+
+  .tag {
+    font-size: 0.48rem;
+    color: var(--dim);
+    padding: 0.08rem 0.3rem;
+    background: var(--void);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+</style>
