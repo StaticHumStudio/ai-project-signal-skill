@@ -61,8 +61,20 @@ matching `method/schema.json`.
 The site is a static build — `cd site && npm run build` emits `dist/`, which
 you can host on any static host (Netlify, Vercel, Cloudflare Pages, GitHub
 Pages, or your own server). No deploy workflow is bundled; wire up whichever
-host you prefer. If you fork this, set `site` in `site/astro.config.mjs` to
-your own domain.
+host you prefer.
+
+Two things to adjust when you fork:
+
+- **`site`** in `site/astro.config.mjs` — set it to your own domain. The
+  canonical and Open Graph URLs are derived from it.
+- **`base`** is `/signal`, and the site's internal links are rooted there, so
+  the built `dist/` must be served under a `/signal/` path (e.g.
+  `yourdomain.com/signal/`). To serve at the domain root instead, change
+  `base` to `/` **and** update the hard-coded `/signal/...` links in
+  `site/src/` together.
+
+The example site also carries Static Hum branding (nav, footer, and the JSON-LD
+publisher name) — swap it for your own.
 
 ## How we ran it in production
 

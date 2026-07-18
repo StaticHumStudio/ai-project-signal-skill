@@ -2,6 +2,7 @@
 import SignalLayout from '../../layouts/SignalLayout.astro';
 import SignalDivider from '../../components/SignalDivider.astro';
 import { getAllSignals, getTotalSignals } from '../../utils/signals';
+import { safeUrl } from '../../utils/safeUrl';
 
 export function getStaticPaths() {
   const allSignals = getAllSignals();
@@ -33,6 +34,8 @@ const metaDescription = signal.summary.length > 155
   ? signal.summary.slice(0, 152) + '...'
   : signal.summary;
 
+const publisherUrl = Astro.site ? Astro.site.origin : Astro.url.origin;
+
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Article",
@@ -45,7 +48,7 @@ const jsonLd = {
   "publisher": {
     "@type": "Organization",
     "name": "Static Hum Studio",
-    "url": "https://statichum.studio",
+    "url": publisherUrl,
   },
 };
 
@@ -78,7 +81,6 @@ const strengthDots: Record<string, string> = {
 <SignalLayout
   title={`${signal.title} | Signal`}
   description={metaDescription}
-  canonical={`https://statichum.studio/signal/s/${signal._slug}/`}
   signalCount={totalSignals}
   jsonLd={jsonLd}
 >
@@ -137,7 +139,7 @@ const strengthDots: Record<string, string> = {
       <div class="landscape-list">
         {signal.landscape.existing_solutions.map((sol: any) => (
           <div class="landscape-item">
-            <a href={sol.url} target="_blank" rel="noopener">{sol.name}</a>
+            <a href={safeUrl(sol.url)} target="_blank" rel="noopener">{sol.name}</a>
             <span class="landscape-gap">{sol.gap}</span>
           </div>
         ))}
@@ -153,7 +155,7 @@ const strengthDots: Record<string, string> = {
         {signal.sources.map((src: any) => (
           <div class="source-item">
             <span class="source-platform">{src.platform}</span>
-            <a href={src.url} target="_blank" rel="noopener" class="source-link">
+            <a href={safeUrl(src.url)} target="_blank" rel="noopener" class="source-link">
               {src.url.length > 60 ? src.url.substring(0, 60) + '...' : src.url}
             </a>
             {src.quote && <span class="source-quote">"{src.quote}"</span>}

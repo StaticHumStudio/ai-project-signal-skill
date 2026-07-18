@@ -46,17 +46,19 @@ function formatDateShort(dateStr: string): string {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
+const siteHome = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : Astro.url.pathname;
+
 const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
     {
       "@type": "WebSite",
       "name": "Signal by Static Hum Studio",
-      "url": "https://statichum.studio/signal/",
+      "url": siteHome,
       "description": "A free, daily-updated library of real software demand signals for developers deciding what to code next.",
       "potentialAction": {
         "@type": "ReadAction",
-        "target": "https://statichum.studio/signal/",
+        "target": siteHome,
       },
       "keywords": [
         "what should I code",
@@ -94,7 +96,6 @@ const jsonLd = {
 <SignalLayout
   title="What Should I Code? Real Coding Projects with Demand Signals | Signal"
   description="Not random coding project ideas. Signal helps developers decide what to code next using real demand from Reddit, Hacker News, app stores, and 40+ communities."
-  canonical="https://statichum.studio/signal/"
   signalCount={totalSignals}
   jsonLd={jsonLd}
 >

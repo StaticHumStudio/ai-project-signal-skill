@@ -1,4 +1,6 @@
 ---
+import { safeUrl } from '../utils/safeUrl';
+
 interface Props {
   signal: {
     title: string;
@@ -101,7 +103,7 @@ const strengthDots: Record<string, string> = {
       <p class="landscape-summary">{signal.landscape.landscape_summary}</p>
       {signal.landscape.existing_solutions.map(sol => (
         <div class="landscape-item">
-          <a href={sol.url} target="_blank" rel="noopener">{sol.name}</a>
+          <a href={safeUrl(sol.url)} target="_blank" rel="noopener">{sol.name}</a>
           <span class="landscape-gap">{sol.gap}</span>
         </div>
       ))}
@@ -114,7 +116,7 @@ const strengthDots: Record<string, string> = {
       {signal.sources.map(src => (
         <div class="source-item">
           <span class="source-platform">{src.platform}</span>
-          <a href={src.url} target="_blank" rel="noopener" class="source-link">
+          <a href={safeUrl(src.url)} target="_blank" rel="noopener" class="source-link">
             {src.url.length > 60 ? src.url.substring(0, 60) + '...' : src.url}
           </a>
           {src.quote && <span class="source-quote">"{src.quote}"</span>}

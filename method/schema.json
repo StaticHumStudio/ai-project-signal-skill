@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Demand Signal",
-  "description": "One unmet-software-demand signal produced by a sourcing pass. A signals file is a JSON array of these objects.",
+  "description": "One unmet-software-demand signal produced by a sourcing pass. A signals file is a JSON array of these objects. Within `sources`, only `url` and `platform` are strictly required, but `quote`, `date`, and `engagement` are strongly recommended — they are what make a signal verifiable (see method/RUBRIC.md).",
   "type": "object",
   "required": ["title", "summary", "sources", "landscape", "category", "difficulty", "demand_strength"],
   "additionalProperties": false,
