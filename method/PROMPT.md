@@ -7,6 +7,10 @@ Paste this whole file into any assistant that can search the web and open pages
 and returns the result in its reply — there is no file to write and no repo to
 read.
 
+> **Don't want to set anything up?** Paste [`GUIDED.md`](./GUIDED.md) instead —
+> it interviews you in plain language and does all of the configuring below for
+> you. This file (`PROMPT.md`) is for when you'd rather drive it by hand.
+
 Three ways to use it, from least to most editing:
 
 1. **Paste and run as-is** — you get an open sweep for unmet *software* demand.
