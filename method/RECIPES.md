@@ -20,6 +20,10 @@ The output schema (`schema.json`) also carries over unchanged; you just read a
 couple of fields differently, noted per recipe. `category`, `difficulty`, and
 `demand_strength` are free-form strings, so reinterpret them however fits.
 
+Want to see the finished product before you edit anything?
+[`EXAMPLE.md`](./EXAMPLE.md) is the **physical products** recipe below, already
+assembled into a complete, paste-and-run prompt.
+
 ---
 
 ## Recipe: content gaps — "what should I make?"
@@ -50,6 +54,7 @@ paywalled). `difficulty` ≈ effort to produce (`quick_explainer` →
 ## Recipe: physical products — "what should I put on the shelf?"
 
 **Hunting:** tangible products people wish existed, or wish worked differently.
+*(This recipe is assembled end-to-end in [`EXAMPLE.md`](./EXAMPLE.md).)*
 
 **Replace the opening paragraph with:**
 > You are a product-gap researcher for physical goods. Your job is to find real,
