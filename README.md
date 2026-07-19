@@ -51,10 +51,12 @@ template: set a `FOCUS`, run an open software sweep, or retarget it to anything
 using [`RECIPES.md`](./method/RECIPES.md).
 [`method/EXAMPLE.md`](./method/EXAMPLE.md) is a finished one.
 
-Either path returns the same thing: one research pass, a JSON array of signals
-matching [`method/schema.json`](./method/schema.json), and a skimmable summary.
-No account, no pipeline, no repo required — an afternoon of research in a couple
-of minutes.
+Either path returns the same thing: one research pass, and the signals in
+whatever form you want — a readable rundown, a **Markdown** file, a standalone
+**HTML** page, or the raw **JSON** (matching
+[`method/schema.json`](./method/schema.json)) that feeds the example site. Don't
+want to build a site? Just ask for the `.md` or `.html`. No account, no
+pipeline, no repo required — an afternoon of research in a couple of minutes.
 
 ## It's not really about software
 
