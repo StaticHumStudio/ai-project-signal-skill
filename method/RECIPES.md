@@ -1,5 +1,9 @@
 # Recipes: point it at something other than software
 
+*You don't have to do any of this by hand — [`GUIDED.md`](./GUIDED.md)
+interviews you and configures the retarget for you. This file is for driving it
+yourself, or for understanding what the guided prompt is doing under the hood.*
+
 `PROMPT.md` ships tuned for unmet *software* demand, but the engine underneath
 doesn't care. To aim it somewhere else you change **two things** at the top of
 `PROMPT.md` and leave the rest alone:

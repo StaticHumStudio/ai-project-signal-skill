@@ -36,18 +36,25 @@ is not "ongoing." A date you didn't open the page and verify is not a fact.
 Every one of those rules was earned by getting it wrong first — they live in
 [`method/RUBRIC.md`](./method/RUBRIC.md).
 
-## Use it in about ten seconds
+## Use it
 
-1. Copy [`method/PROMPT.md`](./method/PROMPT.md) into any assistant that can
-   search the web and open pages — Claude, ChatGPT, Gemini, take your pick.
-2. Optionally fill in the `FOCUS` / `EXCLUDE` block at the top of the prompt (a
-   theme to lean into; signals you already know about) — or leave it blank.
-3. Run it. One pass, one JSON array of signals matching
-   [`method/schema.json`](./method/schema.json), and a plain-English summary
-   underneath so you can skim.
+**The easy way — let it interview you.** Paste
+[`method/GUIDED.md`](./method/GUIDED.md) into your assistant (Claude, ChatGPT,
+Gemini — anything that can search the web and open pages). It asks you a few
+plain-language questions about what you're hunting, works out the rest itself —
+the angle, the communities, the exact searches — and then goes and does the
+research. You configure nothing.
 
-No account, no pipeline, no repo required. Just a prompt doing an afternoon of
-research in a couple of minutes.
+**The manual way — if you'd rather drive.**
+[`method/PROMPT.md`](./method/PROMPT.md) is the same engine as a fill-in-and-swap
+template: set a `FOCUS`, run an open software sweep, or retarget it to anything
+using [`RECIPES.md`](./method/RECIPES.md).
+[`method/EXAMPLE.md`](./method/EXAMPLE.md) is a finished one.
+
+Either path returns the same thing: one research pass, a JSON array of signals
+matching [`method/schema.json`](./method/schema.json), and a skimmable summary.
+No account, no pipeline, no repo required — an afternoon of research in a couple
+of minutes.
 
 ## It's not really about software
 
@@ -82,7 +89,9 @@ way to turn scattered human longing into a verified, evidenced shortlist.*
 [`method/RECIPES.md`](./method/RECIPES.md) has the exact swaps for each of the
 above — copy one, drop it into `PROMPT.md`'s two marked swap points, and go.
 Want to see one already done? [`method/EXAMPLE.md`](./method/EXAMPLE.md) is a
-complete, retargeted prompt (physical products) you can paste and run as-is.
+complete, retargeted prompt (physical products) you can paste and run as-is. Or
+don't lift a finger: tell the [guided prompt](./method/GUIDED.md) what you're
+after and it does the retarget for you.
 
 ## Run the example site
 
@@ -143,9 +152,10 @@ example of how to automate the thing:
 ## Repository layout
 
 ```
-method/       The give-away: PROMPT.md (the portable prompt), RUBRIC.md (the
-              rules), schema.json (the output shape), RECIPES.md (swaps for
-              non-software hunts), and EXAMPLE.md (a finished, retargeted prompt)
+method/       The give-away. Start with GUIDED.md — it interviews you and
+              configures itself. PROMPT.md is the manual engine; RUBRIC.md the
+              rules; schema.json the output shape; RECIPES.md the non-software
+              swaps; EXAMPLE.md a finished, retargeted prompt.
 reference/    How Signal ran in production (documentation)
 site/         Runnable Astro example front-end (one synthetic signal)
 ```
