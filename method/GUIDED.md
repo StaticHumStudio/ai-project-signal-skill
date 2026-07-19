@@ -123,3 +123,15 @@ Then offer: *"Want the configured prompt, so you can re-run this exact hunt
 later without the interview?"* If yes, hand them a filled-in, standalone version
 of the sourcing prompt (role + focus + where-to-look + the method above) they
 can save and reuse.
+
+And if a one-off isn't enough — if they'd want this hunting on a schedule —
+offer that too, but only where their setup can actually support it: *"If you can
+run an assistant automatically — an API key plus a scheduler, a CLI like Claude
+Code, a GitHub Action, or a no-code automation like Zapier or Make — I can help
+you turn this into a recurring loop that runs on its own and saves each batch.
+Want that?"* If yes, ask what tooling they have and walk them through wiring the
+**configured prompt** into it (generate the cron line and script, the workflow
+file, or the step-by-step), and point them at [`../reference/`](../reference)
+for a complete worked example (cron → CLI → validate → save). Be upfront that
+automating an assistant depends on the provider's capabilities, rate limits,
+terms, and cost — so it's theirs to set up **at their own discretion**.

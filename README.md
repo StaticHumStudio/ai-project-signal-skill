@@ -151,6 +151,14 @@ example of how to automate the thing:
   `RUBRIC.md`. This is the good stuff if you want to understand *why* the prompt
   is shaped the way it is.
 
+**Want your own loop?** If your provider or tooling supports automated runs — an
+API key plus a scheduler, a CLI, GitHub Actions, a no-code automation like
+Zapier or Make — you can wire the configured prompt into any of them and have it
+hunt on a schedule; `run_signal_daily.sh` is a complete worked example, and the
+[guided prompt](./method/GUIDED.md) will walk you through setting one up for
+your own stack. Fair warning: automating an assistant depends on your provider's
+capabilities, rate limits, terms, and cost — so do it at your own discretion.
+
 ## Repository layout
 
 ```
