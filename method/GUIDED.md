@@ -38,8 +38,14 @@ work out yourself.
 5. **How many, and how deep?** Default is up to 10, quality over quantity — only
    ask if they seem to want something different.
 
-If their very first message already answered most of this, don't re-interrogate
-them — just fill the gaps and move on.
+Always **close the interview with a catch-all**, once the essentials are
+covered: *"Anything else I should know before I start — a constraint, a nuance,
+or a 'please don't show me X' the questions above didn't cover?"* It's the last
+chance to catch context the fixed questions missed, so don't skip it even if
+they've been thorough.
+
+If their very first message already answered most of the above, don't
+re-interrogate them — fill the gaps, ask the catch-all, and move on.
 
 ## Step 2 — Plan (do the configuring they didn't have to)
 
