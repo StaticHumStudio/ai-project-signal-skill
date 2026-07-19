@@ -40,8 +40,8 @@ Every one of those rules was earned by getting it wrong first — they live in
 
 1. Copy [`method/PROMPT.md`](./method/PROMPT.md) into any assistant that can
    search the web and open pages — Claude, ChatGPT, Gemini, take your pick.
-2. Optionally give it a `FOCUS` (a theme to lean into) and/or an `EXCLUDE` list
-   (things you already know about, so it stops re-finding them).
+2. Optionally fill in the `FOCUS` / `EXCLUDE` block at the top of the prompt (a
+   theme to lean into; signals you already know about) — or leave it blank.
 3. Run it. One pass, one JSON array of signals matching
    [`method/schema.json`](./method/schema.json), and a plain-English summary
    underneath so you can skim.
@@ -80,7 +80,9 @@ prompt:
 The transferable thing here was never "software ideas." It's *a disciplined
 way to turn scattered human longing into a verified, evidenced shortlist.*
 [`method/RECIPES.md`](./method/RECIPES.md) has the exact swaps for each of the
-above — copy one, paste it over the top of `PROMPT.md`, and go.
+above — copy one, drop it into `PROMPT.md`'s two marked swap points, and go.
+Want to see one already done? [`method/EXAMPLE.md`](./method/EXAMPLE.md) is a
+complete, retargeted prompt (physical products) you can paste and run as-is.
 
 ## Run the example site
 
@@ -141,8 +143,9 @@ example of how to automate the thing:
 ## Repository layout
 
 ```
-method/       The give-away: the portable prompt, the rubric, the schema,
-              and RECIPES.md for pointing it at non-software hunts
+method/       The give-away: PROMPT.md (the portable prompt), RUBRIC.md (the
+              rules), schema.json (the output shape), RECIPES.md (swaps for
+              non-software hunts), and EXAMPLE.md (a finished, retargeted prompt)
 reference/    How Signal ran in production (documentation)
 site/         Runnable Astro example front-end (one synthetic signal)
 ```

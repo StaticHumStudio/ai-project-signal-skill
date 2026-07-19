@@ -1,62 +1,75 @@
 # Demand Signal Sourcing
 
+## How to use this file
+
+Paste this whole file into any assistant that can search the web and open pages
+(Claude, ChatGPT, Gemini, or similar) and run it. It does **one research pass**
+and returns the result in its reply — there is no file to write and no repo to
+read.
+
+Three ways to use it, from least to most editing:
+
+1. **Paste and run as-is** — you get an open sweep for unmet *software* demand.
+2. **Steer it** — fill in the `FOCUS` / `EXCLUDE` block below before you paste.
+   Both are optional; blank means "open sweep, no exclusions."
+3. **Retarget it** to something non-software — content gaps, physical products,
+   local business, competitor intel, books, and so on — by replacing the **two
+   marked swap points** below (the *Role* section, and Phase 1's *Where to look*
+   list). Nothing else changes. [`RECIPES.md`](./RECIPES.md) has the exact
+   drop-in text for each, and [`EXAMPLE.md`](./EXAMPLE.md) is a complete,
+   retargeted prompt you can paste and run right now.
+
+Everything from **`## Method`** onward is the discipline that makes the results
+trustworthy — leave it exactly as-is unless a recipe tells you to edit Phase 1.
+And hold the whole run to the quality bar in [`RUBRIC.md`](./RUBRIC.md); it is
+what separates a real signal from a plausible-sounding guess.
+
+## Set your inputs (optional)
+
+Fill in these two lines before you paste — or leave them blank:
+
+```text
+FOCUS:
+EXCLUDE:
+```
+
+- **FOCUS** — a category or theme to bias toward, e.g. `developer tools`,
+  `privacy / local-first`, `parenting`, `Android apps`. Blank = an open sweep
+  across all categories: widest net, favor serendipity and cross-category
+  patterns. Across repeated passes you can rotate focus instead of repeating
+  yourself — mobile/consumer, then dev tools / CLIs / infra, then SaaS / B2B /
+  workflow automation, then privacy / local-first / self-hosted, then a fully
+  open sweep, then niche communities (health, parenting, cooking, hobbies,
+  accessibility).
+- **EXCLUDE** — titles or summaries of signals you already know about, so this
+  pass doesn't resurface them even if phrased differently. Blank = no
+  exclusions. You can also vary *where* you look from pass to pass to avoid
+  tunnel vision (Reddit-heavy one time; Hacker News + Indie Hackers another;
+  app-store reviews + Bluesky another; Product Hunt + niche forums another).
+
+## Role — swap point 1 of 2
+
+*The default below hunts unmet software demand. To hunt something else, replace
+this whole section with a role from [`RECIPES.md`](./RECIPES.md).*
+
 You are a demand signal researcher for the software industry. Your job is to
 find real, actionable evidence of unmet software demand by mining online
 communities where real users express frustration, wishes, and unmet needs —
 then package each one as a structured "signal" a builder can act on.
 
-This prompt is self-contained and provider-agnostic. Paste it into any
-assistant that can search the web and open pages (Claude, ChatGPT, Gemini, or
-similar). It performs **one independent sourcing pass** and returns the result
-in its reply. There is no file to write and no repository to read.
-
-Hold yourself to the quality bar in [`RUBRIC.md`](./RUBRIC.md). It is not
-optional — it is what separates a real signal from a plausible-sounding guess.
-
-Hunting something other than software? The same method retargets to content
-gaps, physical products, local business, competitor intel, and more — see
-[`RECIPES.md`](./RECIPES.md) for drop-in swaps.
-
-## How to run this
-
-1. (Optional) Set a `FOCUS` — a category or theme to bias toward. Leave it
-   empty for an open sweep across all categories.
-2. (Optional) Paste an `EXCLUDE` list — titles or summaries of signals you
-   already know about, so this pass doesn't resurface them.
-3. Run the pass. Work through the Method below in order. Do not skip phases.
-4. Read the Output section and return the results in your reply.
-
-## Inputs (optional)
-
-- **`FOCUS`**: a category or theme, e.g. `developer tools`, `privacy /
-  local-first`, `parenting`, `Android apps`. Default: open sweep — pull demand
-  from any category, cast the widest net, favor serendipity and cross-category
-  patterns.
-
-  If you want structure across repeated passes, you can rotate focus rather
-  than repeat yourself — for example: mobile/consumer, then developer tools /
-  CLIs / infra, then SaaS / B2B / workflow automation, then privacy /
-  local-first / self-hosted, then a fully open sweep, then niche communities
-  (health, parenting, cooking, hobbies, accessibility). This is a suggestion,
-  not a requirement.
-
-- **`EXCLUDE`**: a list of already-known signal titles/summaries. Do not output
-  any signal that covers the same demand as an entry here, even if phrased
-  differently. Default: none — skip dedup if no list is provided.
-
-You can also vary where you look from pass to pass to avoid tunnel vision —
-Reddit-heavy one time, Hacker News + Indie Hackers another, app-store reviews +
-Twitter/Bluesky another, Product Hunt + niche forums + Fediverse another.
-
 ## Method
 
 Run all phases in order. Each builds on the last.
 
-### Phase 1 — Thread discovery (web search)
+### Phase 1 — Thread discovery (web search) · swap point 2 of 2
 
 Using your web-search tool, run 8–15 searches aimed at **specific threads**
 where real users discuss unmet needs. You want raw community discussion, NOT
 listicle articles and NOT "top app ideas" SEO content.
+
+*To retarget: replace the query patterns and community list below with your
+domain's from [`RECIPES.md`](./RECIPES.md). The intent — hunt real threads, not
+listicles — stays the same.*
 
 Query patterns that work (substitute your focus keyword):
 
