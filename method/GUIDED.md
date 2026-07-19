@@ -37,6 +37,10 @@ work out yourself.
    and don't want repeated. ("Nothing" is a fine answer.)
 5. **How many, and how deep?** Default is up to 10, quality over quantity — only
    ask if they seem to want something different.
+6. **How do you want the results?** A readable rundown right here in the chat
+   (the default), a **Markdown file** to save, a **standalone HTML page** you
+   can open in a browser, or the **raw JSON** (for feeding a site or your own
+   tooling). No wrong answer — most people just want the rundown.
 
 Always **close the interview with a catch-all**, once the essentials are
 covered: *"Anything else I should know before I start — a constraint, a nuance,
@@ -61,8 +65,8 @@ From their answers, **you** build the setup:
 
 Then reflect the plan back in a few lines — *"I'll hunt **X** for **[who]**,
 mainly across **[these places]**, focusing on **[focus]**, skipping
-**[exclude]**. Say 'go' or tweak it."* — and wait for their go before spending
-searches.
+**[exclude]**, delivered as **[format]**. Say 'go' or tweak it."* — and wait for
+their go before spending searches.
 
 ## Step 3 — Hunt (the disciplined part — do not cut corners)
 
@@ -92,15 +96,28 @@ Two strong signals beat five shaky ones.
 
 ## Step 4 — Deliver
 
-Return two things in your reply:
+Under the hood you always produce the same verified signals — up to 10 matching
+[`schema.json`](./schema.json) (`title`, `summary`, `sources` with real
+`url`/`quote`/`date`, `landscape` = existing solutions + the specific gap,
+`category`, `difficulty`, `demand_strength`, `builder_note`; the last three are
+free-form). **How you present them is the output format they chose:**
 
-1. A **JSON array** of up to 10 signal objects matching
-   [`schema.json`](./schema.json): `title`, `summary`, `sources` (each with a
-   real `url`, `quote`, and `date`), `landscape` (existing solutions + the
-   specific gap), `category`, `difficulty`, `demand_strength`, and a
-   `builder_note`. `category` / `difficulty` / `demand_strength` are free-form —
-   use whatever vocabulary fits what you actually hunted.
-2. A short, skimmable summary — one line per signal.
+- **Readable rundown (default)** — a clean, skimmable writeup in your reply: a
+  one-line intro, then each signal as a short block (what it is; why it's real,
+  with the best quote + link; what already exists and the gap; the builder's
+  note). No JSON unless they ask.
+- **Markdown file** — the same writeup as a complete `.md` document they can
+  save: a title, a section per signal with linked sources, landscape, and
+  builder's note. Append the raw JSON in a fenced code block at the end so it
+  can still feed a site.
+- **HTML page** — a single self-contained `.html` file (inline CSS, no external
+  requests, clean and readable) rendering the same report, so they can just open
+  it in a browser. No build step.
+- **Raw JSON** — the JSON array matching `schema.json`, plus a
+  one-line-per-signal summary underneath.
+
+If they picked anything other than JSON, offer it anyway: *"want the raw JSON
+too, to drop into the example site or your own tooling?"*
 
 Then offer: *"Want the configured prompt, so you can re-run this exact hunt
 later without the interview?"* If yes, hand them a filled-in, standalone version

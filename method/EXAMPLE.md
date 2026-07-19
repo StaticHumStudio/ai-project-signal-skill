@@ -18,6 +18,7 @@ software to physical goods. The Method discipline is otherwise identical.*
 ```text
 FOCUS: kitchen and cooking gear
 EXCLUDE:
+OUTPUT: markdown
 ```
 
 ## Role
@@ -98,13 +99,13 @@ two strong signals than five mixed ones.
 
 ## Output
 
-Return the results **in your reply** in two parts:
-
-1. A JSON array of up to 10 signal objects, each matching the shape below (it's
-   [`schema.json`](./schema.json), with the free-form fields read for physical
-   goods). Quality beats count — if you only found 4 strong signals, return 4.
-2. A short human-readable summary beneath the JSON — a one-line takeaway per
-   signal so the reader can skim.
+`OUTPUT` here is `markdown`, so deliver a complete, saveable `.md` report — a
+title, then one section per signal (what it is; why it's real, with a linked
+quote; the existing options and the specific gap; and the builder's note) — and
+append the raw JSON in a fenced code block at the end so it can still feed a
+site. Each signal is built to the shape below (it's [`schema.json`](./schema.json),
+free-form fields read for physical goods). Quality beats count — if you only
+found 4 strong signals, return 4.
 
 ```json
 {
