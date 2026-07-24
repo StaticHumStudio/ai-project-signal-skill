@@ -101,9 +101,12 @@ after and it does the retarget for you.
 browsable feed. It ships with exactly **one synthetic example signal** so it
 renders out of the box — there is no real signal data in this repo.
 
+You need Node.js 22.12.0 or newer and npm 9.6.5 or newer. If you use `nvm`,
+`site/.nvmrc` selects the supported Node release line.
+
 ```bash
 cd site
-npm install
+npm ci
 npm run dev
 ```
 
@@ -120,6 +123,13 @@ Validate a batch before building:
 
 ```bash
 node reference/validate-staging.mjs site/content/published/2026-07-18.json --strict
+```
+
+Run every test, validate the bundled fixture, and build the site:
+
+```bash
+cd site
+npm run check
 ```
 
 ## Deploy
