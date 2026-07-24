@@ -2,7 +2,12 @@
 import SignalLayout from '../layouts/SignalLayout.astro';
 import SignalCard from '../components/SignalCard.astro';
 import SignalDivider from '../components/SignalDivider.astro';
-import { getAllSignals, getDateEntries, getTotalSignals } from '../utils/signals';
+import {
+  getAllSignals,
+  getCategoryEntries,
+  getDateEntries,
+  getTotalSignals,
+} from '../utils/signals';
 
 // ── Load all published signals ──
 const allSignals = getAllSignals();
@@ -15,10 +20,10 @@ for (const entry of dateEntries) {
   signalsByDate[entry.date] = entry.signals;
 }
 
-const categoryCounts: Record<string, number> = {};
+const categoryEntries = getCategoryEntries()
+  .sort((a, b) => b.signals.length - a.signals.length);
 const platforms = new Set<string>();
 for (const s of allSignals) {
-  categoryCounts[s.category] = (categoryCounts[s.category] || 0) + 1;
   for (const src of s.sources || []) {
     if (src.platform) platforms.add(src.platform);
   }
@@ -30,10 +35,6 @@ const latestSignals = latestDate ? (signalsByDate[latestDate] || []).slice(0, 5)
 
 // Recent days (last 10)
 const recentDays = allDates.slice(0, 10);
-
-// Category list sorted by count
-const categories = Object.entries(categoryCounts)
-  .sort((a, b) => b[1] - a[1]);
 
 // Format date for display
 function formatDate(dateStr: string): string {
@@ -128,7 +129,7 @@ const jsonLd = {
   <SignalDivider />
 
   <!-- Browse by Category -->
-  {categories.length > 0 && (
+  {categoryEntries.length > 0 && (
     <section class="section-void">
       <header class="section-header">
         <div class="section-label">
@@ -137,10 +138,10 @@ const jsonLd = {
         </div>
       </header>
       <div class="category-grid">
-        {categories.map(([cat, count]) => (
-          <a href={`/signal/category/${cat}/`} class="category-card">
-            <span class="category-name">{cat.replace(/_/g, ' ')}</span>
-            <span class="category-count">{count} signals</span>
+        {categoryEntries.map(({ label, slug, signals }) => (
+          <a href={`/signal/category/${slug}/`} class="category-card">
+            <span class="category-name">{label.replace(/_/g, ' ')}</span>
+            <span class="category-count">{signals.length} signals</span>
           </a>
         ))}
       </div>
