@@ -1,5 +1,5 @@
 ---
-import { safeUrl } from '../utils/safeUrl';
+import { safeUrl } from '../utils/safeUrl.js';
 
 interface Props {
   signal: {
@@ -26,6 +26,7 @@ interface Props {
     tags?: string[];
     builder_note?: string;
     _introduced?: string;
+    _slug: string;
   };
   /** When true, builder note is inside a <details> element. Default: false (always visible). */
   collapseBuilderNote?: boolean;
@@ -33,12 +34,9 @@ interface Props {
   compact?: boolean;
 }
 
-import { slugify } from '../utils/slugify';
-
 const { signal, collapseBuilderNote = false, compact = false } = Astro.props;
 
-const slug = slugify(signal.title);
-const signalHref = `/signal/s/${signal._slug || slug}/`;
+const signalHref = `/signal/s/${signal._slug}/`;
 
 const difficultyLabel: Record<string, string> = {
   weekend_hack: 'weekend hack',
@@ -65,7 +63,7 @@ const strengthDots: Record<string, string> = {
 };
 ---
 
-<article class="signal-card" id={slug}>
+<article class="signal-card" id={signal._slug}>
   <div class="card-header">
     <a href={signalHref} class="card-title-link">
       <h2 class="card-title">{signal.title}</h2>

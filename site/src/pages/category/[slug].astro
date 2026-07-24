@@ -2,22 +2,14 @@
 import SignalLayout from '../../layouts/SignalLayout.astro';
 import SignalCard from '../../components/SignalCard.astro';
 import SignalDivider from '../../components/SignalDivider.astro';
-import { getAllSignals, getTotalSignals } from '../../utils/signals';
+import { getCategoryEntries, getTotalSignals } from '../../utils/signals';
 
 export function getStaticPaths() {
-  const allSignals = getAllSignals();
   const totalSignals = getTotalSignals();
 
-  const byCategory: Record<string, any[]> = {};
-  for (const s of allSignals) {
-    const cat = s.category || 'other';
-    if (!byCategory[cat]) byCategory[cat] = [];
-    byCategory[cat].push(s);
-  }
-
-  return Object.entries(byCategory).map(([cat, signals]) => ({
-    params: { slug: cat },
-    props: { category: cat, signals, totalSignals },
+  return getCategoryEntries().map(({ label, slug, signals }) => ({
+    params: { slug },
+    props: { category: label, signals, totalSignals },
   }));
 }
 
