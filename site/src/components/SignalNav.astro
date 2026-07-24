@@ -16,7 +16,7 @@ const { signalCount = 0 } = Astro.props;
     <a href="https://statichum.studio" class="nav-hum-link">STATIC HUM</a>
   </div>
   <div class="nav-right">
-    <span class="nav-count">{signalCount} signals</span>
+    <span class="nav-count">{signalCount} signal{signalCount === 1 ? '' : 's'}</span>
     <span class="nav-dot"></span>
   </div>
 </nav>

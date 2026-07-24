@@ -9,7 +9,7 @@ import {
   getTotalSignals,
 } from '../utils/signals';
 
-// ── Load all published signals ──
+// Load all published signals.
 const allSignals = getAllSignals();
 const dateEntries = getDateEntries();
 const totalSignals = getTotalSignals();
@@ -56,7 +56,7 @@ const jsonLd = {
       "@type": "WebSite",
       "name": "Signal by Static Hum Studio",
       "url": siteHome,
-      "description": "A free, daily-updated library of real software demand signals for developers deciding what to code next.",
+      "description": "An open source example interface for evidence-backed software demand research. The bundled feed contains synthetic demo data.",
       "potentialAction": {
         "@type": "ReadAction",
         "target": siteHome,
@@ -76,7 +76,7 @@ const jsonLd = {
           "name": "What should I code next?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Start with a real demand signal: a concrete pain point people are actively discussing. Signal curates those requests daily, adds evidence, and highlights where existing tools fall short.",
+            "text": "Start with a concrete pain point people are actively discussing, verify the evidence, and identify where existing tools fall short. This example site demonstrates how to present that research.",
           },
         },
         {
@@ -95,8 +95,8 @@ const jsonLd = {
 ---
 
 <SignalLayout
-  title="What Should I Code? Real Coding Projects with Demand Signals | Signal"
-  description="Not random coding project ideas. Signal helps developers decide what to code next using real demand from Reddit, Hacker News, app stores, and 40+ communities."
+  title="Signal Demo | Evidence-backed Software Project Research"
+  description="An open source example interface for software demand research. The bundled feed contains synthetic demo data you can replace with your own findings."
   signalCount={totalSignals}
   jsonLd={jsonLd}
 >
@@ -104,24 +104,24 @@ const jsonLd = {
   <!-- Hero -->
   <section class="hero">
     <div class="hero-ambient"></div>
-    <p class="hero-overline">demand intelligence for independent builders</p>
-    <h1 class="hero-h1">What should I code?<br />Start with real demand.<span class="cursor"></span></h1>
+    <p class="hero-overline">open source demand research example</p>
+    <h1 class="hero-h1">What should I code?<br />Start with evidence.<span class="cursor"></span></h1>
     <p class="hero-subtitle">
-      A free library of validated coding projects sourced from communities across the internet.
-      Each signal includes demand evidence, competitive landscape analysis, and builder notes.
+      This site demonstrates how verified demand research can become a browsable project feed.
+      The bundled signal is synthetic, clearly labeled, and ready to replace with your own research.
     </p>
     <div class="hero-stats">
       <div class="stat">
         <span class="stat-number">{totalSignals}</span>
-        <span class="stat-label">signals indexed</span>
+        <span class="stat-label">demo signals</span>
       </div>
       <div class="stat">
-        <span class="stat-number">10</span>
-        <span class="stat-label">new daily</span>
+        <span class="stat-number">{dateEntries.length}</span>
+        <span class="stat-label">example batches</span>
       </div>
       <div class="stat">
-        <span class="stat-number">{platforms.size}+</span>
-        <span class="stat-label">source communities</span>
+        <span class="stat-number">{platforms.size}</span>
+        <span class="stat-label">source types shown</span>
       </div>
     </div>
   </section>
@@ -141,7 +141,7 @@ const jsonLd = {
         {categoryEntries.map(({ label, slug, signals }) => (
           <a href={`/signal/category/${slug}/`} class="category-card">
             <span class="category-name">{label.replace(/_/g, ' ')}</span>
-            <span class="category-count">{signals.length} signals</span>
+            <span class="category-count">{signals.length} signal{signals.length === 1 ? '' : 's'}</span>
           </a>
         ))}
       </div>
@@ -150,13 +150,13 @@ const jsonLd = {
 
   <SignalDivider />
 
-  <!-- Latest Signals -->
+  <!-- Example Signals -->
   {latestSignals.length > 0 && (
     <section class="section-void">
       <header class="section-header">
         <div class="section-label">
           <span class="prompt">$</span>
-          <h2>latest signals</h2>
+          <h2>example signals</h2>
         </div>
         <p class="section-sub">from {formatDate(latestDate)}</p>
       </header>
@@ -170,20 +170,24 @@ const jsonLd = {
         ))}
       </div>
       <div class="section-cta">
-        <a href={`/signal/${latestDate}/`} class="btn btn--primary">view all {signalsByDate[latestDate]?.length || 0} signals from {formatDateShort(latestDate)}</a>
+        <a href={`/signal/${latestDate}/`} class="btn btn--primary">
+          view all {signalsByDate[latestDate]?.length || 0}
+          {' '}signal{signalsByDate[latestDate]?.length === 1 ? '' : 's'}
+          {' '}from {formatDateShort(latestDate)}
+        </a>
       </div>
     </section>
   )}
 
   <SignalDivider />
 
-  <!-- Recent Days -->
+  <!-- Example Batches -->
   {recentDays.length > 0 && (
     <section class="section-warm">
       <header class="section-header">
         <div class="section-label">
           <span class="prompt">$</span>
-          <h2>recent days</h2>
+          <h2>example batches</h2>
         </div>
       </header>
       <div class="days-list">
@@ -194,7 +198,7 @@ const jsonLd = {
             <a href={`/signal/${date}/`} class="day-card">
               <div class="day-card-header">
                 <span class="day-date">{formatDate(date)}</span>
-                <span class="day-count">{signals.length} signals</span>
+                <span class="day-count">{signals.length} signal{signals.length === 1 ? '' : 's'}</span>
               </div>
               <div class="day-previews">
                 {previewTitles.map(t => (
@@ -224,7 +228,7 @@ const jsonLd = {
         real user request, complaint, or workflow pain point pulled from public communities.
       </p>
       <p>
-        If you want project ideas for developers that are genuinely useful, browse by category,
+        If you want project ideas for developers that are useful, browse by category,
         pick a signal with repeated demand, then build the smallest helpful version first.
       </p>
     </div>
@@ -242,18 +246,17 @@ const jsonLd = {
     </header>
     <div class="about-content">
       <p>
-        Signal is a curated feed of real software demand. Not brainstormed app ideas.
-        Not startup pitches. Actual problems people are posting about in communities across
-        the internet — Reddit, Hacker News, app store reviews, niche forums, and more.
+        Signal is an open source method and example interface for software demand research.
+        The single signal bundled with this repository is synthetic. It exists to demonstrate
+        the schema, routes, cards, filters, and feed without republishing anyone's words.
       </p>
       <p>
-        Every signal includes competitive landscape analysis showing what already exists and
-        where it falls short, plus builder notes with opinionated advice on how to approach
-        the opportunity. Updated daily — quality over count, never padded.
+        Replace the example JSON with research you have verified yourself. Each signal can include
+        source evidence, competitive landscape analysis, and an opinionated builder note.
       </p>
       <p>
-        Built for indie developers, solo founders, and small teams looking for validated
-        software ideas with demand evidence — not guesswork.
+        Built for indie developers, solo founders, and small teams who want evidence behind
+        their next project.
       </p>
     </div>
   </section>
@@ -272,7 +275,7 @@ const jsonLd = {
       <div class="process-step">
         <span class="step-number">01</span>
         <h3>source</h3>
-        <p>Scan 40+ communities daily — Reddit, HN, app stores, niche forums, Twitter — for people describing software they wish existed.</p>
+        <p>Search relevant communities for people describing software they wish existed, then open each source and read the full discussion.</p>
       </div>
       <div class="process-step">
         <span class="step-number">02</span>
@@ -287,7 +290,7 @@ const jsonLd = {
       <div class="process-step">
         <span class="step-number">04</span>
         <h3>publish</h3>
-        <p>Package each signal with builder notes, difficulty assessment, and demand strength rating. Ship only what clears the bar — never padded to hit a number.</p>
+        <p>Package each signal with builder notes, difficulty assessment, and demand strength rating. Ship only what clears the bar. Never pad a batch to hit a number.</p>
       </div>
     </div>
   </section>
