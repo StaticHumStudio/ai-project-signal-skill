@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  claimStableSlugs,
   claimUniqueSlug,
   slugifyRoute,
 } from '../src/utils/routes.js';
@@ -27,4 +28,22 @@ test('duplicate slugs receive stable numeric suffixes', () => {
   const counts = new Map();
   assert.equal(claimUniqueSlug('Same title', counts, 'signal'), 'same-title');
   assert.equal(claimUniqueSlug('Same title', counts, 'signal'), 'same-title-2');
+});
+
+test('generated suffixes skip naturally claimed numbered slugs', () => {
+  const counts = new Map();
+  assert.equal(claimUniqueSlug('Foo', counts, 'signal'), 'foo');
+  assert.equal(claimUniqueSlug('Foo-2', counts, 'signal'), 'foo-2');
+  assert.equal(claimUniqueSlug('Foo', counts, 'signal'), 'foo-3');
+});
+
+test('stable slug ownership does not depend on input recency', () => {
+  const newestFirst = Object.fromEntries(
+    claimStableSlugs(['foo-bar', 'foo bar'], 'category'),
+  );
+  const oldestFirst = Object.fromEntries(
+    claimStableSlugs(['foo bar', 'foo-bar'], 'category'),
+  );
+
+  assert.deepEqual(newestFirst, oldestFirst);
 });
