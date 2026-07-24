@@ -2,8 +2,8 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
-  claimStableSlugs,
   claimUniqueSlug,
+  stableRouteSlug,
   slugifyRoute,
 } from '../src/utils/routes.js';
 
@@ -37,13 +37,10 @@ test('generated suffixes skip naturally claimed numbered slugs', () => {
   assert.equal(claimUniqueSlug('Foo', counts, 'signal'), 'foo-3');
 });
 
-test('stable slug ownership does not depend on input recency', () => {
-  const newestFirst = Object.fromEntries(
-    claimStableSlugs(['foo-bar', 'foo bar'], 'category'),
-  );
-  const oldestFirst = Object.fromEntries(
-    claimStableSlugs(['foo bar', 'foo-bar'], 'category'),
-  );
+test('category routes cannot be stolen by a later colliding label', () => {
+  const existingRoute = stableRouteSlug('foo-bar', 'category');
+  const laterRoute = stableRouteSlug('foo bar', 'category');
 
-  assert.deepEqual(newestFirst, oldestFirst);
+  assert.notEqual(existingRoute, laterRoute);
+  assert.equal(stableRouteSlug('foo-bar', 'category'), existingRoute);
 });
