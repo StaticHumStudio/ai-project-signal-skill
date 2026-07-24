@@ -8,22 +8,42 @@
 #
 # Daily Signal sourcing via Claude Code CLI.
 # After staging is written and validated, opens a review PR with the
-# day's signals copied into content/published/. Merging the PR triggers
-# the existing FTP deploy workflow.
+# day's signals copied into site/content/published/.
 
 set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-REPO_DIR="${SIGNAL_REPO_DIR:-$SCRIPT_DIR}"
+REPO_DIR="${SIGNAL_REPO_DIR:-$(cd -- "$SCRIPT_DIR/.." && pwd -P)}"
 LOG_FILE="${SIGNAL_LOG_FILE:-$REPO_DIR/signal-cron.log}"
 LOCK_FILE="${SIGNAL_LOCK_FILE:-/tmp/signal-daily.lock}"
 CLAUDE_BIN="${CLAUDE_BIN:-$HOME/.local/bin/claude}"
 GH_BIN="${GH_BIN:-/usr/bin/gh}"
 TODAY="$(date +%F)"
-STAGING_REL="content/staging/$TODAY.json"
-PUBLISHED_REL="content/published/$TODAY.json"
+PROMPT_REL="reference/SKILL.md"
+VALIDATOR_REL="reference/validate-staging.mjs"
+STAGING_REL="site/content/staging/$TODAY.json"
+PUBLISHED_REL="site/content/published/$TODAY.json"
 BRANCH="signal/auto-$TODAY"
 WORKTREE_DIR="${SIGNAL_WORKTREE_DIR:-/tmp/signal-pr-$TODAY}"
+
+if [[ "${SIGNAL_CHECK_ONLY:-0}" == "1" ]]; then
+  for path in "$PROMPT_REL" "$VALIDATOR_REL"; do
+    if [[ ! -f "$REPO_DIR/$path" ]]; then
+      echo "$path: MISSING"
+      exit 1
+    fi
+    echo "$path: OK"
+  done
+
+  for path in "site/content/staging" "site/content/published"; do
+    if [[ ! -d "$REPO_DIR/$path" ]]; then
+      echo "$path: MISSING"
+      exit 1
+    fi
+    echo "$path: OK"
+  done
+  exit 0
+fi
 
 mkdir -p "$(dirname "$LOG_FILE")"
 exec >> "$LOG_FILE" 2>&1
@@ -49,7 +69,7 @@ done
 if [[ -e "$STAGING_REL" ]]; then
   echo "[$(date -Is)] Staging file already exists, reusing: $STAGING_REL"
 else
-  "$CLAUDE_BIN" -p "Execute the Signal Sourcing Task in SKILL.md for today's date, $TODAY. Write one valid JSON array to $STAGING_REL with up to 10 high-quality demand signals. Do not pad with weak signals just to reach 10. Do not move the file to content/published. Do not run git add, git commit, git push, or any deploy step. Stop after the staging file is written and report the file path." --permission-mode auto
+  "$CLAUDE_BIN" -p "Execute the Signal Sourcing Task in $PROMPT_REL for today's date, $TODAY. Write one valid JSON array to $STAGING_REL with up to 10 high-quality demand signals. Do not pad with weak signals just to reach 10. Do not move the file to site/content/published. Do not run git add, git commit, git push, or any deploy step. Stop after the staging file is written and report the file path." --permission-mode auto
 fi
 
 # Validate the staging file in both the freshly-written and reuse cases.
@@ -59,7 +79,7 @@ if [[ ! -s "$STAGING_REL" ]]; then
   exit 1
 fi
 
-node scripts/validate-staging.mjs "$STAGING_REL"
+node "$VALIDATOR_REL" "$STAGING_REL"
 
 echo "[$(date -Is)] Staging file validated: $STAGING_REL"
 
@@ -97,12 +117,11 @@ if [[ $REMOTE_BRANCH_EXISTS -eq 1 ]]; then
   git worktree add "$WORKTREE_DIR" "origin/$BRANCH"
 else
   git worktree add -b "$BRANCH" "$WORKTREE_DIR" origin/main
-  mkdir -p "$WORKTREE_DIR/content/staging" "$WORKTREE_DIR/content/published"
-  cp "$STAGING_REL" "$WORKTREE_DIR/$STAGING_REL"
+  mkdir -p "$WORKTREE_DIR/site/content/published"
   cp "$STAGING_REL" "$WORKTREE_DIR/$PUBLISHED_REL"
   (
     cd "$WORKTREE_DIR"
-    git add "$STAGING_REL" "$PUBLISHED_REL"
+    git add "$PUBLISHED_REL"
     git commit -m "Signal: $TODAY"
     git push -u origin "$BRANCH"
   )
@@ -115,8 +134,7 @@ fi
     --body "Automated daily signal sourcing for $TODAY.
 
 Review the published file and merge to deploy to statichum.studio/signal.
-Edit or drop weak signals before merging if needed. Closing without merging
-leaves the staging copy as a record." \
+Edit or drop weak signals before merging if needed." \
     --base main \
     --head "$BRANCH"
 )

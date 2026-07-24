@@ -5,7 +5,7 @@
 - v2.2: Added Phase 4 per-source verification (mandatory web_fetch on
   every cited source before publishing), fixed the App Store rule to
   distinguish review-as-source from listing-as-source, and added
-  scripts/validate-staging.mjs (wired into run_signal_daily.sh) that
+  reference/validate-staging.mjs (wired into run_signal_daily.sh) that
   prints warnings for stale dates without recent-activity engagement
   and for vendor-domain sources. PR #8 was closed without merging
   after every signal failed Phase 4 in retrospect.
@@ -254,8 +254,8 @@ Apply these filters to every potential signal:
 
 ### OUTPUT FORMAT
 
-Return EXACTLY {count} signals as a JSON array. No markdown wrapping, no
-preamble, no explanation. Pure JSON.
+Return up to {count} signals as one JSON array. Quality beats count. No
+markdown wrapping, no preamble, no explanation. Pure JSON.
 
 Each signal object:
 
@@ -290,19 +290,6 @@ Each signal object:
   "tags": ["up to 5 descriptive tags"],
   "builder_note": "One sentence of opinionated advice for the builder.
                    What's the non-obvious insight or the trap to avoid?"
-}
-
-After the signal array, include a brief "signal_strength_updates" array
-for any previously published signals that got new evidence this run:
-
-{
-  "signal_strength_updates": [
-    {
-      "original_title": "Title of the previously published signal",
-      "new_evidence": "Brief description of what new evidence was found",
-      "new_source_url": "https://..."
-    }
-  ]
 }
 
 ### QUALITY STANDARDS
@@ -342,7 +329,7 @@ Workflow reminder:
 3. PHASE 3: For each candidate signal, search for and evaluate the existing
    solution landscape. This is the highest-value step.
 4. Filter ruthlessly. Quality over quantity.
-5. Return pure JSON with {count} signals + any signal_strength_updates.
+5. Return one pure JSON array with up to {count} signals.
 ```
 
 ---
