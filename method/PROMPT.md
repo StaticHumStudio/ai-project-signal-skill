@@ -38,9 +38,10 @@ EXCLUDE:
 OUTPUT:
 ```
 
-- **OUTPUT** — how you want the results delivered: `json` (a JSON array plus a
-  short summary — the default, and what the example site consumes), `rundown` (a
-  readable writeup in the reply), `markdown` (a saveable `.md` report), or
+- **OUTPUT** — how you want the results delivered: `json` (only the JSON array,
+  with no prose or Markdown wrapping — the default, and what the example site
+  consumes), `rundown` (a readable writeup in the reply), `markdown` (a
+  saveable `.md` report), or
   `html` (a single self-contained page you can open in a browser). Blank =
   `json`. See the **Output** section for what each produces.
 - **FOCUS** — a category or theme to bias toward, e.g. `developer tools`,
@@ -156,8 +157,9 @@ to 10 objects in the shape below (quality beats count; if you only found 4
 strong ones, return 4, and never pad with weak, stale, or thinly-sourced ideas).
 **How you present them depends on `OUTPUT`:**
 
-- **`json`** (default) — a JSON array of the signal objects, followed by a short
-  one-line-per-signal summary. This is what the example `site/` consumes.
+- **`json`** (default) — only the JSON array of signal objects. No preamble,
+  Markdown fence, or summary may appear before or after it. This is what the
+  example `site/` consumes.
 - **`rundown`** — a readable writeup in your reply: a one-line intro, then each
   signal as a short block (what it is; why it's real, with the best quote +
   link; what already exists and the gap; the builder's note).

@@ -14,7 +14,7 @@
  * bytes. The cleaned string is what we return, so no such byte can survive to
  * re-expose a blocked scheme.
  */
-export function safeUrl(u: string | null | undefined): string {
+export function safeUrl(u) {
   if (!u) return '#';
   let cleaned = '';
   for (const ch of u) {

@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { slugify } from './slugify';
+import { validateSignals } from '../../../method/validate-signals.mjs';
+import { claimUniqueSlug, stableRouteSlug } from './routes.js';
 
 export interface Signal {
   title: string;
@@ -35,6 +36,12 @@ export interface DateEntry {
   signals: Signal[];
 }
 
+export interface CategoryEntry {
+  label: string;
+  slug: string;
+  signals: Signal[];
+}
+
 const publishedDir = path.join(process.cwd(), 'content/published');
 
 let _cache: Signal[] | null = null;
@@ -62,17 +69,18 @@ export function getAllSignals(): Signal[] {
     const raw = fs.readFileSync(path.join(publishedDir, file), 'utf-8');
     try {
       const data = JSON.parse(raw);
-      const signals = Array.isArray(data) ? data : [data];
-      for (const s of signals) {
-        let base = slugify(s.title);
-        const count = slugCounts.get(base) || 0;
-        slugCounts.set(base, count + 1);
-        const slug = count > 0 ? `${base}-${count + 1}` : base;
+      const validation = validateSignals(data, { stagingDay: date });
+      if (validation.errors.length > 0) {
+        throw new Error(validation.errors.join('; '));
+      }
+      for (const s of data) {
+        const slug = claimUniqueSlug(s.title, slugCounts, 'signal');
 
         all.push({ ...s, _date: date, _slug: slug });
       }
     } catch (e) {
-      console.warn(`Failed to parse ${file}`);
+      const message = e instanceof Error ? e.message : String(e);
+      throw new Error(`Invalid published signal file ${file}: ${message}`);
     }
   }
 
@@ -106,4 +114,20 @@ export function getDatesAscending(): string[] {
 /** Total signal count. */
 export function getTotalSignals(): number {
   return getAllSignals().length;
+}
+
+/** Group signals by their display category and assign safe, stable route slugs. */
+export function getCategoryEntries(): CategoryEntry[] {
+  const groups = new Map<string, Signal[]>();
+
+  for (const signal of getAllSignals()) {
+    const label = signal.category || 'other';
+    groups.set(label, [...(groups.get(label) ?? []), signal]);
+  }
+
+  return Array.from(groups.entries()).map(([label, signals]) => ({
+    label,
+    slug: stableRouteSlug(label, 'category'),
+    signals,
+  }));
 }

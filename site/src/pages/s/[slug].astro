@@ -2,7 +2,7 @@
 import SignalLayout from '../../layouts/SignalLayout.astro';
 import SignalDivider from '../../components/SignalDivider.astro';
 import { getAllSignals, getTotalSignals } from '../../utils/signals';
-import { safeUrl } from '../../utils/safeUrl';
+import { safeUrl } from '../../utils/safeUrl.js';
 
 export function getStaticPaths() {
   const allSignals = getAllSignals();

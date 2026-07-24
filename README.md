@@ -101,9 +101,12 @@ after and it does the retarget for you.
 browsable feed. It ships with exactly **one synthetic example signal** so it
 renders out of the box — there is no real signal data in this repo.
 
+You need Node.js 22.12.0 or newer and npm 9.6.5 or newer. If you use `nvm`,
+`site/.nvmrc` selects the supported Node release line.
+
 ```bash
 cd site
-npm install
+npm ci
 npm run dev
 ```
 
@@ -113,7 +116,21 @@ Then open the URL Astro prints. The site is served under **`/signal/`** (e.g.
 To fill it with your own results, drop array-of-signal JSON files into
 `site/content/published/`, named by date — `2026-07-18.json` — since the
 filename's date is how the site groups them. Each file is a JSON array of
-objects matching `method/schema.json`.
+1 to 10 objects matching `method/schema.json`. Every source requires a URL,
+platform, brief quote, and real publication date.
+
+Validate a batch before building:
+
+```bash
+node reference/validate-staging.mjs site/content/published/2026-07-18.json --strict
+```
+
+Run every test, validate the bundled fixture, and build the site:
+
+```bash
+cd site
+npm run check
+```
 
 ## Deploy
 
@@ -137,7 +154,10 @@ publisher name) — swap it for your own.
 ## How we ran it in production
 
 [`reference/`](./reference) is Signal's real daily pipeline, kept as a worked
-example of how to automate the thing:
+example of how to automate the thing. The method itself is provider-neutral.
+The reference runner is specifically wired to the Claude CLI and GitHub CLI,
+so treat it as architecture to adapt, not a portable command you can run
+unchanged:
 
 - [`reference/SKILL.md`](./reference/SKILL.md) — the repo-coupled prompt the
   cron job fed to the Claude CLI (it writes to a staging file instead of
@@ -154,10 +174,10 @@ example of how to automate the thing:
 **Want your own loop?** If your provider or tooling supports automated runs — an
 API key plus a scheduler, a CLI, GitHub Actions, a no-code automation like
 Zapier or Make — you can wire the configured prompt into any of them and have it
-hunt on a schedule; `run_signal_daily.sh` is a complete worked example, and the
+hunt on a schedule. `run_signal_daily.sh` shows one Claude CLI implementation, and the
 [guided prompt](./method/GUIDED.md) will walk you through setting one up for
-your own stack. Fair warning: automating an assistant depends on your provider's
-capabilities, rate limits, terms, and cost — so do it at your own discretion.
+your own stack. Automating an assistant depends on your provider's capabilities,
+rate limits, terms, and cost, so check those before scheduling anything.
 
 ## Repository layout
 
