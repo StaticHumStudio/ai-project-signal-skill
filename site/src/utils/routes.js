@@ -25,10 +25,14 @@ export function slugifyRoute(value, fallbackPrefix = 'item') {
 }
 
 export function stableRouteSlug(value, fallbackPrefix = 'item') {
+  const exact = String(value ?? '');
   const source = normalizeRouteSource(value);
-  const hash = hash32(source);
+  const normalizedHash = hash32(source);
   const base = slugifyRoute(source, fallbackPrefix);
-  return base === `${fallbackPrefix}-${hash}` ? base : `${base}-${hash}`;
+  if (base === `${fallbackPrefix}-${normalizedHash}` && exact === source) {
+    return base;
+  }
+  return `${base}-${hash32(exact)}`;
 }
 
 export function claimUniqueSlug(value, counts, fallbackPrefix = 'item') {

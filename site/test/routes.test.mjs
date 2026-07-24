@@ -44,3 +44,10 @@ test('category routes cannot be stolen by a later colliding label', () => {
   assert.notEqual(existingRoute, laterRoute);
   assert.equal(stableRouteSlug('foo-bar', 'category'), existingRoute);
 });
+
+test('distinct category labels remain distinct after normalization', () => {
+  assert.notEqual(
+    stableRouteSlug('AI', 'category'),
+    stableRouteSlug('ai', 'category'),
+  );
+});
