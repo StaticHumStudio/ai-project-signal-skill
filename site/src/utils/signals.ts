@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { validateSignals } from '../../../method/validate-signals.mjs';
 import { claimUniqueSlug } from './routes.js';
 
 export interface Signal {
@@ -68,14 +69,18 @@ export function getAllSignals(): Signal[] {
     const raw = fs.readFileSync(path.join(publishedDir, file), 'utf-8');
     try {
       const data = JSON.parse(raw);
-      const signals = Array.isArray(data) ? data : [data];
-      for (const s of signals) {
+      const validation = validateSignals(data, { stagingDay: date });
+      if (validation.errors.length > 0) {
+        throw new Error(validation.errors.join('; '));
+      }
+      for (const s of data) {
         const slug = claimUniqueSlug(s.title, slugCounts, 'signal');
 
         all.push({ ...s, _date: date, _slug: slug });
       }
     } catch (e) {
-      console.warn(`Failed to parse ${file}`);
+      const message = e instanceof Error ? e.message : String(e);
+      throw new Error(`Invalid published signal file ${file}: ${message}`);
     }
   }
 

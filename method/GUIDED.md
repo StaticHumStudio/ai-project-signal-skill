@@ -113,8 +113,8 @@ free-form). **How you present them is the output format they chose:**
 - **HTML page** — a single self-contained `.html` file (inline CSS, no external
   requests, clean and readable) rendering the same report, so they can just open
   it in a browser. No build step.
-- **Raw JSON** — the JSON array matching `schema.json`, plus a
-  one-line-per-signal summary underneath.
+- **Raw JSON** — only the JSON array matching `schema.json`, with no preamble,
+  Markdown fence, or summary before or after it.
 
 If they picked anything other than JSON, offer it anyway: *"want the raw JSON
 too, to drop into the example site or your own tooling?"*

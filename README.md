@@ -113,7 +113,14 @@ Then open the URL Astro prints. The site is served under **`/signal/`** (e.g.
 To fill it with your own results, drop array-of-signal JSON files into
 `site/content/published/`, named by date — `2026-07-18.json` — since the
 filename's date is how the site groups them. Each file is a JSON array of
-objects matching `method/schema.json`.
+1 to 10 objects matching `method/schema.json`. Every source requires a URL,
+platform, brief quote, and real publication date.
+
+Validate a batch before building:
+
+```bash
+node reference/validate-staging.mjs site/content/published/2026-07-18.json --strict
+```
 
 ## Deploy
 
