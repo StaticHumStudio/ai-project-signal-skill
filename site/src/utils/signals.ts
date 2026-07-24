@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { validateSignals } from '../../../method/validate-signals.mjs';
-import { claimStableSlugs, claimUniqueSlug } from './routes.js';
+import { claimUniqueSlug, stableRouteSlug } from './routes.js';
 
 export interface Signal {
   title: string;
@@ -125,12 +125,9 @@ export function getCategoryEntries(): CategoryEntry[] {
     groups.set(label, [...(groups.get(label) ?? []), signal]);
   }
 
-  const slugByLabel = new Map(
-    claimStableSlugs(groups.keys(), 'category'),
-  );
   return Array.from(groups.entries()).map(([label, signals]) => ({
     label,
-    slug: slugByLabel.get(label)!,
+    slug: stableRouteSlug(label, 'category'),
     signals,
   }));
 }

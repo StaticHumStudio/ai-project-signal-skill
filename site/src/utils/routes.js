@@ -7,8 +7,12 @@ function hash32(value) {
   return (hash >>> 0).toString(16).padStart(8, '0');
 }
 
+function normalizeRouteSource(value) {
+  return String(value ?? '').normalize('NFKC').trim().toLowerCase();
+}
+
 export function slugifyRoute(value, fallbackPrefix = 'item') {
-  const source = String(value ?? '').normalize('NFKC').trim().toLowerCase();
+  const source = normalizeRouteSource(value);
   const readable = source
     .replace(/[^\p{Letter}\p{Number}]+/gu, '-')
     .replace(/^-+|-+$/g, '');
@@ -18,6 +22,13 @@ export function slugifyRoute(value, fallbackPrefix = 'item') {
     .replace(/-+$/g, '');
 
   return capped || `${fallbackPrefix}-${hash32(source)}`;
+}
+
+export function stableRouteSlug(value, fallbackPrefix = 'item') {
+  const source = normalizeRouteSource(value);
+  const hash = hash32(source);
+  const base = slugifyRoute(source, fallbackPrefix);
+  return base === `${fallbackPrefix}-${hash}` ? base : `${base}-${hash}`;
 }
 
 export function claimUniqueSlug(value, counts, fallbackPrefix = 'item') {
@@ -37,14 +48,4 @@ export function claimUniqueSlug(value, counts, fallbackPrefix = 'item') {
   counts.set(base, suffix);
   counts.set(candidate, 1);
   return candidate;
-}
-
-export function claimStableSlugs(values, fallbackPrefix = 'item') {
-  const counts = new Map();
-  return [...values]
-    .sort((a, b) => String(a).localeCompare(String(b), 'en'))
-    .map(value => [
-      value,
-      claimUniqueSlug(value, counts, fallbackPrefix),
-    ]);
 }
