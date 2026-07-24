@@ -22,7 +22,29 @@ export function slugifyRoute(value, fallbackPrefix = 'item') {
 
 export function claimUniqueSlug(value, counts, fallbackPrefix = 'item') {
   const base = slugifyRoute(value, fallbackPrefix);
-  const count = counts.get(base) ?? 0;
-  counts.set(base, count + 1);
-  return count === 0 ? base : `${base}-${count + 1}`;
+  if (!counts.has(base)) {
+    counts.set(base, 1);
+    return base;
+  }
+
+  let suffix = (counts.get(base) ?? 1) + 1;
+  let candidate = `${base}-${suffix}`;
+  while (counts.has(candidate)) {
+    suffix += 1;
+    candidate = `${base}-${suffix}`;
+  }
+
+  counts.set(base, suffix);
+  counts.set(candidate, 1);
+  return candidate;
+}
+
+export function claimStableSlugs(values, fallbackPrefix = 'item') {
+  const counts = new Map();
+  return [...values]
+    .sort((a, b) => String(a).localeCompare(String(b), 'en'))
+    .map(value => [
+      value,
+      claimUniqueSlug(value, counts, fallbackPrefix),
+    ]);
 }
