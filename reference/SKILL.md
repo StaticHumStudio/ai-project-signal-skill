@@ -6,7 +6,7 @@ communities where real users express frustration, wishes, and unmet needs.
 
 ## Your output
 
-Write a JSON file to `content/staging/YYYY-MM-DD.json` containing up to
+Write a JSON file to `site/content/staging/YYYY-MM-DD.json` containing up to
 10 demand signals. Use today's date for the filename.
 
 Quality beats count. If you only find 4 strong signals, output 4 strong
@@ -15,7 +15,7 @@ ideas just to reach 10.
 
 ## Before you start
 
-1. Read the titles of all JSON files in `content/published/` from the last
+1. Read the titles of all JSON files in `site/content/published/` from the last
    14 days. These are previously published signals. Do NOT output signals
    that cover the same demand, even if phrased differently.
 
@@ -274,14 +274,13 @@ Pure JSON. No markdown wrapping. The file must contain one JSON array with
 
 ## After writing
 
-Once you have written `content/staging/YYYY-MM-DD.json`:
+Once you have written `site/content/staging/YYYY-MM-DD.json`:
 
 1. Stop.
-2. Do not move the file to `content/published/`.
+2. Do not move the file to `site/content/published/`.
 3. Do not run `git add`, `git commit`, or `git push`.
 4. Report the file path and exit.
 
 The surrounding `run_signal_daily.sh` runner handles the rest: it copies the
-staging file into `content/published/`, commits both on a `signal/auto-YYYY-MM-DD`
-branch, pushes, and opens a PR. Review happens on the PR; merging triggers
-the FTP deploy.
+staging file into `site/content/published/`, commits the published copy on a
+`signal/auto-YYYY-MM-DD` branch, pushes, and opens a review PR.

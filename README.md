@@ -144,7 +144,10 @@ publisher name) — swap it for your own.
 ## How we ran it in production
 
 [`reference/`](./reference) is Signal's real daily pipeline, kept as a worked
-example of how to automate the thing:
+example of how to automate the thing. The method itself is provider-neutral.
+The reference runner is specifically wired to the Claude CLI and GitHub CLI,
+so treat it as architecture to adapt, not a portable command you can run
+unchanged:
 
 - [`reference/SKILL.md`](./reference/SKILL.md) — the repo-coupled prompt the
   cron job fed to the Claude CLI (it writes to a staging file instead of
@@ -161,10 +164,10 @@ example of how to automate the thing:
 **Want your own loop?** If your provider or tooling supports automated runs — an
 API key plus a scheduler, a CLI, GitHub Actions, a no-code automation like
 Zapier or Make — you can wire the configured prompt into any of them and have it
-hunt on a schedule; `run_signal_daily.sh` is a complete worked example, and the
+hunt on a schedule. `run_signal_daily.sh` shows one Claude CLI implementation, and the
 [guided prompt](./method/GUIDED.md) will walk you through setting one up for
-your own stack. Fair warning: automating an assistant depends on your provider's
-capabilities, rate limits, terms, and cost — so do it at your own discretion.
+your own stack. Automating an assistant depends on your provider's capabilities,
+rate limits, terms, and cost, so check those before scheduling anything.
 
 ## Repository layout
 
