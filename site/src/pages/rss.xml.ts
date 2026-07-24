@@ -13,8 +13,8 @@ export function GET(context: APIContext) {
   }));
 
   return rss({
-    title: 'Signal — Static Hum Studio',
-    description: 'Curated feed of real software demand sourced from communities across the internet. Updated daily.',
+    title: 'Signal Demo: Static Hum Studio',
+    description: 'Open source example feed for evidence-backed software demand research. Bundled entries are synthetic demo data.',
     site: context.site!.toString(),
     items,
   });

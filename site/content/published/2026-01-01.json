@@ -1,7 +1,7 @@
 [
   {
     "title": "Offline-first recipe manager that survives account death",
-    "summary": "This is a SYNTHETIC example signal shipped only to make the demo render — it is not a real sourced signal. Home cooks repeatedly ask for a recipe app whose data lives locally and stays usable if the company shuts down, after several cloud recipe services sunset and stranded users' collections.",
+    "summary": "This is a SYNTHETIC example signal shipped only to make the demo render. It is not a real sourced signal. Home cooks repeatedly ask for a recipe app whose data lives locally and stays usable if the company shuts down, after several cloud recipe services sunset and stranded users' collections.",
     "sources": [
       {
         "url": "https://example.com/thread/offline-recipe-manager",
