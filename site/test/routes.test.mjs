@@ -59,3 +59,13 @@ test('case variants of a label share a route once normalized', () => {
     stableRouteSlug(normalizeRouteSource('saas'), 'category'),
   );
 });
+
+test('internal whitespace variants of a label share a route once normalized', () => {
+  const canonical = stableRouteSlug(normalizeRouteSource('saas tools'), 'category');
+  for (const variant of ['SaaS  tools', 'SaaS\ttools', ' saas tools ']) {
+    assert.equal(
+      stableRouteSlug(normalizeRouteSource(variant), 'category'),
+      canonical,
+    );
+  }
+});

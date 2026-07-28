@@ -9,7 +9,11 @@ function hash32(value) {
 
 /** Fold case, spacing, and Unicode presentation so label variants compare equal. */
 export function normalizeRouteSource(value) {
-  return String(value ?? '').normalize('NFKC').trim().toLowerCase();
+  return String(value ?? '')
+    .normalize('NFKC')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
 }
 
 export function slugifyRoute(value, fallbackPrefix = 'item') {
