@@ -7,8 +7,13 @@ function hash32(value) {
   return (hash >>> 0).toString(16).padStart(8, '0');
 }
 
-function normalizeRouteSource(value) {
-  return String(value ?? '').normalize('NFKC').trim().toLowerCase();
+/** Fold case, spacing, and Unicode presentation so label variants compare equal. */
+export function normalizeRouteSource(value) {
+  return String(value ?? '')
+    .normalize('NFKC')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
 }
 
 export function slugifyRoute(value, fallbackPrefix = 'item') {

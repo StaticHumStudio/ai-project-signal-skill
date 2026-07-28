@@ -18,6 +18,7 @@ software to physical goods. The Method discipline is otherwise identical.*
 ```text
 FOCUS: kitchen and cooking gear
 EXCLUDE:
+DISTRUST:
 OUTPUT: markdown
 ```
 
@@ -87,6 +88,9 @@ eyes:
 1. The `date` matches what the page shows (the real review/post date).
 2. The author is a real owner/user — not the brand, an affiliate, or a
    sponsored reviewer. Those go to landscape or get dropped, never to `sources`.
+   Decide this yourself from the page: who runs this domain, do they sell this
+   category, is the page built to rank rather than to complain? Anything on the
+   `DISTRUST` list is out on sight, but that list is a shortcut, not the test.
 3. It's demand, not supply — a brand promoting its own product is supply. Drop it.
 4. If the page is older than a few weeks, cite a specific recent activity you
    saw (a review or comment dated within the last month). Age alone doesn't count.

@@ -35,6 +35,11 @@ work out yourself.
    specific product/community to point at — or "cast wide, surprise me".
 4. **Anything to exclude?** Ideas, products, or angles you already know about
    and don't want repeated. ("Nothing" is a fine answer.)
+   Also ask, in the same breath, whether there are **specific sites or domains
+   they already distrust** — an SEO farm, an affiliate blog, a vendor that
+   floods the space. Make clear this is optional and that you'll work the rest
+   out yourself: *"and if any particular sites are junk in your world, name
+   them — otherwise I'll spot the marketing myself as I go."*
 5. **How many, and how deep?** Default is up to 10, quality over quantity — only
    ask if they seem to want something different.
 6. **How do you want the results?** A readable rundown right here in the chat
@@ -61,6 +66,12 @@ From their answers, **you** build the setup:
 - **Where to look.** Choose the specific communities, forums, subreddits, review
   sources, and search patterns where *these* people actually gather and complain.
   Use what you know about the space — don't make the user name subreddits.
+- **Who not to believe.** Work out, from what you know about this space, which
+  kinds of pages will pose as demand and aren't: the vendors who sell here, the
+  affiliate and "best alternatives to X" farms, the comparison blogs, the
+  self-promoters. Name the specific ones you expect to hit. This is **your**
+  homework, not the user's — fold in any domains they volunteered, but don't
+  wait on them to tell you who the marketers are.
 - **FOCUS and EXCLUDE.** Carry over whatever they gave you.
 
 Then reflect the plan back in a few lines — *"I'll hunt **X** for **[who]**,
