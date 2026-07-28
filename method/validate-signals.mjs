@@ -27,21 +27,15 @@ const LANDSCAPE_KEYS = new Set([
 ]);
 const SOLUTION_KEYS = new Set(['name', 'url', 'gap']);
 
-const VENDOR_DOMAINS = [
-  'gigradar.io',
-  'useoutbid.com',
-  'uphunt.io',
-  'vollna.com',
-  'chaserhq.com',
-  'paidnice.com',
-  'lunos.ai',
-  'upflow.io',
-  'zeeg.me',
-  'onecal.io',
-  'meetergo.com',
-  'buildmvpfast.com',
-  'super-productivity.com',
-];
+// Deliberately empty. Telling a vendor's marketing page apart from real user
+// demand is the assistant's job during Phase 4 of the sourcing prompt, and the
+// right domains are different for every focus area, so this ships with no
+// opinion about anyone's business.
+//
+// It stays here as an optional backstop: if a particular domain keeps slipping
+// through your runs, add it below (or pass `vendorDomains` to validateSignals)
+// and every source from it gets flagged for a second look.
+const VENDOR_DOMAINS = [];
 
 const JOURNALISM_DOMAINS = [
   'techcrunch.com',
@@ -99,7 +93,7 @@ function matchesDomain(host, domains) {
   return domains.some(domain => host === domain || host.endsWith(`.${domain}`));
 }
 
-export function validateSignals(data, {stagingDay} = {}) {
+export function validateSignals(data, {stagingDay, vendorDomains = VENDOR_DOMAINS} = {}) {
   const errors = [];
   const warnings = [];
   const stagingDayString = stagingDay ?? new Date().toISOString().slice(0, 10);
@@ -198,7 +192,7 @@ export function validateSignals(data, {stagingDay} = {}) {
             const host = parsedUrl.hostname.replace(/^www\./, '');
             if (matchesDomain(host, JOURNALISM_DOMAINS)) {
               warnings.push(`${sourceWhere}: ${host} is a journalism outlet; move it to landscape or drop it`);
-            } else if (matchesDomain(host, VENDOR_DOMAINS)) {
+            } else if (matchesDomain(host, vendorDomains)) {
               warnings.push(`${sourceWhere}: ${host} is on the vendor-domain watchlist; verify that it is user demand`);
             } else {
               userSourceCount += 1;
@@ -248,8 +242,15 @@ export function validateSignals(data, {stagingDay} = {}) {
           }
           rejectUnknownKeys(solution, SOLUTION_KEYS, solutionWhere, errors);
           requireString(solution, 'name', solutionWhere, errors);
-          requireString(solution, 'url', solutionWhere, errors);
+          const hasSolutionUrl = requireString(solution, 'url', solutionWhere, errors);
           requireString(solution, 'gap', solutionWhere, errors);
+          if (hasSolutionUrl) {
+            try {
+              new URL(solution.url);
+            } catch {
+              errors.push(`${solutionWhere}: invalid url ${JSON.stringify(solution.url)}`);
+            }
+          }
         }
       }
     }
@@ -265,7 +266,10 @@ export function validateSignals(data, {stagingDay} = {}) {
 }
 
 export function validateSignalFile(file, {strict = false} = {}) {
-  const stagingDay = file.match(/(\d{4}-\d{2}-\d{2})/)?.[1]
+  // Read the date off the file name only; a date-looking directory somewhere
+  // up the path (backups/2024-01-01/...) must not become the staging day.
+  const baseName = file.split(/[\\/]/).pop() ?? file;
+  const stagingDay = baseName.match(/(\d{4}-\d{2}-\d{2})/)?.[1]
     ?? new Date().toISOString().slice(0, 10);
   let data;
 

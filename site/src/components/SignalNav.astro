@@ -1,4 +1,6 @@
 ---
+import { withBase } from '../utils/paths.js';
+
 interface Props {
   signalCount?: number;
 }
@@ -11,7 +13,7 @@ const { signalCount = 0 } = Astro.props;
 </div>
 <nav class="top-nav">
   <div class="nav-brand">
-    <a href="/signal/" class="nav-signal-link">SIGNAL</a>
+    <a href={withBase('/')} class="nav-signal-link">SIGNAL</a>
     <span class="nav-divider">//</span>
     <a href="https://statichum.studio" class="nav-hum-link">STATIC HUM</a>
   </div>

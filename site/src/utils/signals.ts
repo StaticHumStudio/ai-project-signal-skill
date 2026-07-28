@@ -1,16 +1,18 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { validateSignals } from '../../../method/validate-signals.mjs';
-import { claimUniqueSlug, stableRouteSlug } from './routes.js';
+import { claimUniqueSlug, normalizeRouteSource, stableRouteSlug } from './routes.js';
 
 export interface Signal {
   title: string;
   summary: string;
+  // `quote` and `date` are required by method/schema.json and enforced by
+  // validate-signals.mjs, so anything that reaches a page has both.
   sources: Array<{
     url: string;
     platform: string;
-    quote?: string;
-    date?: string;
+    quote: string;
+    date: string;
     engagement?: string;
   }>;
   landscape: {
@@ -26,7 +28,6 @@ export interface Signal {
   demand_strength: string;
   tags?: string[];
   builder_note?: string;
-  _introduced?: string;
   _date: string;
   _slug: string;
 }
@@ -118,16 +119,25 @@ export function getTotalSignals(): number {
 
 /** Group signals by their display category and assign safe, stable route slugs. */
 export function getCategoryEntries(): CategoryEntry[] {
-  const groups = new Map<string, Signal[]>();
+  // `category` is a free-form string from model output, so batches drift
+  // ("SaaS" one day, "saas" the next). Group and route by the normalized
+  // label so variants share one page; the first-seen label is the display.
+  const groups = new Map<string, { label: string; signals: Signal[] }>();
 
   for (const signal of getAllSignals()) {
     const label = signal.category || 'other';
-    groups.set(label, [...(groups.get(label) ?? []), signal]);
+    const key = normalizeRouteSource(label) || 'other';
+    const group = groups.get(key);
+    if (group) {
+      group.signals.push(signal);
+    } else {
+      groups.set(key, { label, signals: [signal] });
+    }
   }
 
-  return Array.from(groups.entries()).map(([label, signals]) => ({
+  return Array.from(groups.entries()).map(([key, { label, signals }]) => ({
     label,
-    slug: stableRouteSlug(label, 'category'),
+    slug: stableRouteSlug(key, 'category'),
     signals,
   }));
 }

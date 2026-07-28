@@ -7,16 +7,18 @@
   distinguish review-as-source from listing-as-source, and added
   reference/validate-staging.mjs (wired into run_signal_daily.sh) that
   prints warnings for stale dates without recent-activity engagement
-  and for vendor-domain sources. PR #8 was closed without merging
-  after every signal failed Phase 4 in retrospect.
-- v2.1: Added source-accuracy rules after PR #8 review. Three rounds of
-  codex review caught: (1) fabricated source dates and a false "newly
-  available" claim about Möbius Sync on iOS, (2) vendor SEO comparison
-  blogs being used as `sources` instead of landscape evidence, and
-  (3) stale 7+ month-old HN threads cited as ongoing demand without
-  verifying recent activity, plus a closed Apple Community thread with
-  zero replies described as having "ongoing replies through 2026." See
-  the SOURCE ACCURACY, SOURCES vs LANDSCAPE, and THREAD RECENCY sections.
+  and for sources on an optional vendor-domain watchlist. The batch that
+  triggered this was thrown out unmerged: applied in retrospect, every
+  signal in it failed Phase 4.
+- v2.1: Added source-accuracy rules after a review of that same batch.
+  Three rounds of review caught: (1) fabricated source dates and a
+  "newly available on iOS" claim about a sync tool that turned out to
+  have shipped years earlier, (2) vendor SEO comparison blogs being used
+  as `sources` instead of landscape evidence, and (3) stale 7+ month-old
+  HN threads cited as ongoing demand without verifying recent activity,
+  plus a closed support-forum thread with zero replies described as
+  having "ongoing replies through 2026." See the SOURCE ACCURACY,
+  SOURCES vs LANDSCAPE, and THREAD RECENCY sections.
 - v2: Rewrote search strategy based on live test run findings. Generic demand
   language searches ("I wish there was an app") get buried by SEO listicles.
   Community-specific thread hunting + web_fetch for full context is the move.

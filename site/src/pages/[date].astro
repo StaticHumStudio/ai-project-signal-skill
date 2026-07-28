@@ -3,6 +3,7 @@ import SignalLayout from '../layouts/SignalLayout.astro';
 import SignalCard from '../components/SignalCard.astro';
 import SignalDivider from '../components/SignalDivider.astro';
 import { getDateEntries, getDatesAscending, getTotalSignals } from '../utils/signals';
+import { withBase } from '../utils/paths.js';
 
 export function getStaticPaths() {
   const dates = getDatesAscending();
@@ -38,7 +39,7 @@ const dayOfWeek = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
 
 // SEO description from first 3 signal titles
 const descSignals = signals.slice(0, 3).map((s: any) => s.title).join(', ');
-const metaDescription = `${signals.length} curated software demand signals: ${descSignals}. With competitive landscape analysis and builder notes.`;
+const metaDescription = `${signals.length} curated demand signals: ${descSignals}. With competitive landscape analysis and builder notes.`;
 
 // JSON-LD
 const publisherUrl = Astro.site ? Astro.site.origin : Astro.url.origin;
@@ -46,7 +47,7 @@ const publisherUrl = Astro.site ? Astro.site.origin : Astro.url.origin;
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Article",
-  "headline": `Software Demand Signals — ${formattedDate}`,
+  "headline": `Demand Signals — ${formattedDate}`,
   "datePublished": date,
   "author": {
     "@type": "Organization",
@@ -61,7 +62,7 @@ const jsonLd = {
 ---
 
 <SignalLayout
-  title={`Software Demand Signals — ${formattedDate} | Signal`}
+  title={`Demand Signals — ${formattedDate} | Signal`}
   description={metaDescription}
   signalCount={totalSignals}
   jsonLd={jsonLd}
@@ -71,13 +72,13 @@ const jsonLd = {
   <header class="page-header">
     <div class="page-nav">
       {prevDate ? (
-        <a href={`/signal/${prevDate}/`} class="nav-arrow nav-prev" title="Previous day">&larr; prev</a>
+        <a href={withBase(`/${prevDate}/`)} class="nav-arrow nav-prev" title="Previous day">&larr; prev</a>
       ) : (
         <span class="nav-arrow nav-disabled">&larr; prev</span>
       )}
-      <a href="/signal/" class="nav-hub">hub</a>
+      <a href={withBase('/')} class="nav-hub">hub</a>
       {nextDate ? (
-        <a href={`/signal/${nextDate}/`} class="nav-arrow nav-next" title="Next day">next &rarr;</a>
+        <a href={withBase(`/${nextDate}/`)} class="nav-arrow nav-next" title="Next day">next &rarr;</a>
       ) : (
         <span class="nav-arrow nav-disabled">next &rarr;</span>
       )}
@@ -103,13 +104,13 @@ const jsonLd = {
   <!-- Bottom nav -->
   <nav class="bottom-nav-bar">
     {prevDate ? (
-      <a href={`/signal/${prevDate}/`} class="btn btn--ghost">&larr; {prevDate}</a>
+      <a href={withBase(`/${prevDate}/`)} class="btn btn--ghost">&larr; {prevDate}</a>
     ) : (
       <span></span>
     )}
-    <a href="/signal/" class="btn btn--primary">back to hub</a>
+    <a href={withBase('/')} class="btn btn--primary">back to hub</a>
     {nextDate ? (
-      <a href={`/signal/${nextDate}/`} class="btn btn--ghost">{nextDate} &rarr;</a>
+      <a href={withBase(`/${nextDate}/`)} class="btn btn--ghost">{nextDate} &rarr;</a>
     ) : (
       <span></span>
     )}

@@ -8,6 +8,7 @@ import {
   getDateEntries,
   getTotalSignals,
 } from '../utils/signals';
+import { withBase } from '../utils/paths.js';
 
 // Load all published signals.
 const allSignals = getAllSignals();
@@ -139,7 +140,7 @@ const jsonLd = {
       </header>
       <div class="category-grid">
         {categoryEntries.map(({ label, slug, signals }) => (
-          <a href={`/signal/category/${slug}/`} class="category-card">
+          <a href={withBase(`/category/${slug}/`)} class="category-card">
             <span class="category-name">{label.replace(/_/g, ' ')}</span>
             <span class="category-count">{signals.length} signal{signals.length === 1 ? '' : 's'}</span>
           </a>
@@ -170,7 +171,7 @@ const jsonLd = {
         ))}
       </div>
       <div class="section-cta">
-        <a href={`/signal/${latestDate}/`} class="btn btn--primary">
+        <a href={withBase(`/${latestDate}/`)} class="btn btn--primary">
           view all {signalsByDate[latestDate]?.length || 0}
           {' '}signal{signalsByDate[latestDate]?.length === 1 ? '' : 's'}
           {' '}from {formatDateShort(latestDate)}
@@ -195,7 +196,7 @@ const jsonLd = {
           const signals = signalsByDate[date] || [];
           const previewTitles = signals.slice(0, 3).map(s => s.title);
           return (
-            <a href={`/signal/${date}/`} class="day-card">
+            <a href={withBase(`/${date}/`)} class="day-card">
               <div class="day-card-header">
                 <span class="day-date">{formatDate(date)}</span>
                 <span class="day-count">{signals.length} signal{signals.length === 1 ? '' : 's'}</span>

@@ -3,6 +3,7 @@ import SignalLayout from '../../layouts/SignalLayout.astro';
 import SignalDivider from '../../components/SignalDivider.astro';
 import { getAllSignals, getTotalSignals } from '../../utils/signals';
 import { safeUrl } from '../../utils/safeUrl.js';
+import { withBase } from '../../utils/paths.js';
 
 export function getStaticPaths() {
   const allSignals = getAllSignals();
@@ -89,19 +90,19 @@ const strengthDots: Record<string, string> = {
   <header class="page-header">
     <nav class="page-nav">
       {prev ? (
-        <a href={`/signal/s/${prev._slug}/`} class="nav-arrow nav-prev" title={prev.title}>&larr; prev</a>
+        <a href={withBase(`/s/${prev._slug}/`)} class="nav-arrow nav-prev" title={prev.title}>&larr; prev</a>
       ) : (
         <span class="nav-arrow nav-disabled">&larr; prev</span>
       )}
-      <a href="/signal/" class="nav-hub">all signals</a>
+      <a href={withBase('/')} class="nav-hub">all signals</a>
       {next ? (
-        <a href={`/signal/s/${next._slug}/`} class="nav-arrow nav-next" title={next.title}>next &rarr;</a>
+        <a href={withBase(`/s/${next._slug}/`)} class="nav-arrow nav-next" title={next.title}>next &rarr;</a>
       ) : (
         <span class="nav-arrow nav-disabled">next &rarr;</span>
       )}
     </nav>
     <p class="page-date-link">
-      <a href={`/signal/${signal._date}/`}>{formattedDate}</a>
+      <a href={withBase(`/${signal._date}/`)}>{formattedDate}</a>
     </p>
   </header>
 
@@ -179,13 +180,13 @@ const strengthDots: Record<string, string> = {
   <!-- Bottom nav -->
   <nav class="bottom-nav-bar">
     {prev ? (
-      <a href={`/signal/s/${prev._slug}/`} class="btn btn--ghost">&larr; prev signal</a>
+      <a href={withBase(`/s/${prev._slug}/`)} class="btn btn--ghost">&larr; prev signal</a>
     ) : (
       <span></span>
     )}
-    <a href={`/signal/${signal._date}/`} class="btn btn--primary">back to {formattedDate}</a>
+    <a href={withBase(`/${signal._date}/`)} class="btn btn--primary">back to {formattedDate}</a>
     {next ? (
-      <a href={`/signal/s/${next._slug}/`} class="btn btn--ghost">next signal &rarr;</a>
+      <a href={withBase(`/s/${next._slug}/`)} class="btn btn--ghost">next signal &rarr;</a>
     ) : (
       <span></span>
     )}

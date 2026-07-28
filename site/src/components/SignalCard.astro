@@ -1,5 +1,6 @@
 ---
 import { safeUrl } from '../utils/safeUrl.js';
+import { withBase } from '../utils/paths.js';
 
 interface Props {
   signal: {
@@ -8,8 +9,8 @@ interface Props {
     sources: Array<{
       url: string;
       platform: string;
-      quote?: string;
-      date?: string;
+      quote: string;
+      date: string;
       engagement?: string;
     }>;
     landscape: {
@@ -25,7 +26,6 @@ interface Props {
     demand_strength: string;
     tags?: string[];
     builder_note?: string;
-    _introduced?: string;
     _slug: string;
   };
   /** When true, builder note is inside a <details> element. Default: false (always visible). */
@@ -36,7 +36,7 @@ interface Props {
 
 const { signal, collapseBuilderNote = false, compact = false } = Astro.props;
 
-const signalHref = `/signal/s/${signal._slug}/`;
+const signalHref = withBase(`/s/${signal._slug}/`);
 
 const difficultyLabel: Record<string, string> = {
   weekend_hack: 'weekend hack',

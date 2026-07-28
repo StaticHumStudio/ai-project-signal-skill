@@ -3,6 +3,7 @@ import SignalLayout from '../../layouts/SignalLayout.astro';
 import SignalCard from '../../components/SignalCard.astro';
 import SignalDivider from '../../components/SignalDivider.astro';
 import { getCategoryEntries, getTotalSignals } from '../../utils/signals';
+import { withBase } from '../../utils/paths.js';
 
 export function getStaticPaths() {
   const totalSignals = getTotalSignals();
@@ -17,7 +18,7 @@ const { category, signals, totalSignals } = Astro.props;
 
 const displayName = category.replace(/_/g, ' ');
 
-const metaDescription = `${signals.length} curated software demand signals in the ${displayName} category. Competitive landscape analysis and builder notes for each.`;
+const metaDescription = `${signals.length} curated demand signals in the ${displayName} category. Competitive landscape analysis and builder notes for each.`;
 ---
 
 <SignalLayout
@@ -29,7 +30,7 @@ const metaDescription = `${signals.length} curated software demand signals in th
   <!-- Page header -->
   <header class="page-header">
     <div class="page-nav">
-      <a href="/signal/" class="nav-hub">&larr; back to hub</a>
+      <a href={withBase('/')} class="nav-hub">&larr; back to hub</a>
     </div>
     <h1 class="page-title">{displayName}</h1>
     <div class="page-meta">
@@ -50,7 +51,7 @@ const metaDescription = `${signals.length} curated software demand signals in th
 
   <!-- Bottom nav -->
   <nav class="bottom-nav-bar">
-    <a href="/signal/" class="btn btn--primary">back to hub</a>
+    <a href={withBase('/')} class="btn btn--primary">back to hub</a>
   </nav>
 
 </SignalLayout>

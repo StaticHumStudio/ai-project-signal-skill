@@ -9,7 +9,9 @@ We ran it as **Signal**: a daily robot that combed the web for unmet software
 demand and filed each opportunity as a tidy little dossier. Signal has since
 wandered out of [Static Hum](https://statichum.studio)'s scope, so here's the
 whole thing — the prompt, the hard-won rules, and the site that displayed it —
-MIT-licensed, no strings. Take it and go.
+MIT-licensed, no strings. The original instance is still humming at
+[signal.statichum.studio](https://signal.statichum.studio) if you want to see
+what the output looks like in the wild. Take it and go.
 
 ## The one idea
 
@@ -142,11 +144,17 @@ Two knobs to turn when you fork:
 
 - **`site`** in `site/astro.config.mjs` — set it to your own domain. Canonical
   and Open Graph URLs are derived from it.
-- **`base`** is `/signal`, and the internal links are rooted there, so the
-  built `dist/` must be served under a `/signal/` path (e.g.
-  `yourdomain.com/signal/`). To serve at the domain root instead, change `base`
-  to `/` **and** update the hard-coded `/signal/...` links in `site/src/`
-  together.
+- **`base`** is `/signal`, so the built `dist/` is served under a `/signal/`
+  path (e.g. `yourdomain.com/signal/`). Set it to `/` to serve at the domain
+  root, or to anything else to move the site. Every internal link runs through
+  `withBase()` in `site/src/utils/paths.js`, so this one value is the only
+  thing you change.
+
+One URL quirk that is not a bug: category pages carry a short hash suffix,
+like `/category/saas-1a2b3c4d/`. Category labels are free-form strings from
+the model, so the hash is what keeps each category URL stable and
+collision-proof no matter what labels later batches invent. Case and spacing
+variants of the same label ("SaaS", "saas") fold onto one page.
 
 The example site also wears Static Hum branding (nav, footer, JSON-LD
 publisher name) — swap it for your own.

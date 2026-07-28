@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict';
-import {readFile} from 'node:fs/promises';
+import {mkdtemp, readFile, mkdir, writeFile} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import path from 'node:path';
 import test from 'node:test';
 
-import {validateSignals} from '../../method/validate-signals.mjs';
+import {validateSignalFile, validateSignals} from '../../method/validate-signals.mjs';
 
 function makeSignal() {
   return {
@@ -54,6 +56,52 @@ test('published files must contain one to ten signals', () => {
     validateSignals([], {stagingDay: '2026-07-24'}).errors[0],
     /1 to 10/,
   );
+});
+
+test('no vendor domains are flagged unless the caller supplies them', () => {
+  const signal = makeSignal();
+  signal.sources[0].url = 'https://some-vendor.example/blog/best-alternatives';
+
+  assert.deepEqual(
+    validateSignals([signal], {stagingDay: '2026-07-24'}).warnings,
+    [],
+  );
+
+  assert.match(
+    validateSignals([signal], {
+      stagingDay: '2026-07-24',
+      vendorDomains: ['some-vendor.example'],
+    }).warnings.join(' '),
+    /vendor-domain watchlist/,
+  );
+});
+
+test('landscape solution urls must parse, like source urls', () => {
+  const invalid = makeSignal();
+  invalid.landscape.existing_solutions = [{
+    name: 'SomeTool',
+    url: 'see their website',
+    gap: 'No offline mode.',
+  }];
+  assert.match(
+    validateSignals([invalid], {stagingDay: '2026-07-24'}).errors[0],
+    /invalid url "see their website"/,
+  );
+});
+
+test('staging day comes from the file name, not the directory path', async () => {
+  const root = await mkdtemp(path.join(tmpdir(), 'signal-validate-'));
+  const decoyDir = path.join(root, '2024-01-01');
+  await mkdir(decoyDir);
+
+  const signal = makeSignal();
+  signal.sources[0].date = '2026-07-20';
+  const file = path.join(decoyDir, '2026-07-24.json');
+  await writeFile(file, JSON.stringify([signal]));
+
+  const result = validateSignalFile(file);
+  assert.equal(result.stagingDay, '2026-07-24');
+  assert.deepEqual(result.errors, []);
 });
 
 test('unknown fields are rejected to match the schema', () => {

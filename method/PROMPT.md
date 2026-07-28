@@ -14,8 +14,9 @@ read.
 Three ways to use it, from least to most editing:
 
 1. **Paste and run as-is** — you get an open sweep for unmet *software* demand.
-2. **Steer it** — fill in the `FOCUS` / `EXCLUDE` block below before you paste.
-   Both are optional; blank means "open sweep, no exclusions."
+2. **Steer it** — fill in the input block below before you paste. Every line is
+   optional; all blank means "open sweep, no exclusions, work the rest out
+   yourself."
 3. **Retarget it** to something non-software — content gaps, physical products,
    local business, competitor intel, books, and so on — by replacing the **two
    marked swap points** below (the *Role* section, and Phase 1's *Where to look*
@@ -30,11 +31,12 @@ what separates a real signal from a plausible-sounding guess.
 
 ## Set your inputs (optional)
 
-Fill in these two lines before you paste — or leave them blank:
+Fill in any of these before you paste — or leave them all blank:
 
 ```text
 FOCUS:
 EXCLUDE:
+DISTRUST:
 OUTPUT:
 ```
 
@@ -57,6 +59,12 @@ OUTPUT:
   exclusions. You can also vary *where* you look from pass to pass to avoid
   tunnel vision (Reddit-heavy one time; Hacker News + Indie Hackers another;
   app-store reviews + Bluesky another; Product Hunt + niche forums another).
+- **DISTRUST** — specific sites or domains whose content must never count as
+  demand evidence, if you already know of some. Blank is the normal case and
+  the default: **working out who the vendors, affiliates, and SEO farms are in
+  this space is the assistant's job**, done live in Phase 4 against pages it
+  actually opened. This line only exists to hand over the ones you already know
+  about, not to make you build a blocklist first.
 
 ## Role — swap point 1 of 2
 
@@ -137,7 +145,11 @@ Before finalizing, open EVERY URL going into `sources` and confirm with your
 eyes (full checklist in [`RUBRIC.md`](./RUBRIC.md)):
 
 1. The `date` matches what the page shows (use the real posted date).
-2. The author is a real user — not a vendor/company/competitor article.
+2. The author is a real user — not a vendor/company/competitor article. Decide
+   this yourself from the page: who runs this domain, do they sell in this
+   space, is the page structured to rank rather than to complain? Anything on
+   the `DISTRUST` list is out on sight, but that list is a shortcut, not the
+   test.
 3. It's demand, not supply — drop "Show HN"/self-promo of one's own product.
 4. If the page is older than ~2 weeks, cite a specific recent activity you saw
    (a comment dated within the last month). Post age or total comment count

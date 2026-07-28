@@ -41,7 +41,10 @@ rather than paraphrasing from memory.
 Before a signal ships, open every URL you cite and confirm with your eyes:
 
 - The **date** matches the page.
-- The author is a **real user**, not a vendor/company/competitor article.
+- The author is a **real user**, not a vendor/company/competitor article. Work
+  out who sells in this space as you go, from the pages themselves — no
+  pre-supplied blocklist will cover your focus area, and its absence is never
+  an excuse to treat marketing as demand.
 - It's **demand, not supply** — someone promoting their own product (a typical
   "Show HN") is supply; drop it from `sources`.
 - The page **actually loaded** — a 429, an error, or a login wall means you

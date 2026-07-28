@@ -37,7 +37,7 @@
             "additionalProperties": false,
             "properties": {
               "name": { "type": "string", "minLength": 1 },
-              "url": { "type": "string", "minLength": 1 },
+              "url": { "type": "string", "format": "uri" },
               "gap": { "type": "string", "minLength": 1 }
             }
           }
