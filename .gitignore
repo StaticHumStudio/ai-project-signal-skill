@@ -4,3 +4,4 @@ dist/
 .worktrees/
 site/content/staging/*
 !site/content/staging/.gitkeep
+cache/

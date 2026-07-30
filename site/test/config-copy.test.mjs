@@ -109,13 +109,20 @@ test('no target-specific copy is hardcoded outside config.js', () => {
 });
 
 test('rendered copy carries no em or en dashes', () => {
-  // House style: no em dashes, no en dashes, in anything a reader sees. That
-  // covers the bundled fixture too, since its fields render on the page.
-  const fixture = JSON.parse(
-    readFileSync(new URL('../content/published/2026-01-01.json', import.meta.url), 'utf8')
-  );
+  // House style: no em dashes, no en dashes, in anything a reader sees. Every
+  // published batch renders on the page, so check all of them and not just the
+  // bundled fixture. A batch added later is exactly the one that slips through.
+  const publishedDir = fileURLToPath(new URL('../content/published', import.meta.url));
+  const batches = readdirSync(publishedDir)
+    .filter(name => name.endsWith('.json'))
+    .map(name => [
+      `published/${name}`,
+      JSON.parse(readFileSync(join(publishedDir, name), 'utf8'))
+    ]);
 
-  for (const [source, tree] of [['config', siteConfig], ['fixture', fixture]]) {
+  assert.ok(batches.length > 0, 'expected at least one published batch to check');
+
+  for (const [source, tree] of [['config', siteConfig], ...batches]) {
     for (const [key, value] of Object.entries(flatten(tree))) {
       assert.ok(
         !/[—–]/.test(value),

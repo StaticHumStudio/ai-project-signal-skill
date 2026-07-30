@@ -72,6 +72,14 @@ pages.
 Test it, don't assume it. A compatibility list would be out of date the moment
 anyone signs a licensing deal.
 
+**If it fails, or you'd rather not depend on it:**
+[`collector/`](./collector) is a standard-library Python script that fetches
+Hacker News, any Discourse forum, and open GitHub issues into a local JSONL
+cache, then hands the assistant real timestamps instead of asking it to read
+them off a page. No install, no keys. It removes the retrieval dependency for
+sources, though landscape research still needs an assistant that can open a
+vendor's page.
+
 Either path returns the same thing: one research pass, then the signals in
 whatever form you want. A readable rundown, a **Markdown** file, a standalone
 **HTML** page, or the raw **JSON** (matching
