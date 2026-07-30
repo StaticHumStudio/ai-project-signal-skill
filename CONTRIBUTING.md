@@ -19,8 +19,10 @@ npm ci
 npm run dev
 ```
 
-The local site is served under `/signal/`. Use the URL Astro prints in the
-terminal.
+The local site is served at the root. Use the URL Astro prints in the terminal.
+
+New signal batches are only picked up when the dev server starts, so restart it
+after adding a file to `site/content/`.
 
 ## Required checks
 
