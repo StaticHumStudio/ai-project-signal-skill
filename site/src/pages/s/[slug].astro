@@ -4,6 +4,7 @@ import SignalDivider from '../../components/SignalDivider.astro';
 import { getAllSignals, getTotalSignals } from '../../utils/signals';
 import { safeUrl } from '../../utils/safeUrl.js';
 import { withBase } from '../../utils/paths.js';
+import { siteConfig } from '../../config.js';
 
 export function getStaticPaths() {
   const allSignals = getAllSignals();
@@ -44,11 +45,11 @@ const jsonLd = {
   "datePublished": signal._date,
   "author": {
     "@type": "Organization",
-    "name": "Static Hum Studio",
+    "name": siteConfig.brand.publisher,
   },
   "publisher": {
     "@type": "Organization",
-    "name": "Static Hum Studio",
+    "name": siteConfig.brand.publisher,
     "url": publisherUrl,
   },
 };
@@ -80,7 +81,7 @@ const strengthDots: Record<string, string> = {
 ---
 
 <SignalLayout
-  title={`${signal.title} | Signal`}
+  title={`${signal.title} | ${siteConfig.brand.name}`}
   description={metaDescription}
   signalCount={totalSignals}
   jsonLd={jsonLd}

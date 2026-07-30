@@ -3,6 +3,7 @@ import SignalNav from '../components/SignalNav.astro';
 import SignalFooter from '../components/SignalFooter.astro';
 import '../styles/signal.css';
 import { withBase } from '../utils/paths.js';
+import { siteConfig } from '../config.js';
 
 interface Props {
   title: string;
@@ -67,7 +68,7 @@ const jsonLdHtml = jsonLd
     />
 
     <!-- RSS -->
-    <link rel="alternate" type="application/rss+xml" title="Signal RSS" href={withBase('/rss.xml')} />
+    <link rel="alternate" type="application/rss+xml" title={siteConfig.rss.linkTitle} href={withBase('/rss.xml')} />
 
     <!-- JSON-LD -->
     {jsonLdHtml && (

@@ -3,7 +3,7 @@
 # REFERENCE: this is the production automation that ran Signal as a daily
 # pipeline (cron -> Claude CLI -> validate -> isolated worktree -> review PR).
 # The portable, provider-agnostic version of the sourcing prompt is
-# ../method/PROMPT.md — use that to run a single pass by hand in any assistant.
+# ../method/PROMPT.md, which runs a single pass by hand in any assistant.
 # This script is kept as an example of how the automated loop was wired.
 #
 # Daily Signal sourcing via Claude Code CLI.

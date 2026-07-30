@@ -1,6 +1,6 @@
 # Recipes: point it at something other than software
 
-*You don't have to do any of this by hand — [`GUIDED.md`](./GUIDED.md)
+*You don't have to do any of this by hand. [`GUIDED.md`](./GUIDED.md)
 interviews you and configures the retarget for you. This file is for driving it
 yourself, or for understanding what the guided prompt is doing under the hood.*
 
@@ -8,15 +8,15 @@ yourself, or for understanding what the guided prompt is doing under the hood.*
 doesn't care. To aim it somewhere else you change **two things** at the top of
 `PROMPT.md` and leave the rest alone:
 
-1. **The opening paragraph** — the "You are a demand signal researcher for the
+1. **The opening paragraph**, the "You are a demand signal researcher for the
    software industry…" sentence. This defines *who* the researcher is and *what
    counts as a signal.*
-2. **The "where to look" list under `### Phase 1`** — the communities and
+2. **The "where to look" list under `### Phase 1`**, the communities and
    search patterns. Point them at wherever your people actually gather.
 
-Everything from `### Phase 2` down — read the whole thread, verify every
+Everything from `### Phase 2` down (read the whole thread, verify every
 source, map what already exists, quality over count, and the whole of
-`RUBRIC.md` — is domain-agnostic discipline. **Don't touch it.** That part is
+`RUBRIC.md`) is domain-agnostic discipline. **Don't touch it.** That part is
 what makes the output trustworthy instead of a confident guess, and it works
 exactly the same whether you're hunting apps, gadgets, or novels.
 
@@ -30,7 +30,7 @@ assembled into a complete, paste-and-run prompt.
 
 ---
 
-## Recipe: content gaps — "what should I make?"
+## Recipe: content gaps, "what should I make?"
 
 **Hunting:** explainers, tutorials, and guides people keep asking for and can't
 find. Great for creators, teachers, and docs writers.
@@ -38,7 +38,7 @@ find. Great for creators, teachers, and docs writers.
 **Replace the opening paragraph with:**
 > You are a content-gap researcher. Your job is to find real, evidenced demand
 > for explainers, tutorials, and guides that people are actively asking for and
-> failing to find — by mining communities where learners describe what confused
+> failing to find, by mining communities where learners describe what confused
 > them and what they wish someone would just explain clearly.
 
 **Where to look (swap into Phase 1):** YouTube comment sections, `r/learn*`
@@ -55,7 +55,7 @@ paywalled). `difficulty` ≈ effort to produce (`quick_explainer` →
 
 ---
 
-## Recipe: physical products — "what should I put on the shelf?"
+## Recipe: physical products, "what should I put on the shelf?"
 
 **Hunting:** tangible products people wish existed, or wish worked differently.
 *(This recipe is assembled end-to-end in [`EXAMPLE.md`](./EXAMPLE.md).)*
@@ -63,12 +63,12 @@ paywalled). `difficulty` ≈ effort to produce (`quick_explainer` →
 **Replace the opening paragraph with:**
 > You are a product-gap researcher for physical goods. Your job is to find real,
 > evidenced demand for physical products people wish existed or wish worked
-> differently — by mining communities and reviews where real owners describe
+> differently, by mining communities and reviews where real owners describe
 > what they can't buy and what their current gear gets wrong.
 
 **Where to look (swap into Phase 1):** `r/BuyItForLife`, `r/gadgets`,
-`r/somethingimade`, hobby and maker forums, Kickstarter comment threads, and —
-this is the gold — 1-to-3-star Amazon reviews. Query patterns:
+`r/somethingimade`, hobby and maker forums, Kickstarter comment threads, and
+(this is the gold) 1-to-3-star Amazon reviews. Query patterns:
 - `[category] "wish there was one that" OR "why doesn't anyone make"`
 - `[popular product] review "wish it also" OR "so close but"`
 - `r/BuyItForLife [category] "can't find one that"`
@@ -79,14 +79,14 @@ crowded, and the win is a specific, named shortfall.
 
 ---
 
-## Recipe: local business gaps — "what's missing in my town?"
+## Recipe: local business gaps, "what's missing in my town?"
 
 **Hunting:** local services or venues a specific place keeps wishing for.
 
 **Replace the opening paragraph with:**
 > You are a local-opportunity researcher. For the city or region named in
 > FOCUS, find real, evidenced demand for local services and venues residents
-> wish existed — by mining where that community talks about what their area
+> wish existed, by mining where that community talks about what their area
 > lacks.
 
 **Where to look (swap into Phase 1):** the city subreddit (`r/[city]`), local
@@ -102,17 +102,17 @@ recurs. Worth a line in `builder_note` about seasonality or catchment size.
 
 ---
 
-## Recipe: competitor intel — "what do [product]'s users secretly want?"
+## Recipe: competitor intel, "what do [product]'s users secretly want?"
 
 **Hunting:** what one specific product's users repeatedly beg for and rage
-about. This one swaps *scope*, not domain — you aim the whole thing at a single
+about. This one swaps *scope*, not domain. You aim the whole thing at a single
 target.
 
 **Replace the opening paragraph with:**
 > You are a product-research analyst studying the user community of the product
-> named in FOCUS. Find what its users repeatedly ask for and complain about —
+> named in FOCUS. Find what its users repeatedly ask for and complain about:
 > the recurring feature requests, dealbreakers, and "I switched away because…"
-> stories — backed by real posts.
+> stories, all backed by real posts.
 
 **Where to look (swap into Phase 1):** the product's subreddit, its **open**
 GitHub issues, its app-store/review sections, its Discord or forum, and
@@ -124,18 +124,18 @@ Query patterns:
 
 **Reading the output:** each signal is a feature-request or complaint cluster;
 `landscape` = how competitors handle that same thing. Keep the source rules
-honest — a vendor's own "Show HN"/announcement is *supply*, not demand.
+honest. A vendor's own "Show HN"/announcement is *supply*, not demand.
 
 ---
 
-## Recipe: books that don't exist — "what should someone write?"
+## Recipe: books that don't exist, "what should someone write?"
 
 **Hunting:** books, genres, and stories readers keep wishing someone would
 write.
 
 **Replace the opening paragraph with:**
 > You are a literary-gap researcher. Find real, evidenced reader demand for
-> books that don't exist yet — by mining where readers describe the exact story
+> books that don't exist yet, by mining where readers describe the exact story
 > they want and can't find.
 
 **Where to look (swap into Phase 1):** `r/suggestmeabook`, `r/books`,
@@ -151,7 +151,7 @@ books and why they miss. `builder_note` becomes the craft/angle note.
 
 ## Roll your own
 
-The template — fill in the four blanks:
+The template, with four blanks to fill in:
 
 > You are a **[X]**-gap researcher. Find real, evidenced demand for **[the
 > thing]** that people actively want and can't adequately find, by mining

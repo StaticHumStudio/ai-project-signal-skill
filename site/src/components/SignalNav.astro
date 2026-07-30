@@ -1,21 +1,26 @@
 ---
 import { withBase } from '../utils/paths.js';
+import { siteConfig } from '../config.js';
 
 interface Props {
   signalCount?: number;
 }
 
 const { signalCount = 0 } = Astro.props;
+const { name, owner, ownerUrl } = siteConfig.brand;
 ---
 
-<div class="utility-bar">
-  <a href="https://statichum.studio" class="utility-home">&larr; statichum.studio</a>
-</div>
 <nav class="top-nav">
   <div class="nav-brand">
-    <a href={withBase('/')} class="nav-signal-link">SIGNAL</a>
-    <span class="nav-divider">//</span>
-    <a href="https://statichum.studio" class="nav-hum-link">STATIC HUM</a>
+    <a href={withBase('/')} class="nav-signal-link">{name}</a>
+    {owner && (
+      <>
+        <span class="nav-divider">//</span>
+        {ownerUrl
+          ? <a href={ownerUrl} class="nav-hum-link">{owner}</a>
+          : <span class="nav-hum-link">{owner}</span>}
+      </>
+    )}
   </div>
   <div class="nav-right">
     <span class="nav-count">{signalCount} signal{signalCount === 1 ? '' : 's'}</span>
@@ -24,35 +29,9 @@ const { signalCount = 0 } = Astro.props;
 </nav>
 
 <style>
-  .utility-bar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 101;
-    background: var(--void, #0a0a0c);
-    border-bottom: 1px solid var(--ghost, rgba(68, 71, 72, 0.12));
-    padding: 0.25rem 1.25rem;
-    display: flex;
-    align-items: center;
-  }
-
-  .utility-home {
-    font-family: var(--font-mono, 'IBM Plex Mono', monospace);
-    font-size: 0.5rem;
-    color: var(--muted, #a69e90);
-    letter-spacing: 0.06em;
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-
-  .utility-home:hover {
-    color: var(--teal, #38b2ac);
-  }
-
   .top-nav {
     position: fixed;
-    top: 1.35rem;
+    top: 0;
     left: 0;
     right: 0;
     z-index: 100;

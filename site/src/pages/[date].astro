@@ -4,6 +4,7 @@ import SignalCard from '../components/SignalCard.astro';
 import SignalDivider from '../components/SignalDivider.astro';
 import { getDateEntries, getDatesAscending, getTotalSignals } from '../utils/signals';
 import { withBase } from '../utils/paths.js';
+import { siteConfig } from '../config.js';
 
 export function getStaticPaths() {
   const dates = getDatesAscending();
@@ -47,22 +48,22 @@ const publisherUrl = Astro.site ? Astro.site.origin : Astro.url.origin;
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Article",
-  "headline": `Demand Signals — ${formattedDate}`,
+  "headline": `Demand Signals: ${formattedDate}`,
   "datePublished": date,
   "author": {
     "@type": "Organization",
-    "name": "Static Hum Studio",
+    "name": siteConfig.brand.publisher,
   },
   "publisher": {
     "@type": "Organization",
-    "name": "Static Hum Studio",
+    "name": siteConfig.brand.publisher,
     "url": publisherUrl,
   },
 };
 ---
 
 <SignalLayout
-  title={`Demand Signals — ${formattedDate} | Signal`}
+  title={`Demand Signals: ${formattedDate} | ${siteConfig.brand.name}`}
   description={metaDescription}
   signalCount={totalSignals}
   jsonLd={jsonLd}

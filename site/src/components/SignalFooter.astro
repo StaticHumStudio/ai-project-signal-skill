@@ -1,13 +1,18 @@
 ---
 import { withBase } from '../utils/paths.js';
+import { siteConfig } from '../config.js';
+
+const { credit, creditLabel, creditUrl } = siteConfig.brand;
 ---
 
 <footer class="signal-footer">
   <div class="footer-inner">
-    <span class="footer-left">Signal // open-source example by Static Hum Studio</span>
+    <span class="footer-left">{credit}</span>
     <div class="footer-links">
       <a href={withBase('/rss.xml')}>RSS</a>
-      <a href="https://statichum.studio" target="_blank" rel="noopener">statichum.studio</a>
+      {creditUrl && (
+        <a href={creditUrl} target="_blank" rel="noopener">{creditLabel}</a>
+      )}
     </div>
   </div>
 </footer>

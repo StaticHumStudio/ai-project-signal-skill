@@ -1,0 +1,143 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+import { siteConfig } from '../src/config.js';
+
+const SRC = fileURLToPath(new URL('../src', import.meta.url));
+const CONFIG = join(SRC, 'config.js');
+
+function sourceFiles(dir) {
+  const out = [];
+  for (const entry of readdirSync(dir)) {
+    const full = join(dir, entry);
+    if (statSync(full).isDirectory()) {
+      out.push(...sourceFiles(full));
+      continue;
+    }
+    if (/\.(astro|ts|js)$/.test(entry) && full !== CONFIG) out.push(full);
+  }
+  return out;
+}
+
+const FILES = sourceFiles(SRC).map(path => ({
+  path: relative(SRC, path),
+  text: readFileSync(path, 'utf8'),
+}));
+
+test('config exposes every string the templates render', () => {
+  const { brand, meta, hero, rss, seo, sections } = siteConfig;
+
+  for (const [key, value] of Object.entries(brand)) {
+    if (value === null) continue;
+    assert.equal(typeof value, 'string', `brand.${key} must be a string or null`);
+    assert.ok(value.length > 0, `brand.${key} must not be empty`);
+  }
+
+  for (const [key, value] of Object.entries(meta)) {
+    assert.ok(value.length > 0, `meta.${key} must not be empty`);
+  }
+
+  for (const key of ['overline', 'headline', 'subhead', 'blurb', 'note']) {
+    assert.equal(typeof hero[key], 'string', `hero.${key} must be a string`);
+    assert.ok(hero[key].length > 0, `hero.${key} must not be empty`);
+  }
+  for (const key of ['signals', 'batches', 'sources']) {
+    assert.ok(hero.stats[key].length > 0, `hero.stats.${key} must not be empty`);
+  }
+
+  for (const key of ['title', 'description', 'linkTitle']) {
+    assert.ok(rss[key].length > 0, `rss.${key} must not be empty`);
+  }
+
+  assert.ok(seo.keywords.length > 0, 'seo.keywords must not be empty');
+  assert.ok(seo.faq.length > 0, 'seo.faq must not be empty');
+  for (const entry of seo.faq) {
+    assert.ok(entry.question.length > 0, 'every faq entry needs a question');
+    assert.ok(entry.answer.length > 0, 'every faq entry needs an answer');
+  }
+
+  for (const name of ['searchIntent', 'about']) {
+    assert.ok(sections[name].heading.length > 0, `sections.${name} needs a heading`);
+    assert.ok(sections[name].body.length > 0, `sections.${name} needs body copy`);
+  }
+  assert.ok(sections.process.steps.length > 0, 'process needs steps');
+  for (const step of sections.process.steps) {
+    for (const key of ['number', 'title', 'body']) {
+      assert.ok(step[key].length > 0, `process step needs a ${key}`);
+    }
+  }
+});
+
+test('no brand identity is hardcoded outside config.js', () => {
+  // A forker changes config.js and expects the whole site to follow. Any
+  // owner-specific string living in a template silently survives that edit,
+  // which is how an unchanged deploy ends up advertising somebody else.
+  const OWNER_STRINGS = [/statichum\.studio/i, /static\s+hum/i];
+
+  for (const file of FILES) {
+    for (const pattern of OWNER_STRINGS) {
+      assert.ok(
+        !pattern.test(file.text),
+        `${file.path} hardcodes ${pattern}. Move it into src/config.js.`
+      );
+    }
+  }
+});
+
+test('no target-specific copy is hardcoded outside config.js', () => {
+  // The method retargets to books, physical products, videos, local services.
+  // Rendered copy that assumes software has to come from config so it can be
+  // swapped along with everything else.
+  const TARGET_WORDS = [
+    /what should I code/i,
+    /coding projects/i,
+    /project ideas for developers/i,
+    /indie developers/i,
+  ];
+
+  for (const file of FILES) {
+    for (const pattern of TARGET_WORDS) {
+      assert.ok(
+        !pattern.test(file.text),
+        `${file.path} hardcodes target-specific copy ${pattern}. Move it into src/config.js.`
+      );
+    }
+  }
+});
+
+test('rendered copy carries no em or en dashes', () => {
+  // House style: no em dashes, no en dashes, in anything a reader sees. That
+  // covers the bundled fixture too, since its fields render on the page.
+  const fixture = JSON.parse(
+    readFileSync(new URL('../content/published/2026-01-01.json', import.meta.url), 'utf8')
+  );
+
+  for (const [source, tree] of [['config', siteConfig], ['fixture', fixture]]) {
+    for (const [key, value] of Object.entries(flatten(tree))) {
+      assert.ok(
+        !/[—–]/.test(value),
+        `${source}.${key} contains a dash character: ${value}`
+      );
+    }
+  }
+});
+
+function flatten(value, prefix = '', out = {}) {
+  if (typeof value === 'string') {
+    out[prefix] = value;
+    return out;
+  }
+  if (Array.isArray(value)) {
+    value.forEach((item, i) => flatten(item, `${prefix}[${i}]`, out));
+    return out;
+  }
+  if (value && typeof value === 'object') {
+    for (const [key, inner] of Object.entries(value)) {
+      flatten(inner, prefix ? `${prefix}.${key}` : key, out);
+    }
+  }
+  return out;
+}

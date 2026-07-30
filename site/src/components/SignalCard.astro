@@ -236,11 +236,18 @@ const strengthDots: Record<string, string> = {
     color: var(--gold-dim);
     letter-spacing: 0.15em;
     text-transform: uppercase;
-    display: block;
     margin-bottom: 0.2rem;
   }
 
+  .note-label {
+    display: block;
+  }
+
+  /* `display: block` on a <summary> strips the disclosure triangle, which left
+     the collapsed note looking like an empty box. `list-item` keeps the marker
+     while still forcing the summary onto its own line. */
   .note-toggle {
+    display: list-item;
     cursor: pointer;
     transition: color 0.2s;
   }
