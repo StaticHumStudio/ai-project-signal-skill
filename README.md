@@ -53,6 +53,25 @@ template: set a `FOCUS`, run an open software sweep, or retarget it to anything
 using [`RECIPES.md`](./method/RECIPES.md).
 [`method/EXAMPLE.md`](./method/EXAMPLE.md) is a finished one.
 
+### Preflight: check your assistant can actually read pages
+
+Do this once, before your first run. Ask your assistant to open one Reddit
+thread and one forum thread and report what it sees. **If it cannot read the
+actual page content, stop.** This method cannot run on search snippets, and an
+assistant that tries will hand you confident fiction rather than an error.
+
+This is not hypothetical. "Can search the web" and "can open a specific page on
+a specific site" are different capabilities, and the second one varies by
+assistant, by harness, and by site. Some sites block some assistants' crawlers
+outright. The failure is silent: the assistant still produces well-formed,
+plausible signals, just built on snippets and recall instead of pages it read.
+That is the exact failure mode [`method/RUBRIC.md`](./method/RUBRIC.md) exists
+to prevent, and it can only prevent it if the assistant is actually opening the
+pages.
+
+Test it, don't assume it. A compatibility list would be out of date the moment
+anyone signs a licensing deal.
+
 Either path returns the same thing: one research pass, then the signals in
 whatever form you want. A readable rundown, a **Markdown** file, a standalone
 **HTML** page, or the raw **JSON** (matching

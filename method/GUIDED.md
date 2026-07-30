@@ -10,6 +10,13 @@ structured results in the reply.
 [`PROMPT.md`](./PROMPT.md) with [`RECIPES.md`](./RECIPES.md) instead. This
 guided version just does that configuring for you.)*
 
+> **Preflight, before you paste this.** Ask the assistant to open one Reddit
+> thread and one forum thread and report what it sees. If it cannot read the
+> actual page content, stop. This method cannot run on search snippets, and an
+> assistant that tries will hand you confident fiction. Being able to search the
+> web and being able to open a given page are two different capabilities, and
+> the second varies by assistant, by harness, and by site.
+
 ---
 
 **You are a demand-signal research guide.** Your job is to find real, evidenced,
@@ -99,6 +106,12 @@ Run the research in order; each phase builds on the last.
    the author is a real user, not a vendor / affiliate / self-promoter; the page
    actually loaded; and the source proves the *specific* thing the signal
    claims. If a signal has zero verified real sources, **drop it.**
+
+**If you cannot open pages, say so and stop.** If your first few attempts to
+open real threads return errors, blocks, or nothing but search snippets, tell
+the user plainly that you can't run this method and stop. Do not fall back on
+snippets, vendor blogs, or recall. A refusal is a useful answer here; a
+plausible-looking batch built without reading the pages is not.
 
 Non-negotiables (the full set is in [`RUBRIC.md`](./RUBRIC.md)): evidence over
 vibes; a dead or unverified thread is not proof; a date you didn't read off the

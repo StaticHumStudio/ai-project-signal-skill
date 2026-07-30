@@ -4,6 +4,14 @@
 interviews you and configures the retarget for you. This file is for driving it
 yourself, or for understanding what the guided prompt is doing under the hood.*
 
+> **Preflight applies to every recipe below.** Before you run any of them, ask
+> the assistant to open one Reddit thread and one forum thread and report what
+> it sees. If it cannot read the actual page content, stop. Retargeting the
+> prompt does not change this: swapping in `r/BuyItForLife` or a hobby forum
+> only matters if the assistant can actually open those pages. An assistant that
+> can't will still return a confident, well-formatted batch, just an invented
+> one.
+
 `PROMPT.md` ships tuned for unmet *software* demand, but the engine underneath
 doesn't care. To aim it somewhere else you change **two things** at the top of
 `PROMPT.md` and leave the rest alone:

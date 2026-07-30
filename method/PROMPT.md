@@ -7,6 +7,13 @@ Paste this whole file into any assistant that can search the web and open pages
 and returns the result in its reply. There is no file to write and no repo to
 read.
 
+> **Preflight, before you paste this.** Ask the assistant to open one Reddit
+> thread and one forum thread and report what it sees. If it cannot read the
+> actual page content, stop. This method cannot run on search snippets, and an
+> assistant that tries will hand you confident fiction. "Can search the web" and
+> "can open this specific page" are different capabilities, and the second
+> varies by assistant, by harness, and by site.
+
 > **Don't want to set anything up?** Paste [`GUIDED.md`](./GUIDED.md) instead.
 > It interviews you in plain language and does all of the configuring below for
 > you. This file (`PROMPT.md`) is for when you'd rather drive it by hand.
