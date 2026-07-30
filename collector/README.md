@@ -16,8 +16,11 @@ what is actually in it. Dates stop being something the model reports and start
 being something the file records, which removes the single most common
 fabrication the rubric exists to catch.
 
-Standard library Python 3.9 or newer. No `pip install`, no virtualenv, no API
-keys, no accounts.
+Standard library only. No `pip install`, no virtualenv, no API keys, no
+accounts. Developed and tested on Python 3.12. It should run on 3.9 and newer,
+but that is reasoning about the syntax used rather than something anyone has
+verified, so if you are on an older Python and it breaks, please open an issue
+with the traceback.
 
 ## Run it
 
