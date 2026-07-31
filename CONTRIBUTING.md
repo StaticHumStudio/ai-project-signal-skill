@@ -6,6 +6,8 @@ easier to review and much more likely to land.
 ## Before you start
 
 - Use Node.js 22.12.0 or newer and npm 9.6.5 or newer.
+- Use Python 3.9 or newer. `npm run check` runs the collector's tests too, and
+  they are standard library `unittest`, so there is nothing to install.
 - Open an issue before a large behavior or schema change so the direction can
   be settled before you spend the time.
 - Never commit credentials, private source material, personal data, or copied
@@ -21,8 +23,10 @@ npm run dev
 
 The local site is served at the root. Use the URL Astro prints in the terminal.
 
-Adding a batch to `site/content/published/` shows up on the next page load. The
-dev server does not cache signals, so there is no need to restart it.
+Editing a batch already in `site/content/published/` shows up on the next page
+load, because the dev server does not cache signals. Adding a batch on a *new*
+date needs a restart: its page comes from `getStaticPaths`, which runs once at
+startup, so the date route 404s until you stop and start the dev server.
 
 ## Required checks
 
@@ -34,8 +38,8 @@ npm run check
 npm audit --omit=dev --audit-level=high
 ```
 
-`npm run check` runs the unit tests, validates the bundled synthetic fixture,
-and builds the static site.
+`npm run check` runs the site's unit tests and the collector's, validates the
+bundled synthetic fixture, and builds the static site.
 
 To validate another signal batch from the repository root:
 

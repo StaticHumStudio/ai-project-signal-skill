@@ -162,34 +162,43 @@ def record(
 
 
 def write_cache(records: list[dict], source: str, out_dir: str) -> str:
-    """Append to today's cache file, skipping ids already present, so repeated
-    passes with different queries accumulate instead of clobbering."""
+    """Merge into today's cache file, so repeated passes with different queries
+    accumulate instead of clobbering.
+
+    A record collected again replaces the older copy rather than being dropped.
+    A GitHub issue's whole claim to being alive is its comment count, and the
+    first pass of the day is the one most likely to be stale.
+    """
     day = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     directory = os.path.join(out_dir, day)
     os.makedirs(directory, exist_ok=True)
     path = os.path.join(directory, f"{source}.jsonl")
 
-    seen = set()
+    merged: dict[str, dict] = {}
     if os.path.exists(path):
         with open(path, encoding="utf-8") as handle:
             for line in handle:
                 line = line.strip()
                 if line:
                     try:
-                        seen.add(json.loads(line)["id"])
+                        item = json.loads(line)
+                        merged[item["id"]] = item
                     except (json.JSONDecodeError, KeyError):
                         continue
 
     added = 0
-    with open(path, "a", encoding="utf-8") as handle:
-        for item in records:
-            if item["id"] in seen:
-                continue
-            seen.add(item["id"])
-            handle.write(json.dumps(item, ensure_ascii=False) + "\n")
+    for item in records:
+        if item["id"] not in merged:
             added += 1
+        merged[item["id"]] = item
 
-    print(f"  wrote {added} new ({len(records) - added} already cached) -> {path}")
+    temporary = f"{path}.tmp"
+    with open(temporary, "w", encoding="utf-8") as handle:
+        for item in merged.values():
+            handle.write(json.dumps(item, ensure_ascii=False) + "\n")
+    os.replace(temporary, path)
+
+    print(f"  wrote {added} new ({len(records) - added} refreshed) -> {path}")
     return path
 
 
@@ -236,10 +245,35 @@ def strip_html(value: str | None) -> str:
 # -------------------------------------------------------------- source: hn
 
 
+HN_PAGE_SIZE = 100
+
+
+def _hn_record(hit, kind, query) -> dict:
+    object_id = hit.get("objectID")
+    story_id = hit.get("story_id") or object_id
+    body = hit.get("comment_text") or hit.get("story_text") or ""
+    return record(
+        doc_id=object_id,
+        source="hackernews",
+        kind=kind,
+        url=f"https://news.ycombinator.com/item?id={object_id}",
+        title=hit.get("title") or hit.get("story_title"),
+        body=strip_html(body) or (hit.get("url") or ""),
+        author=hit.get("author"),
+        created=hit.get("created_at_i"),
+        score=hit.get("points"),
+        num_comments=hit.get("num_comments"),
+        thread_id=story_id,
+        thread_url=f"https://news.ycombinator.com/item?id={story_id}",
+        query=query,
+    )
+
+
 def collect_hn(args) -> list[dict]:
     """Hacker News via the Algolia search API. Stories and comments both, since
     the signal is usually in the replies."""
     results: list[dict] = []
+    story_ids: list[str] = []
     cutoff = parse_since(args.since)
 
     for tag in ("story", "comment"):
@@ -251,7 +285,9 @@ def collect_hn(args) -> list[dict]:
                     "query": args.query,
                     "tags": tag,
                     "numericFilters": f"created_at_i>{cutoff}",
-                    "hitsPerPage": min(100, args.limit - collected),
+                    # Algolia derives each page's offset from hitsPerPage, so
+                    # shrinking it on the last request re-reads earlier hits.
+                    "hitsPerPage": HN_PAGE_SIZE,
                     "page": page,
                 }
             )
@@ -262,35 +298,56 @@ def collect_hn(args) -> list[dict]:
             if not hits:
                 break
 
-            for hit in hits:
-                object_id = hit.get("objectID")
+            for hit in hits[: args.limit - collected]:
                 is_comment = tag == "comment"
                 body = hit.get("comment_text") or hit.get("story_text") or ""
                 if is_comment and not body.strip():
                     continue
-                story_id = hit.get("story_id") or object_id
+                if not is_comment:
+                    story_ids.append(hit.get("objectID"))
                 results.append(
-                    record(
-                        doc_id=object_id,
-                        source="hackernews",
-                        kind="comment" if is_comment else "story",
-                        url=f"https://news.ycombinator.com/item?id={object_id}",
-                        title=hit.get("title") or hit.get("story_title"),
-                        body=strip_html(body) or (hit.get("url") or ""),
-                        author=hit.get("author"),
-                        created=hit.get("created_at_i"),
-                        score=hit.get("points"),
-                        num_comments=hit.get("num_comments"),
-                        thread_id=story_id,
-                        thread_url=f"https://news.ycombinator.com/item?id={story_id}",
-                        query=args.query,
-                    )
+                    _hn_record(hit, "comment" if is_comment else "story", args.query)
                 )
                 collected += 1
 
             page += 1
             if page >= payload.get("nbPages", 0):
                 break
+
+    results.extend(_hn_replies(story_ids, args.replies, args.query))
+
+    deduped: dict[str, dict] = {}
+    for item in results:
+        deduped.setdefault(item["id"], item)
+    return list(deduped.values())
+
+
+def _hn_replies(story_ids: list[str], want: int, query: str) -> list[dict]:
+    """Pull each matched story's own replies, newest first.
+
+    The comment pass above only finds comments containing the query text. A
+    story about the problem usually draws replies that never repeat its
+    wording, and those replies are where the method says the demand lives.
+    """
+    results: list[dict] = []
+    if want <= 0:
+        return results
+
+    for story_id in story_ids:
+        params = urllib.parse.urlencode(
+            {"tags": f"comment,story_{story_id}", "hitsPerPage": min(HN_PAGE_SIZE, want)}
+        )
+        url = f"https://hn.algolia.com/api/v1/search_by_date?{params}"
+        print(f"  replies to {story_id}: {url}")
+        try:
+            payload = fetch_json(url, respect_robots=False)
+        except urllib.error.HTTPError as error:
+            print(f"    could not fetch replies: {error}")
+            continue
+        for hit in payload.get("hits", []):
+            if not (hit.get("comment_text") or "").strip():
+                continue
+            results.append(_hn_record(hit, "comment", query))
 
     return results
 
@@ -386,6 +443,10 @@ def collect_discourse(args) -> list[dict]:
             continue
 
         posts = _discourse_posts(base, detail, topic_id, args.max_posts, args.delay)
+        # posts_count counts the opener, and the rubric rejects zero-reply
+        # threads, so a lone topic must not read as one comment.
+        total = detail.get("posts_count")
+        replies = max(0, total - 1) if isinstance(total, int) else None
         for post in posts:
             number = post.get("post_number", 1)
             results.append(
@@ -399,7 +460,7 @@ def collect_discourse(args) -> list[dict]:
                     author=post.get("username"),
                     created=post.get("created_at"),
                     score=post.get("score"),
-                    num_comments=detail.get("posts_count"),
+                    num_comments=replies,
                     thread_id=topic_id,
                     thread_url=topic_url,
                     query=args.match,
@@ -541,6 +602,12 @@ def main() -> int:
     hn.add_argument("--query", required=True)
     hn.add_argument("--since", default="30d", help="14d, 48h, 2w (default: 30d)")
     hn.add_argument("--limit", type=int, default=100, help="per kind (default: 100)")
+    hn.add_argument(
+        "--replies",
+        type=int,
+        default=20,
+        help="newest replies to pull per matched story, 0 to skip (default: 20)",
+    )
     hn.set_defaults(func=collect_hn, name="hackernews")
 
     discourse = subparsers.add_parser("discourse", help="any Discourse forum")

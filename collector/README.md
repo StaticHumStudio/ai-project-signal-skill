@@ -22,10 +22,15 @@ The `hn` and `discourse` collectors need no account and no setup at all. The
 `github` collector is the exception: it shells out to the
 [`gh` CLI](https://cli.github.com/), so that one needs `gh` installed and
 `gh auth login` run once. It exits with a message telling you so rather than
-failing quietly. Developed and tested on Python 3.12. It should run on 3.9 and newer,
-but that is reasoning about the syntax used rather than something anyone has
-verified, so if you are on an older Python and it breaks, please open an issue
-with the traceback.
+failing quietly. CI runs the collector's own tests on Python 3.9 and 3.12 on every
+push, so those two are known good and anything between them should be. Older than
+3.9 is untested, so if it breaks there, please open an issue with the traceback.
+
+Its tests are `test_collect.py`, standard library `unittest`, no network:
+
+```bash
+python3 -m unittest discover -s collector
+```
 
 ## Run it
 
@@ -42,8 +47,9 @@ python3 collector/collect.py github --query "\"wish there was\" in:body created:
 ```
 
 Everything lands in `cache/<YYYY-MM-DD>/<source>.jsonl`, which is gitignored.
-Re-running is safe and additive: records are deduplicated by id, so a real hunt
-is several passes with different queries and you keep the union.
+Re-running is safe and additive: records are keyed by id, so a real hunt is
+several passes with different queries and you keep the union, with a record
+collected twice refreshed rather than left stale.
 
 ## Then point your assistant at the cache
 
@@ -55,6 +61,25 @@ Paste [`../method/PROMPT.md`](../method/PROMPT.md) as usual, and add:
 > records. Use `created_utc` for the `date` field, never your own estimate. You
 > still have to do Phase 3 landscape research yourself, and you still have to
 > drop anything that is supply rather than demand.
+>
+> Phase 4 is not skipped, it is redirected. Verify each source against its
+> cached record instead of by opening the page, and cite nothing that is not in
+> the cache:
+>
+> - **Date**: copy `created_utc`. It came from the API, so there is nothing to
+>   check it against and nothing to estimate.
+> - **Real user, not a vendor**: judge from `author` and `body`, same test as on
+>   the page.
+> - **Demand, not supply**: judge from `body`. Self-promotion is still out.
+> - **Recency**: a record older than about two weeks qualifies only if the cache
+>   holds a dated reply on the same `thread_id` from within the last month.
+>   Quote that reply and its date in `engagement`. No such reply in the cache
+>   means drop it. A `num_comments` count is not a recent-activity claim, and it
+>   counts replies only, so zero means a thread nobody answered.
+> - **Page loaded**: already true. The record exists because the API returned it.
+> - **GitHub issue is open**: already true. The collector forces `is:open`.
+> - **Platform match and claim alignment**: judge from `body` and `title`,
+>   unchanged.
 
 The preflight page-access test in the main README still applies to Phase 3,
 because landscape verification means opening a vendor's page and reading it.
@@ -84,15 +109,20 @@ The cache removes the retrieval dependency for sources, not for landscape.
 `thread_id` and `thread_url` let the assistant reconstruct a conversation from
 loose comments, which matters because the signal is usually in the replies, not
 the headline. `query` records what surfaced the document, so you can tell a
-targeted hit from a broad sweep.
+targeted hit from a broad sweep. `num_comments` is a reply count and excludes
+the post itself, so zero means nobody answered, which the rubric rejects.
 
 ## What each source is good for
 
 **Hacker News** (`hn`) pulls stories and comments through the Algolia search
-API. Deep, technical, and heavily skewed toward developers and founders, so it
-is strong for tooling and infrastructure demand and weak for anything consumer.
-Watch for `Show HN`, which is somebody promoting their own product. That is
-supply, and the rubric says drop it from sources.
+API, then pulls each matched story's own newest replies, since a thread about
+the problem draws answers that never repeat its wording. That costs one
+throttled request per matched story, so it is the slow part of an `hn` run.
+`--replies 0` turns it off. Deep, technical, and heavily skewed toward
+developers and founders,
+so it is strong for tooling and infrastructure demand and weak for anything
+consumer. Watch for `Show HN`, which is somebody promoting their own product.
+That is supply, and the rubric says drop it from sources.
 
 **Discourse** (`discourse`) works against any Discourse forum, and a surprising
 number of trade, hobby, and vendor communities run one without anybody thinking
