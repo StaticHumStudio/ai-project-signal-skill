@@ -27,7 +27,7 @@ const FILES = sourceFiles(SRC).map(path => ({
   text: readFileSync(path, 'utf8'),
 }));
 
-test('config exposes every string the templates render', () => {
+test('config exposes the strings the templates read from it', () => {
   const { brand, meta, hero, rss, seo, sections } = siteConfig;
 
   for (const [key, value] of Object.entries(brand)) {
@@ -59,6 +59,9 @@ test('config exposes every string the templates render', () => {
     assert.ok(entry.answer.length > 0, 'every faq entry needs an answer');
   }
 
+  for (const name of ['signals', 'batches']) {
+    assert.ok(sections[name].heading.length > 0, `sections.${name} needs a heading`);
+  }
   for (const name of ['searchIntent', 'about']) {
     assert.ok(sections[name].heading.length > 0, `sections.${name} needs a heading`);
     assert.ok(sections[name].body.length > 0, `sections.${name} needs body copy`);
@@ -87,22 +90,34 @@ test('no brand identity is hardcoded outside config.js', () => {
   }
 });
 
-test('no target-specific copy is hardcoded outside config.js', () => {
-  // The method retargets to books, physical products, videos, local services.
-  // Rendered copy that assumes software has to come from config so it can be
-  // swapped along with everything else.
-  const TARGET_WORDS = [
+test('no target or demo wording is hardcoded outside config.js', () => {
+  // Two things a fork has to be able to change in one file. The method
+  // retargets to books, physical products, videos, local services, so copy
+  // that assumes software has to come from config. And the bundled data is
+  // synthetic, so the words that say so have to come out when real research
+  // replaces it, or the site calls its own signals fake forever.
+  //
+  // This is a blacklist, not a proof. Structural labels a fork keeps either
+  // way ("sources", "landscape", "builder note", "browse by category") stay in
+  // the templates on purpose; chasing every literal into config buys nothing
+  // and costs readability.
+  const BANNED = [
     /what should I code/i,
     /coding projects/i,
     /project ideas for developers/i,
     /indie developers/i,
+    /\bsoftware\b/i,
+    /\bdevelopers?\b/i,
+    /example\s+(signals?|batches)/i,
+    /demo\s+(signals?|batches|data)/i,
+    /\bsynthetic\b/i,
   ];
 
   for (const file of FILES) {
-    for (const pattern of TARGET_WORDS) {
+    for (const pattern of BANNED) {
       assert.ok(
         !pattern.test(file.text),
-        `${file.path} hardcodes target-specific copy ${pattern}. Move it into src/config.js.`
+        `${file.path} hardcodes ${pattern}. Move it into src/config.js.`
       );
     }
   }

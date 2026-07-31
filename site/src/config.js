@@ -89,6 +89,13 @@ export const siteConfig = {
 
   /** Body copy. Each `body` is an array of paragraphs. */
   sections: {
+    /**
+     * Heading only. These two say "example" because the bundled data is
+     * synthetic; once you publish your own research, "latest" is the honest
+     * word.
+     */
+    signals: { heading: 'example signals' },
+    batches: { heading: 'example batches' },
     searchIntent: {
       heading: 'if you’re searching “what should I make?”',
       body: [

@@ -137,13 +137,13 @@ const jsonLd = {
 
   <SignalDivider />
 
-  <!-- Example Signals -->
+  <!-- Signals section -->
   {latestSignals.length > 0 && (
     <section class="section-void">
       <header class="section-header">
         <div class="section-label">
           <span class="prompt">$</span>
-          <h2>example signals</h2>
+          <h2>{sections.signals.heading}</h2>
         </div>
         <p class="section-sub">from {formatDate(latestDate)}</p>
       </header>
@@ -168,13 +168,13 @@ const jsonLd = {
 
   <SignalDivider />
 
-  <!-- Example Batches -->
+  <!-- Batches section -->
   {recentDays.length > 0 && (
     <section class="section-warm">
       <header class="section-header">
         <div class="section-label">
           <span class="prompt">$</span>
-          <h2>example batches</h2>
+          <h2>{sections.batches.heading}</h2>
         </div>
       </header>
       <div class="days-list">
