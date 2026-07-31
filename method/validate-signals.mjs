@@ -294,9 +294,8 @@ export function validateSignalFile(file, {strict = false} = {}) {
 }
 
 export async function runValidationCli(args) {
-  // Accept several files so a caller can pass a glob. Taking only the first
-  // and ignoring the rest would let `content/published/*.json` report OK while
-  // silently skipping every batch but one.
+  // Accept a glob. Using only the first argument let `published/*.json` report
+  // OK while skipping every batch but one.
   const flags = args.filter(arg => arg.startsWith('--'));
   const files = args.filter(arg => !arg.startsWith('--'));
   if (files.length === 0) {

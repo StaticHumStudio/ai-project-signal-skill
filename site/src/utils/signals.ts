@@ -47,11 +47,8 @@ const publishedDir = path.join(process.cwd(), 'content/published');
 
 let _cache: Signal[] | null = null;
 
-// In dev, never cache. content/ lives outside src/, so Vite does not watch it,
-// and a module-level cache on top of that meant a newly added batch stayed
-// invisible until you restarted the server. That reads as a broken site rather
-// than a stale cache, which is a bad first hour for anyone trying this out.
-// Re-reading the directory per request costs nothing at this size.
+// content/ sits outside src/ so Vite does not watch it. Caching on top of that
+// left a newly added batch invisible until restart, which reads as a broken site.
 const CACHE_ENABLED = !import.meta.env?.DEV;
 
 /** Load all signals from content/published/*.json, sorted by date descending then array position. */
