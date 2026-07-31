@@ -311,7 +311,11 @@ def _discourse_posts(base, detail, topic_id, max_posts, delay) -> list[dict]:
     if not stream:
         return list(have.values())[:max_posts]
 
-    if len(stream) <= max_posts:
+    if max_posts <= 1:
+        # stream[-0:] is the whole list, so this case cannot go through the
+        # branch below.
+        wanted = stream[:1]
+    elif len(stream) <= max_posts:
         wanted = stream
     else:
         wanted = [stream[0]] + stream[-(max_posts - 1):]
@@ -452,9 +456,12 @@ def collect_github(args) -> list[dict]:
     results = []
     for issue in json.loads(completed.stdout or "[]"):
         repo = (issue.get("repository") or {}).get("nameWithOwner", "?")
+        number = issue.get("number")
+        issue_id = f"{repo}#{number}"
+        count = issue.get("commentsCount") or 0
         results.append(
             record(
-                doc_id=f"{repo}#{issue.get('number')}",
+                doc_id=issue_id,
                 source="github",
                 kind="issue",
                 url=issue.get("url"),
@@ -462,12 +469,55 @@ def collect_github(args) -> list[dict]:
                 body=issue.get("body") or "",
                 author=(issue.get("author") or {}).get("login"),
                 created=issue.get("createdAt"),
-                num_comments=issue.get("commentsCount"),
+                num_comments=count,
+                thread_id=issue_id,
                 thread_url=issue.get("url"),
                 query=query,
             )
         )
+        if count and args.comments:
+            results.extend(
+                _github_comments(repo, number, issue_id, issue.get("url"), count, args.comments)
+            )
     return results
+
+
+def _github_comments(repo, number, issue_id, issue_url, count, want) -> list[dict]:
+    """Cache an issue's most recent comments.
+
+    Without these the cache holds a count and no dates, so an issue older than
+    the rubric's recency window cannot be shown to be alive from the cache
+    alone. That forces the assistant to drop a live issue or guess at its
+    activity, which is the fabrication this whole script exists to prevent.
+    """
+    page = max(1, -(-count // 100))  # last page, comments come back oldest first
+    path = f"repos/{repo}/issues/{number}/comments?per_page=100&page={page}"
+    completed = subprocess.run(
+        ["gh", "api", path], capture_output=True, text=True
+    )
+    if completed.returncode != 0:
+        print(f"    could not fetch comments for {issue_id}: {completed.stderr.strip()[:120]}")
+        return []
+
+    try:
+        comments = json.loads(completed.stdout or "[]")
+    except json.JSONDecodeError:
+        return []
+
+    return [
+        record(
+            doc_id=f"{issue_id}-c{comment.get('id')}",
+            source="github",
+            kind="comment",
+            url=comment.get("html_url"),
+            body=comment.get("body") or "",
+            author=(comment.get("user") or {}).get("login"),
+            created=comment.get("created_at"),
+            thread_id=issue_id,
+            thread_url=issue_url,
+        )
+        for comment in comments[-want:]
+    ]
 
 
 # ------------------------------------------------------------------------ cli
@@ -499,6 +549,12 @@ def main() -> int:
     github = subparsers.add_parser("github", help="open issues via the gh CLI")
     github.add_argument("--query", required=True, help="gh search syntax")
     github.add_argument("--limit", type=int, default=50)
+    github.add_argument(
+        "--comments",
+        type=int,
+        default=10,
+        help="most recent comments to cache per issue, 0 to skip (default: 10)",
+    )
     github.set_defaults(func=collect_github, name="github")
 
     args = parser.parse_args()
