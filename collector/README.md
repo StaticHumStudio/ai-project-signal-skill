@@ -16,8 +16,13 @@ what is actually in it. Dates stop being something the model reports and start
 being something the file records, which removes the single most common
 fabrication the rubric exists to catch.
 
-Standard library only. No `pip install`, no virtualenv, no API keys, no
-accounts. Developed and tested on Python 3.12. It should run on 3.9 and newer,
+Standard library only. No `pip install`, no virtualenv, no API keys.
+
+The `hn` and `discourse` collectors need no account and no setup at all. The
+`github` collector is the exception: it shells out to the
+[`gh` CLI](https://cli.github.com/), so that one needs `gh` installed and
+`gh auth login` run once. It exits with a message telling you so rather than
+failing quietly. Developed and tested on Python 3.12. It should run on 3.9 and newer,
 but that is reasoning about the syntax used rather than something anyone has
 verified, so if you are on an older Python and it breaks, please open an issue
 with the traceback.

@@ -490,19 +490,25 @@ def _github_comments(repo, number, issue_id, issue_url, count, want) -> list[dic
     alone. That forces the assistant to drop a live issue or guess at its
     activity, which is the fabrication this whole script exists to prevent.
     """
-    page = max(1, -(-count // 100))  # last page, comments come back oldest first
-    path = f"repos/{repo}/issues/{number}/comments?per_page=100&page={page}"
-    completed = subprocess.run(
-        ["gh", "api", path], capture_output=True, text=True
-    )
-    if completed.returncode != 0:
-        print(f"    could not fetch comments for {issue_id}: {completed.stderr.strip()[:120]}")
-        return []
-
-    try:
-        comments = json.loads(completed.stdout or "[]")
-    except json.JSONDecodeError:
-        return []
+    # Comments come back oldest first, so the newest are on the last page. That
+    # page can hold as little as one comment, so walk backwards until we have
+    # enough rather than assuming one page covers `want`.
+    comments: list[dict] = []
+    page = max(1, -(-count // 100))
+    while page >= 1 and len(comments) < want:
+        path = f"repos/{repo}/issues/{number}/comments?per_page=100&page={page}"
+        completed = subprocess.run(["gh", "api", path], capture_output=True, text=True)
+        if completed.returncode != 0:
+            print(f"    could not fetch comments for {issue_id}: {completed.stderr.strip()[:120]}")
+            break
+        try:
+            batch = json.loads(completed.stdout or "[]")
+        except json.JSONDecodeError:
+            break
+        if not batch:
+            break
+        comments = batch + comments
+        page -= 1
 
     return [
         record(
