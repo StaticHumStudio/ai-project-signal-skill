@@ -16,6 +16,11 @@ guided version just does that configuring for you.)*
 > assistant that tries will hand you confident fiction. Being able to search the
 > web and being able to open a given page are two different capabilities, and
 > the second varies by assistant, by harness, and by site.
+>
+> **If it fails,** [`../collector/`](../collector) fetches Hacker News, any
+> Discourse forum, and open GitHub issues into a local cache first, so the
+> assistant reads real timestamps instead of trying to open pages. Standard
+> library Python, no install, no keys.
 
 ---
 

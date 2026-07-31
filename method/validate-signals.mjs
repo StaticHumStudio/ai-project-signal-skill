@@ -294,28 +294,46 @@ export function validateSignalFile(file, {strict = false} = {}) {
 }
 
 export async function runValidationCli(args) {
-  const [file, ...flags] = args;
-  if (!file) {
-    console.error('usage: validate-staging.mjs <path/to/signals.json> [--strict]');
+  // Accept several files so a caller can pass a glob. Taking only the first
+  // and ignoring the rest would let `content/published/*.json` report OK while
+  // silently skipping every batch but one.
+  const flags = args.filter(arg => arg.startsWith('--'));
+  const files = args.filter(arg => !arg.startsWith('--'));
+  if (files.length === 0) {
+    console.error('usage: validate-staging.mjs <path/to/signals.json...> [--strict]');
     process.exitCode = 2;
     return;
   }
 
-  const result = validateSignalFile(file, {strict: flags.includes('--strict')});
-  if (result.warnings.length > 0) {
-    console.error(`\n${result.warnings.length} warning(s):`);
-    for (const warning of result.warnings) console.error(`  WARN ${warning}`);
+  const strict = flags.includes('--strict');
+  let total = 0;
+  let failed = false;
+
+  for (const file of files) {
+    const result = validateSignalFile(file, {strict});
+    const label = files.length > 1 ? `${file}: ` : '';
+    if (result.warnings.length > 0) {
+      console.error(`\n${label}${result.warnings.length} warning(s):`);
+      for (const warning of result.warnings) console.error(`  WARN ${warning}`);
+    }
+    if (result.errors.length > 0) {
+      console.error(`\n${label}${result.errors.length} error(s):`);
+      for (const error of result.errors) console.error(`  ERROR ${error}`);
+      failed = true;
+      continue;
+    }
+    if (result.strict && result.warnings.length > 0) {
+      failed = true;
+      continue;
+    }
+    total += result.data.length;
   }
-  if (result.errors.length > 0) {
-    console.error(`\n${result.errors.length} error(s):`);
-    for (const error of result.errors) console.error(`  ERROR ${error}`);
-    process.exitCode = 1;
-    return;
-  }
-  if (result.strict && result.warnings.length > 0) {
+
+  if (failed) {
     process.exitCode = 1;
     return;
   }
 
-  console.error(`\nOK: ${result.data.length} signal(s) validated.`);
+  const scope = files.length > 1 ? ` across ${files.length} file(s)` : '';
+  console.error(`\nOK: ${total} signal(s) validated${scope}.`);
 }

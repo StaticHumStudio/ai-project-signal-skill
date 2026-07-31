@@ -13,6 +13,11 @@ read.
 > assistant that tries will hand you confident fiction. "Can search the web" and
 > "can open this specific page" are different capabilities, and the second
 > varies by assistant, by harness, and by site.
+>
+> **If it fails,** [`../collector/`](../collector) fetches Hacker News, any
+> Discourse forum, and open GitHub issues into a local cache first, so the
+> assistant reads real timestamps instead of trying to open pages. Standard
+> library Python, no install, no keys.
 
 > **Don't want to set anything up?** Paste [`GUIDED.md`](./GUIDED.md) instead.
 > It interviews you in plain language and does all of the configuring below for

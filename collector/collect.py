@@ -54,6 +54,10 @@ _last_request: dict[str, float] = {}
 _robots: dict[str, urllib.robotparser.RobotFileParser | None] = {}
 
 
+class SetupRequired(Exception):
+    """A collector needs something installed or configured, not a retry."""
+
+
 # ---------------------------------------------------------------- http helpers
 
 
@@ -316,6 +320,54 @@ def collect_hn(args) -> list[dict]:
 # ------------------------------------------------------- source: discourse
 
 
+def _discourse_posts(base, detail, topic_id, max_posts, delay) -> list[dict]:
+    """Resolve a topic's posts, following post_stream.stream past the first page.
+
+    /t/{id}.json only inlines the first ~20 posts. The complete ordered list of
+    post ids lives in post_stream.stream, and anything beyond the first window
+    has to be requested from /t/{id}/posts.json. Skipping that quietly capped
+    every topic at 20 posts, which is the worst possible 20: a long thread's
+    OLDEST replies. The rubric needs the newest activity to judge whether a
+    discussion is live, so a stale window does not just lose data, it produces
+    confidently wrong recency calls.
+
+    When a topic is longer than max_posts, keep the first post (the actual ask)
+    and the most recent ones (the proof it is still alive) rather than an
+    arbitrary leading slice.
+    """
+    stream = detail.get("post_stream", {}).get("stream", []) or []
+    have = {p.get("id"): p for p in detail.get("post_stream", {}).get("posts", [])}
+
+    if not stream:
+        return list(have.values())[:max_posts]
+
+    if len(stream) <= max_posts:
+        wanted = stream
+    else:
+        wanted = [stream[0]] + stream[-(max_posts - 1):]
+        seen, deduped = set(), []
+        for post_id in wanted:
+            if post_id not in seen:
+                seen.add(post_id)
+                deduped.append(post_id)
+        wanted = deduped
+
+    missing = [post_id for post_id in wanted if post_id not in have]
+    for start in range(0, len(missing), 50):
+        chunk = missing[start : start + 50]
+        query = "&".join(f"post_ids[]={post_id}" for post_id in chunk)
+        url = f"{base}/t/{topic_id}/posts.json?{query}"
+        try:
+            payload = fetch_json(url, delay=delay)
+        except (urllib.error.HTTPError, PermissionError) as error:
+            print(f"    could not fetch {len(chunk)} more posts: {error}")
+            break
+        for post in payload.get("post_stream", {}).get("posts", []):
+            have[post.get("id")] = post
+
+    return [have[post_id] for post_id in wanted if post_id in have]
+
+
 def collect_discourse(args) -> list[dict]:
     """Any Discourse forum via its public JSON endpoints.
 
@@ -364,8 +416,8 @@ def collect_discourse(args) -> list[dict]:
             print(f"    skipped: {error}")
             continue
 
-        posts = detail.get("post_stream", {}).get("posts", [])
-        for post in posts[: args.max_posts]:
+        posts = _discourse_posts(base, detail, topic_id, args.max_posts, args.delay)
+        for post in posts:
             number = post.get("post_number", 1)
             results.append(
                 record(
@@ -401,9 +453,22 @@ def collect_github(args) -> list[dict]:
     The RUBRIC only counts OPEN issues as evidence of unmet demand, so is:open
     is forced into the query.
     """
+    # Distinguish "you have not set this up" from "there was nothing to find".
+    # Both used to print a bare message and exit 0, which reads as a broken
+    # collector rather than an unconfigured optional dependency.
     if not shutil.which("gh"):
-        print("  gh CLI not found. Install it from https://cli.github.com/ and run 'gh auth login'.")
-        return []
+        raise SetupRequired(
+            "the GitHub collector needs the gh CLI, which is not installed.\n"
+            "  Install it from https://cli.github.com/ then run: gh auth login\n"
+            "  The hn and discourse collectors need no setup and work without it."
+        )
+    auth = subprocess.run(["gh", "auth", "status"], capture_output=True, text=True)
+    if auth.returncode != 0:
+        raise SetupRequired(
+            "gh is installed but not authenticated.\n"
+            "  Run: gh auth login\n"
+            "  The hn and discourse collectors need no setup and work without it."
+        )
 
     query = args.query
     if "is:open" not in query:
@@ -482,6 +547,9 @@ def main() -> int:
     print(f"collecting from {args.name}...")
     try:
         results = args.func(args)
+    except SetupRequired as error:
+        print(f"\nsetup needed: {error}", file=sys.stderr)
+        return 3
     except PermissionError as error:
         print(f"\nrefused: {error}", file=sys.stderr)
         return 2

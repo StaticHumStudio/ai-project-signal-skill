@@ -21,8 +21,8 @@ npm run dev
 
 The local site is served at the root. Use the URL Astro prints in the terminal.
 
-New signal batches are only picked up when the dev server starts, so restart it
-after adding a file to `site/content/`.
+Adding a batch to `site/content/published/` shows up on the next page load. The
+dev server does not cache signals, so there is no need to restart it.
 
 ## Required checks
 
