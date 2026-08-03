@@ -44,6 +44,10 @@ class SetupRequired(Exception):
     """A collector needs something installed or configured, not a retry."""
 
 
+class UnsupportedQuery(Exception):
+    """The query asks for something a collector will not do, not a retry."""
+
+
 # ---------------------------------------------------------------- http helpers
 
 
@@ -246,6 +250,9 @@ def strip_html(value: str | None) -> str:
 
 
 HN_PAGE_SIZE = 100
+
+# Every way GitHub search spells an issue-state constraint, negation aside.
+STATE_QUALIFIERS = ("is:open", "is:closed", "state:open", "state:closed")
 
 
 def _hn_record(hit, kind, query) -> dict:
@@ -485,7 +492,7 @@ def collect_github(args) -> list[dict]:
 
     gh rather than raw REST because unauthenticated GitHub is 60 requests an
     hour, and this way the script never touches a token. Closed issues do not
-    prove unmet demand, so is:open is forced in.
+    prove unmet demand, so open is forced in through gh's own --state flag.
     """
     if not shutil.which("gh"):
         raise SetupRequired(
@@ -501,21 +508,41 @@ def collect_github(args) -> list[dict]:
             "  The hn and discourse collectors need no setup and work without it."
         )
 
-    query = args.query
-    if "is:open" not in query:
-        query = f"{query} is:open"
-    if "is:issue" not in query and "is:pr" not in query:
-        query = f"{query} is:issue"
+    # The open constraint rides gh's --state flag rather than an appended
+    # is:open, because a substring test cannot tell is:open from -is:open. It
+    # read the negated form as already-constrained and let closed issues into a
+    # cache collector/README.md tells the assistant to treat as open. An
+    # explicit is:closed got both qualifiers and silently matched nothing.
+    kept = []
+    for token in args.query.split():
+        bare = token.lstrip("-").lower()
+        if bare in STATE_QUALIFIERS:
+            # -is:closed asks for open the long way round, so it can just go.
+            wants_open = bare.endswith(":open") != token.startswith("-")
+            if not wants_open:
+                raise UnsupportedQuery(
+                    f"{token} asks for closed issues, and this collector only "
+                    "returns open ones.\n"
+                    "  A closed issue does not prove unmet demand.\n"
+                    "  Drop the state qualifier. Open is applied for you."
+                )
+            continue
+        kept.append(token)
+
+    if not any(t.lstrip("-").lower() in ("is:issue", "is:pr") for t in kept):
+        kept.append("is:issue")
+    query = " ".join(kept)
 
     fields = "number,title,body,url,createdAt,author,commentsCount,repository"
     command = [
         "gh", "search", "issues", query,
+        "--state", "open",
         "--limit", str(args.limit),
         "--json", fields,
         "--sort", "created",
         "--order", "desc",
     ]
-    print(f"  gh search issues {query!r} --limit {args.limit}")
+    print(f"  gh search issues {query!r} --state open --limit {args.limit}")
     completed = subprocess.run(command, capture_output=True, text=True)
     if completed.returncode != 0:
         print(f"  gh failed: {completed.stderr.strip()}")
@@ -645,6 +672,9 @@ def main() -> int:
     except SetupRequired as error:
         print(f"\nsetup needed: {error}", file=sys.stderr)
         return 3
+    except UnsupportedQuery as error:
+        print(f"\nunsupported query: {error}", file=sys.stderr)
+        return 4
     except PermissionError as error:
         print(f"\nrefused: {error}", file=sys.stderr)
         return 2

@@ -19,7 +19,11 @@
           "url": { "type": "string", "format": "uri" },
           "platform": { "type": "string", "minLength": 1 },
           "quote": { "type": "string", "minLength": 1 },
-          "date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])$"
+          },
           "engagement": { "type": "string" }
         }
       }

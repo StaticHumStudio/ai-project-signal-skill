@@ -152,6 +152,56 @@ class GithubCommentPaging(unittest.TestCase):
         self.assertEqual(records[0]["created_utc"], "2026-07-30T00:00:00Z")
 
 
+class GithubStateConstraint(unittest.TestCase):
+    """collect_github is open-issues-only, and says so structurally."""
+
+    def args(self, query):
+        return SimpleNamespace(query=query, limit=5, since="30d", comments=0)
+
+    def run_query(self, query):
+        """Returns the argv gh would have been handed."""
+        seen = []
+
+        def fake_run(command, **kwargs):
+            seen.append(command)
+            if command[:3] == ["gh", "auth", "status"]:
+                return SimpleNamespace(returncode=0, stdout="", stderr="")
+            return SimpleNamespace(returncode=0, stdout="[]", stderr="")
+
+        with mock.patch.object(collect.shutil, "which", return_value="/usr/bin/gh"):
+            with mock.patch.object(collect.subprocess, "run", side_effect=fake_run):
+                collect.collect_github(self.args(query))
+        return next(c for c in seen if c[:3] == ["gh", "search", "issues"])
+
+    def test_open_rides_the_state_flag_not_the_query_text(self):
+        command = self.run_query("invoice")
+        self.assertIn("--state", command)
+        self.assertEqual(command[command.index("--state") + 1], "open")
+        self.assertNotIn("is:open", command[3])
+
+    def test_negated_open_cannot_smuggle_closed_issues_in(self):
+        # "is:open" is a substring of "-is:open", so the old membership test
+        # read this as already constrained, appended nothing, and handed gh a
+        # query that asked for exactly the closed issues the cache promises
+        # it does not contain. Negated open means closed, so it is refused.
+        with self.assertRaises(collect.UnsupportedQuery):
+            self.run_query("invoice -is:open")
+
+    def test_negated_closed_is_just_open_the_long_way(self):
+        command = self.run_query("invoice -is:closed")
+        self.assertEqual(command[command.index("--state") + 1], "open")
+        self.assertEqual(command[3], "invoice is:issue")
+
+    def test_asking_for_closed_issues_is_refused_rather_than_ignored(self):
+        with self.assertRaises(collect.UnsupportedQuery) as caught:
+            self.run_query("invoice is:closed")
+        self.assertIn("closed", str(caught.exception))
+
+    def test_a_redundant_open_qualifier_is_dropped_not_duplicated(self):
+        command = self.run_query("invoice is:open")
+        self.assertEqual(command[3], "invoice is:issue")
+
+
 class HnPaging(unittest.TestCase):
     """collect_hn pages Algolia and pulls each matched story's own replies."""
 

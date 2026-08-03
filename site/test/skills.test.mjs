@@ -109,6 +109,16 @@ test('the channel schema stays valid and keeps its anchor requirements', () => {
     ['verdict', 'rules_url', 'checked'],
   );
 
+  // `checked` is the only freshness anchor a channel entry has, and nothing in
+  // this repo validates channel output the way validate-signals.mjs validates
+  // the demand side. So the pattern is the whole enforcement, and a shape-only
+  // \d{2} for the month happily accepts 2026-13-40.
+  const checked = new RegExp(schema.properties.rules.properties.checked.pattern);
+  assert.ok(checked.test('2026-08-03'));
+  for (const impossible of ['2026-13-03', '2026-00-03', '2026-08-32', '2026-08-00']) {
+    assert.ok(!checked.test(impossible), `${impossible} passes the checked pattern`);
+  }
+
   // `unverified` claims the opposite, so it must stay bare.
   const overreach = schema.allOf.find(
     rule => rule.if?.properties?.rules?.properties?.verdict?.const === 'unverified',

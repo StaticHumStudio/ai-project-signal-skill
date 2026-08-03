@@ -62,8 +62,9 @@
         },
         "checked": {
           "type": "string",
-          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
-          "description": "The date the page was actually read. Rules pages change, and a reader needs to know how stale this is."
+          "format": "date",
+          "pattern": "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])$",
+          "description": "The date the page was actually read, as a real calendar day. Rules pages change, and a reader needs to know how stale this is. The pattern rejects impossible months and days. It cannot catch 2026-02-31, so anything validating this file should check the date parses too."
         },
         "open_source_carveout": {
           "type": "string",
