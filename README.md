@@ -307,6 +307,24 @@ The JSON-LD publisher is the one you actually have to change: leave it and
 you are telling search engines that Static Hum Studio publishes your site.
 The footer credit is ordinary attribution, so keep it or yank it as you like.
 
+**The demo makes no third-party requests.** Fonts are self-hosted (five woff2
+files, latin subset, OFL licenses alongside them), there's no analytics, no
+CDN, no embeds, and no JavaScript that phones anywhere. Every external URL in
+the built output is an `<a href>` a reader chooses to click. A privacy claim
+you can't check is just a vibe, so check it:
+
+```bash
+cd site && npm run build && grep -rhoE '(src|href)="https?://[^"]*"' dist/ --include=*.html | sort -u
+```
+
+What comes back should be links and your own domain in the canonical tags.
+Neither is a request the browser makes on its own.
+
+Two things that doesn't cover. It's a claim about what this repo builds, and it
+stops being true the moment you add analytics or deploy behind a host that
+injects its own script. And it says nothing about the assistant you point the
+method at, which obviously talks to whoever made it.
+
 ## How we ran it in production
 
 [`reference/`](./reference) is Signal's real daily pipeline, kept as a worked
