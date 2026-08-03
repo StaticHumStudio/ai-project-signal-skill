@@ -49,8 +49,16 @@ research. You configure nothing.
 
 **The even easier way, if your assistant supports Agent Skills.**
 [`SKILL.md`](./SKILL.md) at the repo root is the same thing with the pasting
-removed. Clone the repo into wherever your tool keeps skills, or point a skill
-installer at it:
+removed. Verified in Claude Code and Codex CLI. Clone the repo into wherever
+your tool keeps skills:
+
+```bash
+git clone https://github.com/StaticHumStudio/ai-project-signal-skill ~/.claude/skills/demand-signal-research
+```
+
+Swap `~/.claude/skills` for `~/.codex/skills` on Codex, or whatever path your
+tool uses. The directory name has to match the `name` in `SKILL.md`'s
+frontmatter. A skill installer pointed at the repo works too:
 
 ```bash
 npx skills add StaticHumStudio/ai-project-signal-skill
