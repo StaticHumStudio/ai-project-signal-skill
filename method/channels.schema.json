@@ -126,6 +126,23 @@
           "rules": { "required": ["verdict", "rules_url", "quote", "checked"] }
         }
       }
+    },
+    {
+      "$comment": "`unwritten` is also a claim about a page that was read: it asserts the rules were checked and said nothing about promotion. That owes a URL and a date like any other reading, and only the quote is excused, because there is nothing to quote. Without this, a bare {\"verdict\": \"unwritten\"} is valid and a verified absence is indistinguishable from a guess. The distinction matters more here than anywhere else in the schema, since both skills tell readers to treat `unwritten` as the highest-risk verdict. `unverified` requires neither, because it claims the opposite: no page was read, and sometimes no rules page could even be found.",
+      "if": {
+        "properties": {
+          "rules": {
+            "properties": { "verdict": { "const": "unwritten" } },
+            "required": ["verdict"]
+          }
+        },
+        "required": ["rules"]
+      },
+      "then": {
+        "properties": {
+          "rules": { "required": ["verdict", "rules_url", "checked"] }
+        }
+      }
     }
   ]
 }

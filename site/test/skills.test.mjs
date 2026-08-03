@@ -95,6 +95,25 @@ test('the channel schema stays valid and keeps its anchor requirements', () => {
     verified.then.properties.rules.required,
     ['verdict', 'rules_url', 'quote', 'checked'],
   );
+
+  // `unwritten` also claims a page was read, so it owes the URL and the date.
+  // Only the quote is excused, because a silent page has nothing to quote.
+  // Without this, a bare {verdict: 'unwritten'} is valid and a verified absence
+  // reads the same as a guess, on the one verdict both skills call highest-risk.
+  const silent = schema.allOf.find(
+    rule => rule.if?.properties?.rules?.properties?.verdict?.const === 'unwritten',
+  );
+  assert.ok(silent, 'the unwritten verdict has no evidence requirement');
+  assert.deepEqual(
+    silent.then.properties.rules.required,
+    ['verdict', 'rules_url', 'checked'],
+  );
+
+  // `unverified` claims the opposite, so it must stay bare.
+  const overreach = schema.allOf.find(
+    rule => rule.if?.properties?.rules?.properties?.verdict?.const === 'unverified',
+  );
+  assert.equal(overreach, undefined, 'unverified should not require evidence');
 });
 
 test('every HTML-output instruction carries the escaping rule', () => {

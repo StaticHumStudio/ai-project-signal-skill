@@ -118,7 +118,14 @@ Sort what you find into exactly one of four verdicts:
 | **closed** | Self-promotion is banned outright, or banned for your commercial category. | Don't. Note whether an open source carve-out exists. |
 | **unwritten** | You read the rules and found nothing about promotion either way. | **Treat as the highest risk, not the lowest.** |
 
-**"Unwritten" is the trap, so say so out loud in the output.** No written rule
+**"Unwritten" is a finding, not a shrug.** It says you opened the rules and they
+were silent on promotion, so it carries the URL and the date exactly like a
+verdict that found text. A verified absence is worth something. An assumed one
+is worth nothing, and the two are indistinguishable once the URL is missing.
+Only "unverified" is allowed to arrive bare, because it claims the opposite:
+that no page was read.
+
+**And it is the trap, so say so out loud in the output.** No written rule
 does not mean no rule. It means the rule lives in the community's habits and
 gets enforced by mods on instinct, with no page you can point at afterward. A
 venue with a written ratio is safer to work with than a venue with nothing on
