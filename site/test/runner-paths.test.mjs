@@ -24,7 +24,7 @@ test('reference runner resolves every repository path', () => {
     },
   );
 
-  assert.match(output, /reference\/SKILL\.md: OK/);
+  assert.match(output, /reference\/DAILY-RUN\.md: OK/);
   assert.match(output, /reference\/validate-staging\.mjs: OK/);
   assert.match(output, /site\/content\/staging: OK/);
   assert.match(output, /site\/content\/published: OK/);
