@@ -133,7 +133,7 @@ fi
     --title "Signal: $TODAY" \
     --body "Automated daily signal sourcing for $TODAY.
 
-Review the published file and merge to deploy to statichum.studio/signal.
+Review the published file and merge to deploy.
 Edit or drop weak signals before merging if needed." \
     --base main \
     --head "$BRANCH"

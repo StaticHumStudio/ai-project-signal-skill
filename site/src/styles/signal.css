@@ -1,6 +1,8 @@
 /* ============================================
    Signal Design System
-   Matches studio-web tokens exactly
+   Every color, font, and spacing value is a
+   custom property in :root. Retheme the site
+   by editing this block, nothing else.
    ============================================ */
 
 :root {
