@@ -293,7 +293,7 @@ def collect_hn(args) -> list[dict]:
             )
             url = f"https://hn.algolia.com/api/v1/search_by_date?{params}"
             print(f"  {tag} page {page}: {url}")
-            payload = fetch_json(url, respect_robots=False)
+            payload = fetch_json(url)
             hits = payload.get("hits", [])
             if not hits:
                 break
@@ -340,7 +340,7 @@ def _hn_replies(story_ids: list[str], want: int, query: str) -> list[dict]:
         url = f"https://hn.algolia.com/api/v1/search_by_date?{params}"
         print(f"  replies to {story_id}: {url}")
         try:
-            payload = fetch_json(url, respect_robots=False)
+            payload = fetch_json(url)
         except urllib.error.HTTPError as error:
             print(f"    could not fetch replies: {error}")
             continue
