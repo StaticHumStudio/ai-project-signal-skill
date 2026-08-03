@@ -26,6 +26,28 @@ failing quietly. CI runs the collector's own tests on Python 3.9 and 3.12 on eve
 push, so those two are known good and anything between them should be. Older than
 3.9 is untested, so if it breaks there, please open an issue with the traceback.
 
+## Why there's no Reddit source
+
+Reddit would be the most valuable source here and it is deliberately absent.
+Its `robots.txt` has been `Disallow: /` for every user agent since the public
+content policy landed, the unauthenticated `.json` endpoint returns 403, and
+several assistants (Claude Code among them, checked 2026-08-02) refuse the
+domain outright. Scraping around that is both blocked and against Reddit's
+stated terms, so this collector doesn't try.
+
+The sanctioned route is Reddit's official OAuth API: register a script app,
+authenticate, and read the same posts and comments with real timestamps, free
+for non-commercial use. That needs a client id and secret, which breaks this
+directory's "no keys, no setup" promise, so it stays out of the box rather than
+becoming a half-configured source that fails at 3am in somebody's cron. Wire it
+up yourself if you need it, following the same shape as the other collectors.
+
+Practical consequence worth stating in your output: without Reddit, a sweep of
+consumer software demand is running on forums, and forum populations are
+self-selecting. A thin run should be reported as a thin run.
+
+## Tests
+
 Its tests are `test_collect.py`, standard library `unittest`, no network:
 
 ```bash

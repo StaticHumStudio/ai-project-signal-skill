@@ -47,6 +47,21 @@ plain-language questions about what you're hunting, works out the rest itself
 (the angle, the communities, the exact searches) and then goes and does the
 research. You configure nothing.
 
+**The even easier way, if your assistant supports Agent Skills.**
+[`SKILL.md`](./SKILL.md) at the repo root is the same thing with the pasting
+removed. Clone the repo into wherever your tool keeps skills, or point a skill
+installer at it:
+
+```bash
+npx skills add StaticHumStudio/ai-project-signal-skill
+```
+
+Then just say what you're hunting for and it loads itself. It routes to the
+same `method/` files everything else uses, so there's one copy of the method
+and no version of it that can drift. Everything below still works by hand if
+you'd rather not install anything, and the paste-in path is the one that runs
+anywhere.
+
 **The manual way: if you'd rather drive.**
 [`method/PROMPT.md`](./method/PROMPT.md) is the same engine as a fill-in-and-swap
 template: set a `FOCUS`, run an open software sweep, or retarget it to anything
@@ -72,6 +87,21 @@ pages.
 Test it, don't assume it. A compatibility list would be out of date the moment
 anyone signs a licensing deal.
 
+**Reddit is the one worth knowing about up front.** As of 2026-08-02, Reddit's
+`robots.txt` is `Disallow: /` for every user agent, and the unauthenticated
+`.json` endpoint returns 403. Claude Code refuses `www.reddit.com` and
+`old.reddit.com` outright. Other assistants may still reach it, since access
+here is a matter of who has an agreement rather than what the software can do,
+which is exactly why this file won't keep a table. Check it yourself on the day.
+
+That gap matters more than it looks, because Reddit is where most consumer
+software demand actually gets discussed. If your assistant can't open it, your
+sweep is running on forums, and forum populations are self-selecting. Say so in
+the output rather than letting a thin run read as a complete one. The
+sanctioned way in is Reddit's official OAuth API (register a script app, free
+for non-commercial use). This repo doesn't ship a Reddit collector, so that's
+yours to wire up if you need it.
+
 **If it fails, or you'd rather not depend on it:**
 [`collector/`](./collector) is a standard-library Python script that fetches
 Hacker News, any Discourse forum, and open GitHub issues into a local JSONL
@@ -81,11 +111,17 @@ sources, though landscape research still needs an assistant that can open a
 vendor's page.
 
 Either path returns the same thing: one research pass, then the signals in
-whatever form you want. A readable rundown, a **Markdown** file, a standalone
-**HTML** page, or the raw **JSON** (matching
-[`method/schema.json`](./method/schema.json)) that feeds the example site. Don't
-want to build a site? Just ask for the `.md` or `.html`. No account, no
-pipeline, no repo required. An afternoon of research in a couple of minutes.
+whatever form you want. Three ways to read them, and it'll ask which you want:
+
+- **In the chat.** Cheapest. Nothing written to disk, just the rundown.
+- **A Markdown file.** Most convenient. Save it, search it, paste it anywhere.
+- **A standalone HTML page.** Best to actually read. One self-contained file
+  that opens in a browser, competitive landscape laid out as a table.
+
+Raw **JSON** (matching [`method/schema.json`](./method/schema.json)) comes free
+on top of any of them, and it's what feeds the example site. Don't want to build
+a site? Just ask for the `.md` or `.html`. No account, no pipeline, no repo
+required. An afternoon of research in a couple of minutes.
 
 ## It's not really about software
 
@@ -208,9 +244,11 @@ The reference runner is specifically wired to the Claude CLI and GitHub CLI,
 so treat it as architecture to adapt, not a portable command you can run
 unchanged:
 
-- [`reference/SKILL.md`](./reference/SKILL.md): the repo-coupled prompt the
-  cron job fed to the Claude CLI (it writes to a staging file instead of
-  replying; `method/PROMPT.md` is the decoupled, portable version).
+- [`reference/DAILY-RUN.md`](./reference/DAILY-RUN.md): the repo-coupled prompt
+  the cron job fed to the Claude CLI (it writes to a staging file instead of
+  replying; `method/PROMPT.md` is the decoupled, portable version). This file
+  used to be called `SKILL.md`, before there was an actual skill to confuse it
+  with.
 - [`reference/run_signal_daily.sh`](./reference/run_signal_daily.sh): the
   runner: cron → Claude CLI → validate → isolated git worktree → review PR.
 - [`reference/validate-staging.mjs`](./reference/validate-staging.mjs): the
@@ -231,10 +269,14 @@ rate limits, terms, and cost, so check those before scheduling anything.
 ## Repository layout
 
 ```
+SKILL.md      Agent Skill front door. Routes to method/, gates on the
+              preflight check. References the files below, never restates them.
 method/       The give-away. Start with GUIDED.md, which interviews you and
               configures itself. PROMPT.md is the manual engine, RUBRIC.md the
               rules, schema.json the output shape, RECIPES.md the non-software
               swaps, EXAMPLE.md a finished, retargeted prompt.
+collector/    Standard-library Python retrieval into a local cache, for when
+              your assistant can't open pages
 reference/    How Signal ran in production (documentation)
 site/         Runnable Astro example front-end (one synthetic signal)
 ```
