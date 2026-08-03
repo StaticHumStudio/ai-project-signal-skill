@@ -184,6 +184,41 @@ class HnPaging(unittest.TestCase):
         self.assertEqual(len(urls), 4)
         self.assertEqual(len(results), 150)
 
+    def test_blank_comments_do_not_push_the_limit_onto_an_older_page(self):
+        """Skipped blanks must be refilled from the same page. Algolia sorts
+        newest first, so spending the slice on blanks and moving to page 1
+        returns older comments while newer ones on page 0 go unread."""
+
+        def fake_fetch(url, **kwargs):
+            if "tags=story" in url:
+                return {"nbPages": 1, "hits": []}
+            page = int(url.split("page=")[-1])
+            start = page * 10
+            return {
+                "nbPages": 2,
+                "hits": [
+                    {
+                        "objectID": str(start + n),
+                        # The two newest comments on page 0 are deleted.
+                        "comment_text": "" if page == 0 and n < 2 else "real",
+                        "created_at_i": 1000 - (start + n),
+                    }
+                    for n in range(10)
+                ],
+            }
+
+        with mock.patch.object(collect, "fetch_json", side_effect=fake_fetch):
+            results = collect.collect_hn(self.args(limit=5))
+
+        ids = [r["id"] for r in results]
+        self.assertEqual(len(ids), 5)
+        # The five newest non-blank comments, all still on page 0.
+        self.assertEqual(
+            ids,
+            ["hackernews:2", "hackernews:3", "hackernews:4",
+             "hackernews:5", "hackernews:6"],
+        )
+
     def test_replies_are_pulled_for_each_matched_story(self):
         def fake_fetch(url, **kwargs):
             if "story_" in url:

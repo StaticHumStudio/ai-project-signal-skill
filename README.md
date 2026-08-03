@@ -133,9 +133,12 @@ yours to wire up if you need it.
 [`collector/`](./collector) is a standard-library Python script that fetches
 Hacker News, any Discourse forum, and open GitHub issues into a local JSONL
 cache, then hands the assistant real timestamps instead of asking it to read
-them off a page. No install, no keys. It removes the retrieval dependency for
-sources, though landscape research still needs an assistant that can open a
-vendor's page.
+them off a page. Hacker News and Discourse need nothing installed and no keys.
+The GitHub one is the exception: it shells out to the `gh` CLI, so that
+collector wants `gh` installed and `gh auth login` run once, which is precisely
+how the script avoids ever handling a token of yours. It removes the retrieval
+dependency for sources, though landscape research still needs an assistant that
+can open a vendor's page.
 
 Either path returns the same thing: one research pass, then the signals in
 whatever form you want. Three ways to read them, and it'll ask which you want:

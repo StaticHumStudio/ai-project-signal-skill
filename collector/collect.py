@@ -298,7 +298,14 @@ def collect_hn(args) -> list[dict]:
             if not hits:
                 break
 
-            for hit in hits[: args.limit - collected]:
+            # Walk the whole page and stop on count, rather than slicing to the
+            # remaining capacity first. Blank comments are skipped below without
+            # incrementing collected, and a slice would spend that capacity
+            # anyway, sending us to an older page while newer hits further down
+            # this one went unread.
+            for hit in hits:
+                if collected >= args.limit:
+                    break
                 is_comment = tag == "comment"
                 body = hit.get("comment_text") or hit.get("story_text") or ""
                 if is_comment and not body.strip():
