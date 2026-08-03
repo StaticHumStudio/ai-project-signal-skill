@@ -2,6 +2,7 @@
 import SignalNav from '../components/SignalNav.astro';
 import SignalFooter from '../components/SignalFooter.astro';
 import '../styles/signal.css';
+import '../styles/fonts.css';
 import { withBase } from '../utils/paths.js';
 import { siteConfig } from '../config.js';
 
@@ -58,14 +59,6 @@ const jsonLdHtml = jsonLd
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Oxanium:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
 
     <!-- RSS -->
     <link rel="alternate" type="application/rss+xml" title={siteConfig.rss.linkTitle} href={withBase('/rss.xml')} />
