@@ -153,6 +153,29 @@ test('solutions may carry a does line, and nothing else new', () => {
   );
 });
 
+test('a does line that is present must be a real one', () => {
+  // `does` is optional, so it was allowlisted without being checked. That let a
+  // number or an empty string reach the site loader, which trusts this
+  // validator and renders whatever it is handed.
+  for (const bad of ['', '   ', 12, null, [], {}]) {
+    const signal = makeSignal();
+    signal.landscape.existing_solutions[0].does = bad;
+    assert.match(
+      validateSignals([signal], {stagingDay: '2026-07-24'}).errors[0] ?? '',
+      /does must be a non-empty string/,
+      `does: ${JSON.stringify(bad)} should have been rejected`,
+    );
+  }
+
+  // Absent stays legal, since the schema marks it optional.
+  const signal = makeSignal();
+  delete signal.landscape.existing_solutions[0].does;
+  assert.deepEqual(
+    validateSignals([signal], {stagingDay: '2026-07-24'}).errors,
+    [],
+  );
+});
+
 test('schema and validator agree on the solution fields', async () => {
   const schema = JSON.parse(await readFile(
     new URL('../../method/schema.json', import.meta.url),

@@ -160,7 +160,10 @@ free-form). **How you present them is the output format they chose:**
   can still feed a site.
 - **HTML page**: a single self-contained `.html` file (inline CSS, no external
   requests, clean and readable) rendering the same report, so they can just open
-  it in a browser. No build step.
+  it in a browser. No build step. **HTML-escape every field you took off a
+  page, and allow only `http`/`https` in an `href`.** Titles and quotes are
+  written by strangers, so an unescaped one means opening the report runs their
+  markup. [`RUBRIC.md`](./RUBRIC.md) has the specifics.
 
 **However you render it, the landscape is a list, never a paragraph.** One row
 per existing tool, in all three formats: the linked name, what it does, and how

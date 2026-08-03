@@ -72,6 +72,12 @@ cheapest), a Markdown file, or a self-contained HTML page. This gets skipped
 constantly, and the research is the expensive part, so a format decided after it
 is a decision made too late to change anything.
 
+If they pick HTML, **HTML-escape every researched field and allow only
+`http`/`https` in an `href`.** That applies with force here, because the fields
+you are quoting are rules pages and forum posts written by strangers, and an
+unescaped one runs their markup when the report is opened. See
+[`method/RUBRIC.md`](method/RUBRIC.md).
+
 ## Step 2: Read the rules, verbatim (the part nobody does)
 
 For every venue that survives, **open its actual rules page and quote what it

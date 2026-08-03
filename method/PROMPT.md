@@ -204,7 +204,11 @@ Three reader-facing formats, plus the machine one:
   still feed a site.
 - **`html`**: the best one to actually read. A single self-contained `.html`
   file (inline CSS, no external requests, clean and readable) rendering that
-  report, openable in a browser with no build step.
+  report, openable in a browser with no build step. **HTML-escape every field
+  you took off a page, and allow only `http`/`https` in an `href`.** Thread
+  titles and quotes are written by strangers, so an unescaped one turns the
+  report into a page that runs their markup when you open it. See
+  [`RUBRIC.md`](./RUBRIC.md).
 - **`json`** (default when `OUTPUT` is unset, since it's what the example
   `site/` consumes): only the JSON array of signal objects. No preamble,
   Markdown fence, or summary may appear before or after it.

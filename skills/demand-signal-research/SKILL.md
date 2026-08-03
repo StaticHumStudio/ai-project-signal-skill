@@ -40,7 +40,13 @@ answer here. A plausible batch built without reading the pages is not.
 **If retrieval fails, or the user would rather not depend on it:** the bundled
 collector fetches Hacker News, any Discourse forum, and open GitHub issues into
 a local JSONL cache, so timestamps come from the source API instead of from
-your reading of a page. Standard library Python, no install, no keys.
+your reading of a page. Standard library Python, no `pip install`, no API keys.
+
+`hn` and `discourse` need no account and no setup at all. **`github` is the
+exception:** it shells out to the `gh` CLI, so that one source needs `gh`
+installed and `gh auth login` run once, and it exits with a message saying so
+rather than failing quietly. Don't route someone to `github` on a no-setup
+promise.
 
 ```bash
 python3 collector/collect.py hn --query "invoice scanning" --since 30d
@@ -77,6 +83,10 @@ the tradeoff out loud:
 - **In the chat** (default, cheapest). A readable rundown, nothing on disk.
 - **Markdown file** (convenient). Save it, search it, paste it anywhere.
 - **HTML page** (best to read). One self-contained file, opens in a browser.
+  If they pick this, HTML-escape every researched field and allow only
+  `http`/`https` in an `href`. Researched text is written by strangers, and an
+  unescaped thread title runs their markup when the file is opened. The rule is
+  in [`method/RUBRIC.md`](method/RUBRIC.md).
 
 Ask even when the request arrived fully specified, because a detailed opening
 message reads as complete while never mentioning a format. This gets skipped

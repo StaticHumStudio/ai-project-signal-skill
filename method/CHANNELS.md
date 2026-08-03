@@ -194,6 +194,12 @@ venues you suspect exist but couldn't confirm are alive, and any class where you
 came up short. A short verified list plus a stated gap is worth more than a long
 list with guesses in it, and the reader can go close the gap themselves.
 
+If they asked for the HTML output, **HTML-escape every researched field and allow
+only `http`/`https` in an `href`.** Everything this method quotes was written by
+a stranger, rules pages and forum posts included, so an unescaped one turns the
+report into a page that runs their markup when opened.
+[`RUBRIC.md`](./RUBRIC.md) has the specifics.
+
 Raw JSON matching [`channels.schema.json`](./channels.schema.json) is available
 on top of whatever format they picked. Offer it at the end.
 

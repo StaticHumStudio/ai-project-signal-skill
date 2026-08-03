@@ -89,6 +89,15 @@ function requireString(value, field, where, errors) {
   return true;
 }
 
+// `does` is optional in schema.json but still typed there, so an entry that
+// carries it must carry a real one. Allowlisting the key without checking its
+// value let `"does": 12` and `"does": ""` through to the site loader, which
+// trusts this validator and renders whatever it gets.
+function optionalString(value, field, where, errors) {
+  if (value?.[field] === undefined) return;
+  requireString(value, field, where, errors);
+}
+
 function matchesDomain(host, domains) {
   return domains.some(domain => host === domain || host.endsWith(`.${domain}`));
 }
@@ -255,6 +264,7 @@ export function validateSignals(data, {stagingDay, vendorDomains = VENDOR_DOMAIN
           requireString(solution, 'name', solutionWhere, errors);
           const hasSolutionUrl = requireString(solution, 'url', solutionWhere, errors);
           requireString(solution, 'gap', solutionWhere, errors);
+          optionalString(solution, 'does', solutionWhere, errors);
           if (hasSolutionUrl) {
             try {
               new URL(solution.url);

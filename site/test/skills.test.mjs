@@ -84,6 +84,57 @@ test('the channel schema stays valid and keeps its anchor requirements', () => {
     'unwritten',
     'unverified',
   ]);
+
+  // A verdict that claims to have read the page owes the reader the quote, the
+  // URL, and the date. Without `checked`, an undated verdict is schema-valid
+  // and nobody downstream can tell a fresh reading from a two-year-old one.
+  const verified = schema.allOf.find(
+    rule => rule.if?.properties?.rules?.properties?.verdict?.enum,
+  );
+  assert.deepEqual(
+    verified.then.properties.rules.required,
+    ['verdict', 'rules_url', 'quote', 'checked'],
+  );
+});
+
+test('every HTML-output instruction carries the escaping rule', () => {
+  // Researched text is attacker-authorable and the HTML path writes a file the
+  // user opens in a browser. The rule lives in RUBRIC.md, but it only works if
+  // each place that offers HTML actually points at it, and there are five.
+  const files = [
+    'method/PROMPT.md',
+    'method/GUIDED.md',
+    'method/CHANNELS.md',
+    'skills/demand-signal-research/SKILL.md',
+    'skills/audience-channel-research/SKILL.md',
+  ];
+
+  for (const file of files) {
+    const text = readFileSync(join(ROOT, file), 'utf8');
+    // Anchor on the exact token rather than /escape/i, which a passing mention
+    // anywhere in a long file would satisfy without the rule being present.
+    assert.ok(
+      text.includes('HTML-escape'),
+      `${file} offers HTML output without the escaping rule`,
+    );
+    assert.match(
+      text,
+      /`http`\/`https`/,
+      `${file} does not allowlist link schemes`,
+    );
+    assert.match(
+      text,
+      /RUBRIC\.md/,
+      `${file} does not point at the rule it is summarizing`,
+    );
+  }
+
+  const rubric = readFileSync(join(ROOT, 'method', 'RUBRIC.md'), 'utf8');
+  for (const entity of ['&amp;', '&lt;', '&gt;', '&quot;']) {
+    assert.ok(rubric.includes(entity), `RUBRIC.md does not name ${entity}`);
+  }
+  assert.match(rubric, /javascript:/);
+  assert.match(rubric, /data:/);
 });
 
 test('VENUES.md dates every quote it publishes', () => {
