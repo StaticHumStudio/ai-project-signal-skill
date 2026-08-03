@@ -72,8 +72,16 @@ This is the highest-value step.
 
 - Search `"[described need]" product OR gear OR tool`.
 - Check whether something launched recently that already nails it.
-- Open the listings of the closest existing options and read them.
+- Open the listings of **every** credible existing option and read them, not
+  just the closest one.
 - Search for alternatives to any products mentioned in the thread.
+
+**List every credible option you found.** Two entries is a floor, not a target:
+if eight things on the shelf are in the running, name eight. Each entry carries
+a `name`, a live `url`, a one-line neutral `does` (what it actually is, as the
+maker would describe it), and a `gap` stating specifically how it differs from
+what people are asking for. Name plus dismissal is not a landscape. Where a
+product genuinely solves part of the demand, say so.
 
 Every signal MUST have a researched landscape, so don't guess. For every negative
 claim about an existing product ("nothing does X", "they all rust", "none under
@@ -107,7 +115,8 @@ two strong signals than five mixed ones.
 title, then one section per signal (what it is; why it's real, with a linked
 quote; the existing options and the specific gap; and the builder's note), and
 append the raw JSON in a fenced code block at the end so it can still feed a
-site. Each signal is built to the shape below (it's [`schema.json`](./schema.json),
+site. Render the landscape as a **table**, one row per existing product
+(linked name, what it is, how it differs), never as a prose paragraph. Each signal is built to the shape below (it's [`schema.json`](./schema.json),
 free-form fields read for physical goods). Quality beats count. If you only
 found 4 strong signals, return 4.
 
@@ -126,7 +135,7 @@ found 4 strong signals, return 4.
   ],
   "landscape": {
     "existing_solutions": [
-      { "name": "Product or brand", "url": "https://...", "gap": "Why it doesn't fully satisfy the demand. Be specific." }
+      { "name": "Product or brand", "url": "https://...", "does": "One neutral line on what it actually is, as the maker would put it.", "gap": "Specifically how it differs from what people are asking for." }
     ],
     "landscape_summary": "1-2 sentences on what's on the shelf and why the gap persists."
   },

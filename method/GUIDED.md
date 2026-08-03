@@ -54,10 +54,18 @@ work out yourself.
    them, otherwise I'll spot the marketing myself as I go."*
 5. **How many, and how deep?** Default is up to 10, quality over quantity. Only
    ask if they seem to want something different.
-6. **How do you want the results?** A readable rundown right here in the chat
-   (the default), a **Markdown file** to save, a **standalone HTML page** you
-   can open in a browser, or the **raw JSON** (for feeding a site or your own
-   tooling). No wrong answer. Most people just want the rundown.
+6. **How do you want the results?** Three options, and say the tradeoff out
+   loud so they can pick on it:
+   - **In the chat** (the default, and the cheapest). A readable rundown right
+     here, nothing written to disk.
+   - **Markdown file** (the convenient one). Same report as a `.md` they can
+     save, search, and paste anywhere.
+   - **HTML page** (the best one to actually read). A single self-contained
+     file they open in a browser, with the landscape laid out as a real table.
+
+   Raw JSON matching [`schema.json`](./schema.json) is also available for
+   feeding a site or their own tooling, but don't lead with it. Offer it at the
+   end, alongside whichever of the three they picked.
 
 Always **close the interview with a catch-all**, once the essentials are
 covered: *"Anything else I should know before I start... a constraint, a nuance,
@@ -67,6 +75,12 @@ they've been thorough.
 
 If their very first message already answered most of the above, don't
 re-interrogate them. Fill the gaps, ask the catch-all, and move on.
+
+**One exception, and it is not optional: always ask question 6.** Nobody
+volunteers an output format unprompted, so a detailed opening message will look
+complete while leaving the one question they actually needed to answer. A
+request that arrives fully specified is exactly the case where this gets
+skipped. Ask it even when you are skipping everything else.
 
 ## Step 2: Plan (do the configuring they didn't have to)
 
@@ -103,9 +117,14 @@ Run the research in order; each phase builds on the last.
    multiple people agreeing, workarounds, "I'd pay for this", and lists of what
    they tried and why each failed.
 3. **Landscape.** For each candidate, search separately for what already exists
-   and open the closest options. Every signal needs a researched landscape with
-   a **specific** gap. Verify every negative claim ("nothing does X") against a
-   page you actually read. Never guess.
+   and open **every** credible option, not just the closest one. This is the
+   part the reader cannot check for themselves, so it's the part you show your
+   work on. For each tool: its name, a live link, one neutral line on what it
+   actually does, and the **specific** way it differs from what people are
+   asking for. Two entries is a floor. If the space has eight tools, name
+   eight. Verify every negative claim ("nothing does X") against a page you
+   actually read, and where a tool does solve part of the problem, say so.
+   Never guess.
 4. **Verify every source (non-skippable).** Before finalizing, open EVERY URL
    going into `sources` and confirm: the date is real and taken from the page;
    the author is a real user, not a vendor / affiliate / self-promoter; the page
@@ -131,10 +150,10 @@ Under the hood you always produce the same verified signals, up to 10 matching
 `category`, `difficulty`, `demand_strength`, `builder_note`; the last three are
 free-form). **How you present them is the output format they chose:**
 
-- **Readable rundown (default)**: a clean, skimmable writeup in your reply. A
-  one-line intro, then each signal as a short block (what it is; why it's real,
-  with the best quote + link; what already exists and the gap; the builder's
-  note). No JSON unless they ask.
+- **In the chat (default)**: a clean, skimmable writeup in your reply. A
+  one-line intro, then each signal as a short block: what it is; why it's real,
+  with the best quote + link; the landscape; the builder's note. No JSON unless
+  they ask.
 - **Markdown file**: the same writeup as a complete `.md` document they can
   save: a title, a section per signal with linked sources, landscape, and
   builder's note. Append the raw JSON in a fenced code block at the end so it
@@ -142,11 +161,21 @@ free-form). **How you present them is the output format they chose:**
 - **HTML page**: a single self-contained `.html` file (inline CSS, no external
   requests, clean and readable) rendering the same report, so they can just open
   it in a browser. No build step.
-- **Raw JSON**: only the JSON array matching `schema.json`, with no preamble,
-  Markdown fence, or summary before or after it.
 
-If they picked anything other than JSON, offer it anyway: *"want the raw JSON
-too, to drop into the example site or your own tooling?"*
+**However you render it, the landscape is a list, never a paragraph.** One row
+per existing tool, in all three formats: the linked name, what it does, and how
+it differs. In chat and Markdown that's a table or a tight bulleted list. In
+HTML make it an actual `<table>`. Burying four competitors inside a prose
+sentence is the failure mode here, because the reader can't scan it, can't
+count them, and can't tell what you checked from what you assumed.
+
+If a signal's landscape is thin, say so in the open ("two adjacent tools, both
+partial") rather than padding it or hiding it.
+
+Raw JSON matching [`schema.json`](./schema.json) stays available whatever they
+picked. Offer it once at the end: *"want the raw JSON too, to drop into the
+example site or your own tooling?"* If they ask for JSON on its own, give only
+the array, with no preamble, Markdown fence, or summary around it.
 
 Then offer: *"Want the configured prompt, so you can re-run this exact hunt
 later without the interview?"* If yes, hand them a filled-in, standalone version

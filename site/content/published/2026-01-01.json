@@ -16,7 +16,14 @@
         {
           "name": "TypicalCloudRecipes",
           "url": "https://example.com/cloud-recipes",
+          "does": "Subscription recipe manager with web clipping, meal planning, and a shared household library.",
           "gap": "Cloud-only; collections are lost if the service shuts down and there is no clean export."
+        },
+        {
+          "name": "PlaceholderNotesApp",
+          "url": "https://example.com/notes-app",
+          "does": "General-purpose local notes app that people press into service for recipes.",
+          "gap": "Stores everything on device, which is the right model, but has no ingredient parsing, scaling, or shopping list."
         }
       ],
       "landscape_summary": "Existing recipe managers are cloud-first and treat your library as hostage to the vendor's survival. The gap is a local-first store with optional sync and a real export."

@@ -142,6 +142,7 @@ const strengthDots: Record<string, string> = {
         {signal.landscape.existing_solutions.map((sol: any) => (
           <div class="landscape-item">
             <a href={safeUrl(sol.url)} target="_blank" rel="noopener">{sol.name}</a>
+            {sol.does && <span class="landscape-does">{sol.does}</span>}
             <span class="landscape-gap">{sol.gap}</span>
           </div>
         ))}
@@ -369,6 +370,14 @@ const strengthDots: Record<string, string> = {
 
   .landscape-item a:hover {
     color: var(--gold-soft);
+  }
+
+  .landscape-does {
+    font-size: 0.66rem;
+    color: var(--text);
+    display: block;
+    margin-top: 0.15rem;
+    line-height: 1.55;
   }
 
   .landscape-gap {

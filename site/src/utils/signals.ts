@@ -19,6 +19,7 @@ export interface Signal {
     existing_solutions: Array<{
       name: string;
       url: string;
+      does?: string;
       gap: string;
     }>;
     landscape_summary: string;

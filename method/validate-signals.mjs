@@ -25,7 +25,7 @@ const LANDSCAPE_KEYS = new Set([
   'existing_solutions',
   'landscape_summary',
 ]);
-const SOLUTION_KEYS = new Set(['name', 'url', 'gap']);
+const SOLUTION_KEYS = new Set(['name', 'url', 'does', 'gap']);
 
 // Deliberately empty. Telling a vendor's marketing page apart from real user
 // demand is the assistant's job during Phase 4 of the sourcing prompt, and the
@@ -234,6 +234,17 @@ export function validateSignals(data, {stagingDay, vendorDomains = VENDOR_DOMAIN
       if (!Array.isArray(signal.landscape.existing_solutions)) {
         errors.push(`${where} landscape: existing_solutions must be an array`);
       } else {
+        // A one-entry landscape is usually an unfinished search rather than an
+        // empty field. It reads as "we found the obvious competitor and
+        // stopped", which is the shape a reader cannot check for themselves.
+        // A warning, not an error: some gaps really are that empty, and the
+        // rubric asks you to say so in landscape_summary when they are.
+        if (signal.landscape.existing_solutions.length < 2) {
+          warnings.push(
+            `${where} landscape: only ${signal.landscape.existing_solutions.length} existing solution(s). ` +
+            'List every credible option you found, or say in landscape_summary what you searched and why nothing else came back.'
+          );
+        }
         for (const [solutionIndex, solution] of signal.landscape.existing_solutions.entries()) {
           const solutionWhere = `${where} landscape existing_solutions[${solutionIndex}]`;
           if (!isRecord(solution)) {
@@ -299,7 +310,7 @@ export async function runValidationCli(args) {
   const flags = args.filter(arg => arg.startsWith('--'));
   const files = args.filter(arg => !arg.startsWith('--'));
   if (files.length === 0) {
-    console.error('usage: validate-staging.mjs <path/to/signals.json...> [--strict]');
+    console.error('usage: validate-signals.mjs <path/to/signals.json...> [--strict]');
     process.exitCode = 2;
     return;
   }

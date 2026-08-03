@@ -26,6 +26,7 @@
     },
     "landscape": {
       "type": "object",
+      "description": "Who else is already in this space and how each one differs. List every credible option you found, not just the closest one. A reader should be able to skim this and understand the field without running their own search. An empty list is only valid if landscape_summary says what you searched and why nothing came back.",
       "required": ["existing_solutions", "landscape_summary"],
       "additionalProperties": false,
       "properties": {
@@ -38,6 +39,11 @@
             "properties": {
               "name": { "type": "string", "minLength": 1 },
               "url": { "type": "string", "format": "uri" },
+              "does": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Optional but strongly preferred. One neutral line on what this product actually is and does, written as if the maker wrote it. Keeps the list readable as a comparison instead of a list of dismissals."
+              },
               "gap": { "type": "string", "minLength": 1 }
             }
           }

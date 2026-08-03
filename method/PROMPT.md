@@ -140,8 +140,19 @@ landscape. This is the highest-value step.
 
 - Search `"[described need]" app OR tool OR software`.
 - Check whether anything launched recently that already solves it.
-- Open the sites/listings of the closest existing solutions and read them.
+- Open the sites/listings of **every** credible existing solution and read
+  them, not just the closest one.
 - Search for alternatives to any tools mentioned in the thread.
+- Check the obvious directories for the platform (F-Droid, Play, the App Store,
+  GitHub topics, awesome-lists) so you catch the ones search engines bury.
+
+**List every credible option you found.** Two entries is a floor, not a target:
+if the space holds eight plausible tools, the reader needs all eight. Each
+entry carries a `name`, a live `url`, a one-line neutral `does` (what the
+product actually is, as its maker would put it), and a `gap` stating
+specifically how it differs from the demand. Name-plus-gap alone reads as a
+list of dismissals; name-plus-does-plus-gap reads as a comparison, which is the
+useful thing. Where a tool genuinely solves part of the demand, say so.
 
 Every signal MUST have a researched landscape section, so don't guess. For every
 negative claim about an existing solution ("X doesn't do Y", "no free tier",
@@ -181,18 +192,28 @@ to 10 objects in the shape below (quality beats count; if you only found 4
 strong ones, return 4, and never pad with weak, stale, or thinly-sourced ideas).
 **How you present them depends on `OUTPUT`:**
 
-- **`json`** (default): only the JSON array of signal objects. No preamble,
-  Markdown fence, or summary may appear before or after it. This is what the
-  example `site/` consumes.
-- **`rundown`**: a readable writeup in your reply. A one-line intro, then each
-  signal as a short block (what it is; why it's real, with the best quote +
-  link; what already exists and the gap; the builder's note).
-- **`markdown`**: the same writeup as a complete `.md` document (a title, a
-  section per signal with linked sources, landscape, and builder's note), with
-  the raw JSON appended in a fenced code block so it can still feed a site.
-- **`html`**: a single self-contained `.html` file (inline CSS, no external
-  requests, clean and readable) rendering that report, openable in a browser
-  with no build step.
+Three reader-facing formats, plus the machine one:
+
+- **`rundown`**: a readable writeup in your reply, and the cheapest option
+  since nothing gets written to disk. A one-line intro, then each signal as a
+  short block (what it is; why it's real, with the best quote + link; the
+  landscape; the builder's note).
+- **`markdown`**: the convenient one. The same writeup as a complete `.md`
+  document (a title, a section per signal with linked sources, landscape, and
+  builder's note), with the raw JSON appended in a fenced code block so it can
+  still feed a site.
+- **`html`**: the best one to actually read. A single self-contained `.html`
+  file (inline CSS, no external requests, clean and readable) rendering that
+  report, openable in a browser with no build step.
+- **`json`** (default when `OUTPUT` is unset, since it's what the example
+  `site/` consumes): only the JSON array of signal objects. No preamble,
+  Markdown fence, or summary may appear before or after it.
+
+**In all three reader-facing formats, render the landscape as a list, never a
+paragraph.** One row per existing tool: linked name, what it does, how it
+differs. A table in `markdown`, a real `<table>` in `html`, a table or tight
+bulleted list in `rundown`. Four competitors buried in a prose sentence can't
+be scanned, counted, or checked, which defeats the point of researching them.
 
 Each signal object looks like this:
 
@@ -211,7 +232,7 @@ Each signal object looks like this:
   ],
   "landscape": {
     "existing_solutions": [
-      { "name": "App or tool", "url": "https://...", "gap": "Why it doesn't fully satisfy the demand. Be specific." }
+      { "name": "App or tool", "url": "https://...", "does": "One neutral line on what it actually is, as its maker would put it.", "gap": "Specifically how it differs from what people are asking for." }
     ],
     "landscape_summary": "1-2 sentences on the current state and why the gap persists."
   },
