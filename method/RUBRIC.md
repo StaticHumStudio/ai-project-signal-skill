@@ -89,6 +89,32 @@ An empty `existing_solutions` is allowed but expensive: `landscape_summary`
 then has to say what you searched and why nothing came back. "I found nothing"
 without the search behind it is indistinguishable from not looking.
 
+## The same line, pointed the other way
+
+This rubric is shared with [`CHANNELS.md`](./CHANNELS.md), the audience and
+channel method, which runs this engine in reverse: not *what should I make* but
+*where do I reach the people who'd want it.* The sources-vs-landscape rule above
+is what keeps the two honest with each other, so it is worth stating in both
+directions.
+
+**Producing landscape is fine. Manufacturing a source never is.**
+
+A directory listing, a release note, a Show HN, an honest "I built this, here's
+what it does and what it doesn't" post: all landscape. Real, useful, findable,
+and exactly what those venues are for. Nobody is fooled and nobody needs to be.
+
+Something engineered to *read* as a source is the other thing entirely: a
+sockpuppet, a friend primed to ask the question so you can answer it, a
+testimonial you wrote, an undisclosed alt account. Whoever runs this rubric
+against your space will eventually classify it as noise, because catching that
+is literally what the rubric is for. Anyone using both halves of this repo would
+be generating the input their own other half is built to reject.
+
+So the outreach rules are just this rule restated: disclose inside the action
+rather than in a footnote, answer first and mention second, one account and it's
+yours, and where a venue states a ratio, treat it as the floor of decency rather
+than a target.
+
 ## Quality over count
 
 Return up to 10 signals, but never pad. Four strong, well-sourced signals beat

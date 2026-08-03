@@ -47,28 +47,37 @@ plain-language questions about what you're hunting, works out the rest itself
 (the angle, the communities, the exact searches) and then goes and does the
 research. You configure nothing.
 
-**The even easier way, if your assistant supports Agent Skills.**
-[`SKILL.md`](./SKILL.md) at the repo root is the same thing with the pasting
-removed. Verified in Claude Code and Codex CLI. Clone the repo into wherever
-your tool keeps skills:
+**The even easier way, if your assistant supports Agent Skills.** The repo ships
+two, in [`skills/`](./skills). Same thing with the pasting removed. Verified in
+Claude Code and Codex CLI. Clone once, then link the skills you want into
+wherever your tool keeps them:
 
 ```bash
-git clone https://github.com/StaticHumStudio/ai-project-signal-skill ~/.claude/skills/demand-signal-research
+git clone https://github.com/StaticHumStudio/ai-project-signal-skill ~/src/signal
+```
+
+```bash
+ln -s ~/src/signal/skills/demand-signal-research ~/.claude/skills/demand-signal-research
+```
+
+```bash
+ln -s ~/src/signal/skills/audience-channel-research ~/.claude/skills/audience-channel-research
 ```
 
 Swap `~/.claude/skills` for `~/.codex/skills` on Codex, or whatever path your
-tool uses. The directory name has to match the `name` in `SKILL.md`'s
-frontmatter. A skill installer pointed at the repo works too:
+tool uses. Each directory name has to match the `name` in that skill's
+frontmatter.
 
-```bash
-npx skills add StaticHumStudio/ai-project-signal-skill
-```
+Both skill directories carry a `method` symlink pointing back at the shared
+[`method/`](./method), so there is exactly one copy of the method and no version
+of it that can drift. That's also why you link the skill directory rather than
+copying it: a copy that flattens the symlink leaves the skill pointing at files
+that aren't there. On Windows, `git clone` only materializes those symlinks with
+`core.symlinks=true` (or Developer Mode on), and without it you'll get plain
+text files with a path inside them. If that happens, use the paste-in path
+below, which needs no install at all and runs anywhere.
 
-Then just say what you're hunting for and it loads itself. It routes to the
-same `method/` files everything else uses, so there's one copy of the method
-and no version of it that can drift. Everything below still works by hand if
-you'd rather not install anything, and the paste-in path is the one that runs
-anywhere.
+Then just say what you're after and the right one loads itself.
 
 **The manual way: if you'd rather drive.**
 [`method/PROMPT.md`](./method/PROMPT.md) is the same engine as a fill-in-and-swap
@@ -167,6 +176,50 @@ Want to see one already done? [`method/EXAMPLE.md`](./method/EXAMPLE.md) is a
 complete, retargeted prompt (physical products) you can paste and run as-is. Or
 don't lift a finger: tell the [guided prompt](./method/GUIDED.md) what you're
 after and it does the retarget for you.
+
+## The other direction: where do you reach these people?
+
+Once you've built the thing, the next question is where to put it, and that's
+the same research problem pointed backwards. So there's a second method for it:
+[`method/CHANNELS.md`](./method/CHANNELS.md), with its own skill
+([`audience-channel-research`](./skills/audience-channel-research)), its own
+output shape ([`channels.schema.json`](./method/channels.schema.json)), and the
+same shared rubric and preflight gate.
+
+**The anchor is the part nobody bothers with.** For every venue it suggests, it
+opens that venue's actual rules page and quotes, verbatim, what it says about
+self-promotion, with the URL and the date it read it. Not a summary, not
+recollection. Because the failure mode here isn't a wasted afternoon, it's
+getting banned from the one community that mattered, and an assistant working
+from memory will cheerfully tell you a forum welcomes project posts when its
+sidebar says the opposite.
+
+That turns out to be worth doing for a reason nobody advertises: **a lot of
+venues ban commercial promotion in one sentence and permit open source project
+sharing in the next.** Privacy Guides publishes a formal self-submission process
+for developers whose only real price is disclosing your affiliation.
+awesome-selfhosted has no self-promotion rule at all, because it gates on
+whether your project is four months old and maintained rather than on your
+relationship to it. Those are doors an MIT-licensed tool walks straight through
+and a paid app cannot. [`method/VENUES.md`](./method/VENUES.md) has that step
+worked by hand, real quotes, real dates, including the ones that couldn't be
+verified and why.
+
+What comes out is deliberately **not** a ranked list and **not** a content
+calendar. It's two sections: a one-time placement checklist you grind once per
+project (sorted by effort, so you can stop wherever your afternoon ends), and a
+standing watchlist where every entry has a trigger phrased as an event in the
+world ("when you ship a release with a user-visible change") rather than a
+frequency. Every venue gets pros and cons. Effort is the axis, not cost, because
+paid placement is out of scope.
+
+And it will not generate what the demand method rejects. That's not a bolted-on
+ethics note, it falls out of the schema: producing landscape is fine, and
+manufacturing a source never is. Your release notes and your directory listing
+are landscape, and everyone knows it. A sockpuppet asking a question so you can
+answer it is a fabricated source, which is the exact artifact
+[`RUBRIC.md`](./method/RUBRIC.md) exists to catch. Using both halves of this
+repo, you'd be feeding one the thing the other is built to reject.
 
 ## Run the example site
 
@@ -277,12 +330,21 @@ rate limits, terms, and cost, so check those before scheduling anything.
 ## Repository layout
 
 ```
-SKILL.md      Agent Skill front door. Routes to method/, gates on the
-              preflight check. References the files below, never restates them.
-method/       The give-away. Start with GUIDED.md, which interviews you and
-              configures itself. PROMPT.md is the manual engine, RUBRIC.md the
-              rules, schema.json the output shape, RECIPES.md the non-software
-              swaps, EXAMPLE.md a finished, retargeted prompt.
+skills/       Two Agent Skill front doors, each a directory you link into your
+              tool's skills path. Both route to method/ through a symlink and
+              gate on the preflight check, and neither restates the method.
+                demand-signal-research/   what should I make?
+                audience-channel-research/ where do I reach those people?
+method/       The give-away, and the one copy both skills read.
+                GUIDED.md    interviews you and configures itself (start here)
+                PROMPT.md    the manual engine, as a fill-in template
+                RUBRIC.md    the evidence rules, shared by both methods
+                schema.json  the demand output shape
+                RECIPES.md   swaps for non-software targets
+                EXAMPLE.md   a finished, retargeted prompt
+                CHANNELS.md  the reverse method: audience and channels
+                VENUES.md    venue rules read and quoted by hand, with dates
+                channels.schema.json  the channel output shape
 collector/    Standard-library Python retrieval into a local cache, for when
               your assistant can't open pages
 reference/    How Signal ran in production (documentation)

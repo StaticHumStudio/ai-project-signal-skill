@@ -1,7 +1,7 @@
 # Signal Sourcing Task (daily automated run)
 
-> **This is not the Agent Skill.** That's [`../SKILL.md`](../SKILL.md) at the
-> repo root. This file is the repo-coupled prompt that Signal's cron job fed to
+> **This is not the Agent Skill.** Those live in [`../skills/`](../skills).
+> This file is the repo-coupled prompt that Signal's cron job fed to
 > the Claude CLI: it writes a staging file instead of replying, and it assumes
 > this repository's layout. It was named `SKILL.md` before the real skill
 > existed. Kept as a worked example of an automated loop.

@@ -58,6 +58,24 @@ Signal batches are JSON arrays containing 1 to 10 objects that match
 `method/schema.json`. Keep the schema, validator, prompt documentation, and
 site loader aligned when changing the format.
 
+`method/VENUES.md` quotes real venue rules pages, and rules pages change. If you
+update an entry, **open the page yourself and re-quote it**, then move that
+entry's read date to the day you actually read it. Do not refresh a date without
+refreshing the quote under it, and do not add a venue you have not opened. An
+entry marked unverified is doing its job; a stale entry with a fresh date is a
+lie the whole file exists to avoid.
+
+## Skills
+
+`skills/` holds one directory per Agent Skill, and each contains symlinks
+(`method`, `collector`, and others) pointing back at the shared directories at
+the repo root. That is what lets a skill be linked into a tool's skills path
+while still reading one canonical copy of the method. Adding a skill means
+adding those symlinks too, and `site/test/skills.test.mjs` will fail if a skill
+carries a real directory instead of a symlink, if its frontmatter `name` does
+not match its directory name, or if any relative link in its `SKILL.md` does not
+resolve.
+
 ## Pull requests
 
 Explain what changed, why it changed, and how you verified it. Include
