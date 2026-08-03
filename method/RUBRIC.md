@@ -64,6 +64,40 @@ For every negative landscape claim ("X doesn't do Y", "no free tier"), open the
 solution's page and verify it's still true. Misrepresenting what an existing
 solution does is the most common landscape error.
 
+## No inferred pain
+
+Everything above polices facts you might invent. This one polices *conclusions*
+you might invent from facts that are real, which is the harder failure to see
+because every individual claim checks out.
+
+You can observe that a business runs three locations, an ecommerce catalog, and
+a wholesale line. You cannot observe that its inventory data is a mess. You can
+observe that a company posted a job for a data analyst. You cannot observe that
+its reporting is broken. The first half of each pair is on the page. The second
+half is a guess about someone's internal state, and writing it down as though
+you read it is the same failure as inventing a date... it just sounds smarter,
+because it comes stapled to a real citation.
+
+So: **evidence of complexity is not evidence of a problem.** Say what you saw,
+then say what it makes plausible, and keep those in separate sentences. "Runs
+retail, estimating, and manufacturing under one roof" is a finding. "Their
+systems don't talk to each other" is fiction until somebody who works there
+says so.
+
+The same move shows up on the demand side, quieter. Eight tools in a space does
+not prove the space is underserved, and a long GitHub issue thread does not
+prove the maintainer is ignoring it. Report the count and the thread. Let the
+reader draw the conclusion, or draw it out loud and label it as yours.
+
+This gets sharpest wherever the method is pointed at a **named third party**: a
+competitor's users, a specific business, a person you might email. An asserted
+internal state about a named company is unverifiable, usually wrong, and
+occasionally forwarded to them.
+
+The honest version keeps its evidence and drops its diagnosis. "Public evidence
+shows X. Whether that costs them anything is what a conversation is for." That
+reads as more competent than the confident version, because it is.
+
 ## Landscape depth
 
 The landscape is the part a reader cannot check for themselves, so show your

@@ -34,9 +34,19 @@ Out comes a structured signal: what people want, who's asking (with receipts),
 what already exists, and one opinionated line about the non-obvious trap.
 
 It is relentless about evidence. A vendor's blog is not demand. A dead thread
-is not "ongoing." A date you didn't open the page and verify is not a fact.
-Every one of those rules was earned by getting it wrong first. They live in
+is not "ongoing." A date you didn't open the page and verify is not a fact. And
+a business that looks complicated is not a business with a problem. Every one of
+those rules was earned by getting it wrong first. They live in
 [`method/RUBRIC.md`](./method/RUBRIC.md).
+
+That last one is the rule the rest of the genre skips. There is no shortage of
+research prompts that will read a job posting, conclude the company's reporting
+is broken, cite the posting, and call that evidence. It isn't. It's a guess
+about someone's insides wearing a real citation, which is exactly why so much
+of this stuff reads as confident and lands as noise. Here, the observation and
+the diagnosis go in separate sentences, and the diagnosis is allowed to be
+missing. What you saw is a finding. What it means is a conversation you haven't
+had yet.
 
 ## Use it
 
