@@ -83,6 +83,7 @@
     },
     "trigger": {
       "type": "string",
+      "minLength": 1,
       "description": "Required for cadence=recurring. The event in the world that means it is time to act (\"when you ship a release with a user-visible change\", \"when someone asks for a tool that does X\"). Must never be a frequency: \"post monthly\" is a content calendar, and it decays into posting because of the date rather than because there is something to say."
     },
     "ban_risk": {

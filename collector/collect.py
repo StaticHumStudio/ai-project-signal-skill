@@ -254,6 +254,12 @@ HN_PAGE_SIZE = 100
 # Every way GitHub search spells an issue-state constraint, negation aside.
 STATE_QUALIFIERS = ("is:open", "is:closed", "state:open", "state:closed")
 
+# And the item-type constraint. gh honors a positive is:pr in the query even
+# though `gh search issues` appends type:issue of its own, so pull requests
+# really do come back. A PR is the author's own work, which is supply, and
+# RUBRIC.md drops supply from sources. It has no business in a demand cache.
+TYPE_QUALIFIERS = ("is:issue", "is:pr")
+
 
 def _hn_record(hit, kind, query) -> dict:
     object_id = hit.get("objectID")
@@ -527,10 +533,21 @@ def collect_github(args) -> list[dict]:
                     "  Drop the state qualifier. Open is applied for you."
                 )
             continue
+        if bare in TYPE_QUALIFIERS:
+            # -is:pr is a long way of saying issues, so it can just go.
+            wants_issues = bare.endswith(":issue") != token.startswith("-")
+            if not wants_issues:
+                raise UnsupportedQuery(
+                    f"{token} asks for pull requests, and this collector only "
+                    "returns issues.\n"
+                    "  A pull request is the author's own work, which is "
+                    "supply rather than demand.\n"
+                    "  Drop the type qualifier. Issues are applied for you."
+                )
+            continue
         kept.append(token)
 
-    if not any(t.lstrip("-").lower() in ("is:issue", "is:pr") for t in kept):
-        kept.append("is:issue")
+    kept.append("is:issue")
     query = " ".join(kept)
 
     fields = "number,title,body,url,createdAt,author,commentsCount,repository"

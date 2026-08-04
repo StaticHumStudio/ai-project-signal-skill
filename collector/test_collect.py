@@ -201,6 +201,22 @@ class GithubStateConstraint(unittest.TestCase):
         command = self.run_query("invoice is:open")
         self.assertEqual(command[3], "invoice is:issue")
 
+    def test_asking_for_pull_requests_is_refused(self):
+        # gh honors a positive is:pr even though `gh search issues` appends
+        # type:issue, so this really did put PRs in the cache. A PR is the
+        # author's own work, which RUBRIC.md calls supply and drops.
+        with self.assertRaises(collect.UnsupportedQuery) as caught:
+            self.run_query("invoice is:pr")
+        self.assertIn("pull request", str(caught.exception))
+
+    def test_negated_pr_is_just_issues_the_long_way(self):
+        command = self.run_query("invoice -is:pr")
+        self.assertEqual(command[3], "invoice is:issue")
+
+    def test_the_issue_constraint_is_applied_even_when_asked_for(self):
+        command = self.run_query("invoice is:issue")
+        self.assertEqual(command[3], "invoice is:issue")
+
 
 class HnPaging(unittest.TestCase):
     """collect_hn pages Algolia and pulls each matched story's own replies."""
