@@ -59,8 +59,22 @@ research. You configure nothing.
 
 **The even easier way, if your assistant supports Agent Skills.** The repo ships
 two, in [`skills/`](./skills). Same thing with the pasting removed. Verified in
-Claude Code and Codex CLI. Clone once, then link the skills you want into
-wherever your tool keeps them:
+Claude Code and Codex CLI.
+
+| Skill | Answers | What comes back |
+|---|---|---|
+| [`demand-signal-research`](./skills/demand-signal-research) | What should I make? | Up to 10 signals. What people want, who asked (quote, URL, and a real publication date on every source), what already exists, and exactly where each option falls short. |
+| [`audience-channel-research`](./skills/audience-channel-research) | Where do I reach those people? | A one-time placement checklist sorted by effort, plus a standing watchlist. Every venue carries its own promotion rules quoted verbatim, with the URL and the date they were read. |
+
+You never invoke them by name. Say what you're actually after ... *"help me work
+out what to build for solo landlords"*, *"where can I post this without getting
+banned"* ... and the matching one loads itself. Both interview you first, so
+there's nothing to configure, and both refuse to guess: if your assistant can't
+open the pages the research needs, they stop and say so rather than handing you
+fiction. That's the preflight check below, and it's the whole reason to trust
+the output.
+
+Clone once, then link the skills you want into wherever your tool keeps them:
 
 ```bash
 git clone https://github.com/StaticHumStudio/ai-project-signal-skill ~/src/signal
@@ -86,8 +100,6 @@ that aren't there. On Windows, `git clone` only materializes those symlinks with
 `core.symlinks=true` (or Developer Mode on), and without it you'll get plain
 text files with a path inside them. If that happens, use the paste-in path
 below, which needs no install at all and runs anywhere.
-
-Then just say what you're after and the right one loads itself.
 
 **The manual way: if you'd rather drive.**
 [`method/PROMPT.md`](./method/PROMPT.md) is the same engine as a fill-in-and-swap
