@@ -4,6 +4,7 @@ import SignalCard from '../../components/SignalCard.astro';
 import SignalDivider from '../../components/SignalDivider.astro';
 import { getCategoryEntries, getTotalSignals } from '../../utils/signals';
 import { withBase } from '../../utils/paths.js';
+import { siteConfig } from '../../config.js';
 
 export function getStaticPaths() {
   const totalSignals = getTotalSignals();
@@ -22,7 +23,7 @@ const metaDescription = `${signals.length} curated demand signals in the ${displ
 ---
 
 <SignalLayout
-  title={`${displayName} Signals | Signal`}
+  title={`${displayName} Signals | ${siteConfig.brand.name}`}
   description={metaDescription}
   signalCount={totalSignals}
 >

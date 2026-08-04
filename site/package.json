@@ -12,7 +12,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "test": "node --test test/*.test.mjs",
-    "check": "npm test && node ../reference/validate-staging.mjs content/published/2026-01-01.json --strict && npm run build"
+    "check": "npm test && python3 -m unittest discover -s ../collector && node ../reference/validate-staging.mjs content/published/*.json --strict && npm run build"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",

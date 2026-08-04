@@ -9,6 +9,9 @@ import {
   getTotalSignals,
 } from '../utils/signals';
 import { withBase } from '../utils/paths.js';
+import { siteConfig } from '../config.js';
+
+const { brand, meta, hero, seo, sections } = siteConfig;
 
 // Load all published signals.
 const allSignals = getAllSignals();
@@ -55,40 +58,25 @@ const jsonLd = {
   "@graph": [
     {
       "@type": "WebSite",
-      "name": "Signal by Static Hum Studio",
+      "name": `${brand.name} by ${brand.publisher}`,
       "url": siteHome,
-      "description": "An open source example interface for evidence-backed software demand research. The bundled feed contains synthetic demo data.",
+      "description": meta.description,
       "potentialAction": {
         "@type": "ReadAction",
         "target": siteHome,
       },
-      "keywords": [
-        "what should I code",
-        "coding projects",
-        "project ideas for developers",
-        "software ideas with demand evidence",
-      ],
+      "keywords": seo.keywords,
     },
     {
       "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "What should I code next?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Start with a concrete pain point people are actively discussing, verify the evidence, and identify where existing tools fall short. This example site demonstrates how to present that research.",
-          },
+      "mainEntity": seo.faq.map(entry => ({
+        "@type": "Question",
+        "name": entry.question,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": entry.answer,
         },
-        {
-          "@type": "Question",
-          "name": "How do I find coding projects that people actually want?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Look for repeated requests across communities, then choose projects where demand is clear but current solutions are weak. Signal tracks both demand evidence and competition for each opportunity.",
-          },
-        },
-      ],
+      })),
     },
   ],
 };
@@ -96,8 +84,8 @@ const jsonLd = {
 ---
 
 <SignalLayout
-  title="Signal Demo | Evidence-backed Software Project Research"
-  description="An open source example interface for software demand research. The bundled feed contains synthetic demo data you can replace with your own findings."
+  title={meta.title}
+  description={meta.description}
   signalCount={totalSignals}
   jsonLd={jsonLd}
 >
@@ -105,24 +93,22 @@ const jsonLd = {
   <!-- Hero -->
   <section class="hero">
     <div class="hero-ambient"></div>
-    <p class="hero-overline">open source demand research example</p>
-    <h1 class="hero-h1">What should I code?<br />Start with evidence.<span class="cursor"></span></h1>
-    <p class="hero-subtitle">
-      This site demonstrates how verified demand research can become a browsable project feed.
-      The bundled signal is synthetic, clearly labeled, and ready to replace with your own research.
-    </p>
+    <p class="hero-overline">{hero.overline}</p>
+    <h1 class="hero-h1">{hero.headline}<br />{hero.subhead}<span class="cursor"></span></h1>
+    <p class="hero-subtitle">{hero.blurb}</p>
+    <p class="hero-note">{hero.note}</p>
     <div class="hero-stats">
       <div class="stat">
         <span class="stat-number">{totalSignals}</span>
-        <span class="stat-label">demo signals</span>
+        <span class="stat-label">{hero.stats.signals}</span>
       </div>
       <div class="stat">
         <span class="stat-number">{dateEntries.length}</span>
-        <span class="stat-label">example batches</span>
+        <span class="stat-label">{hero.stats.batches}</span>
       </div>
       <div class="stat">
         <span class="stat-number">{platforms.size}</span>
-        <span class="stat-label">source types shown</span>
+        <span class="stat-label">{hero.stats.sources}</span>
       </div>
     </div>
   </section>
@@ -151,13 +137,13 @@ const jsonLd = {
 
   <SignalDivider />
 
-  <!-- Example Signals -->
+  <!-- Signals section -->
   {latestSignals.length > 0 && (
     <section class="section-void">
       <header class="section-header">
         <div class="section-label">
           <span class="prompt">$</span>
-          <h2>example signals</h2>
+          <h2>{sections.signals.heading}</h2>
         </div>
         <p class="section-sub">from {formatDate(latestDate)}</p>
       </header>
@@ -182,13 +168,13 @@ const jsonLd = {
 
   <SignalDivider />
 
-  <!-- Example Batches -->
+  <!-- Batches section -->
   {recentDays.length > 0 && (
     <section class="section-warm">
       <header class="section-header">
         <div class="section-label">
           <span class="prompt">$</span>
-          <h2>example batches</h2>
+          <h2>{sections.batches.heading}</h2>
         </div>
       </header>
       <div class="days-list">
@@ -215,50 +201,31 @@ const jsonLd = {
 
   <SignalDivider />
 
-  <!-- Developer Search Intent -->
+  <!-- Search Intent -->
   <section class="section-warm">
     <header class="section-header">
       <div class="section-label">
         <span class="prompt">$</span>
-        <h2>if you're searching “what should I code?”</h2>
+        <h2>{sections.searchIntent.heading}</h2>
       </div>
     </header>
     <div class="about-content">
-      <p>
-        Most "coding projects" lists are random. Signal is different: every idea starts from a
-        real user request, complaint, or workflow pain point pulled from public communities.
-      </p>
-      <p>
-        If you want project ideas for developers that are useful, browse by category,
-        pick a signal with repeated demand, then build the smallest helpful version first.
-      </p>
+      {sections.searchIntent.body.map(paragraph => <p>{paragraph}</p>)}
     </div>
   </section>
 
   <SignalDivider />
 
-  <!-- About Signal -->
+  <!-- About -->
   <section class="section-void">
     <header class="section-header">
       <div class="section-label">
         <span class="prompt">$</span>
-        <h2>about signal</h2>
+        <h2>{sections.about.heading}</h2>
       </div>
     </header>
     <div class="about-content">
-      <p>
-        Signal is an open source method and example interface for software demand research.
-        The single signal bundled with this repository is synthetic. It exists to demonstrate
-        the schema, routes, cards, filters, and feed without republishing anyone's words.
-      </p>
-      <p>
-        Replace the example JSON with research you have verified yourself. Each signal can include
-        source evidence, competitive landscape analysis, and an opinionated builder note.
-      </p>
-      <p>
-        Built for indie developers, solo founders, and small teams who want evidence behind
-        their next project.
-      </p>
+      {sections.about.body.map(paragraph => <p>{paragraph}</p>)}
     </div>
   </section>
 
@@ -269,30 +236,17 @@ const jsonLd = {
     <header class="section-header">
       <div class="section-label">
         <span class="prompt">$</span>
-        <h2>how signals are sourced</h2>
+        <h2>{sections.process.heading}</h2>
       </div>
     </header>
     <div class="process-grid">
-      <div class="process-step">
-        <span class="step-number">01</span>
-        <h3>source</h3>
-        <p>Search relevant communities for people describing software they wish existed, then open each source and read the full discussion.</p>
-      </div>
-      <div class="process-step">
-        <span class="step-number">02</span>
-        <h3>filter</h3>
-        <p>Remove noise, duplicates, and vague wishes. Keep signals with specific, actionable demand and evidence of multiple people wanting the same thing.</p>
-      </div>
-      <div class="process-step">
-        <span class="step-number">03</span>
-        <h3>analyze</h3>
-        <p>Map the competitive landscape for each signal. Identify existing solutions and document exactly where they fall short.</p>
-      </div>
-      <div class="process-step">
-        <span class="step-number">04</span>
-        <h3>publish</h3>
-        <p>Package each signal with builder notes, difficulty assessment, and demand strength rating. Ship only what clears the bar. Never pad a batch to hit a number.</p>
-      </div>
+      {sections.process.steps.map(step => (
+        <div class="process-step">
+          <span class="step-number">{step.number}</span>
+          <h3>{step.title}</h3>
+          <p>{step.body}</p>
+        </div>
+      ))}
     </div>
   </section>
 
@@ -350,6 +304,16 @@ const jsonLd = {
   .hero-subtitle {
     font-size: 0.72rem;
     color: var(--text-dim);
+    max-width: 520px;
+    margin: 0 auto 0.75rem;
+    line-height: 1.6;
+    position: relative;
+  }
+
+  /* Demo disclaimer. Quieter than the blurb on purpose, but not hidden. */
+  .hero-note {
+    font-size: 0.62rem;
+    color: var(--muted);
     max-width: 520px;
     margin: 0 auto 1.5rem;
     line-height: 1.6;

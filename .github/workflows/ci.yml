@@ -27,6 +27,11 @@ jobs:
           cache: npm
           cache-dependency-path: site/package-lock.json
 
+      - name: Use Python 3.12
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
       - name: Install dependencies
         run: npm ci
 
@@ -35,3 +40,23 @@ jobs:
 
       - name: Audit production dependencies
         run: npm audit --omit=dev --audit-level=high
+
+  collector:
+    # The collector is standard library only and advertises 3.9 and newer, so
+    # run the oldest supported version as well as the one it was written on.
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.12']
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Use Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Run collector tests
+        run: python3 -m unittest discover -s collector

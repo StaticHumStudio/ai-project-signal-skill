@@ -3,7 +3,7 @@
 # REFERENCE: this is the production automation that ran Signal as a daily
 # pipeline (cron -> Claude CLI -> validate -> isolated worktree -> review PR).
 # The portable, provider-agnostic version of the sourcing prompt is
-# ../method/PROMPT.md — use that to run a single pass by hand in any assistant.
+# ../method/PROMPT.md, which runs a single pass by hand in any assistant.
 # This script is kept as an example of how the automated loop was wired.
 #
 # Daily Signal sourcing via Claude Code CLI.
@@ -19,7 +19,7 @@ LOCK_FILE="${SIGNAL_LOCK_FILE:-/tmp/signal-daily.lock}"
 CLAUDE_BIN="${CLAUDE_BIN:-$HOME/.local/bin/claude}"
 GH_BIN="${GH_BIN:-/usr/bin/gh}"
 TODAY="$(date +%F)"
-PROMPT_REL="reference/SKILL.md"
+PROMPT_REL="reference/DAILY-RUN.md"
 VALIDATOR_REL="reference/validate-staging.mjs"
 STAGING_REL="site/content/staging/$TODAY.json"
 PUBLISHED_REL="site/content/published/$TODAY.json"
@@ -133,7 +133,7 @@ fi
     --title "Signal: $TODAY" \
     --body "Automated daily signal sourcing for $TODAY.
 
-Review the published file and merge to deploy to statichum.studio/signal.
+Review the published file and merge to deploy.
 Edit or drop weak signals before merging if needed." \
     --base main \
     --head "$BRANCH"

@@ -1,4 +1,11 @@
-# Signal Sourcing Task
+# Signal Sourcing Task (daily automated run)
+
+> **This is not the Agent Skill.** Those live in [`../skills/`](../skills).
+> This file is the repo-coupled prompt that Signal's cron job fed to
+> the Claude CLI: it writes a staging file instead of replying, and it assumes
+> this repository's layout. It was named `SKILL.md` before the real skill
+> existed. Kept as a worked example of an automated loop.
+> [`../method/PROMPT.md`](../method/PROMPT.md) is the portable version.
 
 You are a demand signal researcher for the software industry. Your job is to
 find real, actionable evidence of unmet software demand by mining online
@@ -103,10 +110,20 @@ landscape. This is the highest-value step.
 
 - Search for `"[described need]" app OR tool OR software`
 - Check if anything launched recently that solves it
-- Visit the websites/listings of the closest existing solutions
+- Visit the websites/listings of every credible existing solution, not just
+  the closest one
+- Check the platform's own directories (F-Droid, Play, the App Store, GitHub
+  topics) so you catch what search engines bury
 - Search for alternatives to any tools mentioned in the thread
 
 **Every signal MUST have a researched landscape section.** Don't guess.
+
+**List every credible option you found.** Two entries is a floor, not a
+target. Each entry carries a `name`, a live `url`, an optional one-line
+neutral `does` (what the product actually is, as its maker would put it), and
+a `gap` stating specifically how it differs from the demand. Name plus
+dismissal is not a landscape. Where a tool genuinely solves part of the
+demand, say so.
 
 **If you write "no free option" or "no free tier" for any named product,**
 explicitly search that product for hardship waiver, scholarship, or
@@ -246,7 +263,8 @@ Pure JSON. No markdown wrapping. The file must contain one JSON array with
         {
           "name": "App or tool name",
           "url": "https://...",
-          "gap": "Why it doesn't fully satisfy the demand. Be specific."
+          "does": "One neutral line on what it actually is, as its maker would put it.",
+          "gap": "Specifically how it differs from what people are asking for."
         }
       ],
       "landscape_summary": "1-2 sentences on the current state and why the gap persists."

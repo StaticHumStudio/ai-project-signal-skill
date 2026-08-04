@@ -1,0 +1,57 @@
+/*
+ * Self-hosted fonts: IBM Plex Mono and Oxanium, both SIL Open Font License 1.1.
+ *
+ * Files live in ../assets/fonts/ and are imported through Astro/Vite's normal
+ * asset pipeline (relative url() below), so the built paths are automatically
+ * content-hashed and prefixed with whatever `base` is set in astro.config.mjs.
+ * No third-party request is made at runtime.
+ *
+ * Only the weights actually used by this site's CSS are shipped (see
+ * src/styles/signal.css and the font-weight declarations across src/), and
+ * only the latin subset, woff2 only. Source: the official @fontsource
+ * packages (@fontsource/ibm-plex-mono@5.3.0, @fontsource/oxanium@5.3.0),
+ * used as a one-time, checksummed acquisition channel rather than a runtime
+ * dependency. License text for both families accompanies the font files in
+ * ../assets/fonts/ (LICENSE-IBM-Plex-Mono.txt, LICENSE-Oxanium.txt) per the
+ * OFL's redistribution requirement.
+ */
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../assets/fonts/ibm-plex-mono-latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../assets/fonts/ibm-plex-mono-latin-500-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Oxanium';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../assets/fonts/oxanium-latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Oxanium';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../assets/fonts/oxanium-latin-500-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Oxanium';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../assets/fonts/oxanium-latin-600-normal.woff2') format('woff2');
+}

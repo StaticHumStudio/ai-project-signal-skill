@@ -1,0 +1,150 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Channel",
+  "description": "One researched venue where a specific audience already gathers, produced by an audience and channel research pass (see CHANNELS.md). A channels file is a JSON array of these objects. The defining requirement is `rules`: every venue carries a verbatim quote of what its own rules page says about self-promotion, the URL that quote came from, and the date it was read. A channel without a verified or explicitly unverified rules block is not a recommendation, because the failure mode this schema exists to prevent is getting banned somewhere you were told you were welcome.",
+  "type": "object",
+  "required": ["name", "url", "class", "cadence", "effort", "rules", "pros", "cons"],
+  "additionalProperties": false,
+  "properties": {
+    "name": { "type": "string", "minLength": 1 },
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "description": "Where the reader goes to act: the submission form, the inclusion policy, the forum itself."
+    },
+    "class": {
+      "type": "string",
+      "enum": ["placement", "earned", "participation"],
+      "description": "placement: a directory or index the thing sits in and gets found. earned: a human with an audience chooses to cover you. participation: somewhere the audience talks and you are one of the people talking. Paid placement is deliberately out of scope."
+    },
+    "cadence": {
+      "type": "string",
+      "enum": ["one_time", "recurring"],
+      "description": "one_time entries form the placement checklist you grind once per project. recurring entries form the standing watchlist and MUST carry a trigger."
+    },
+    "effort": {
+      "type": "object",
+      "description": "Effort is the primary sorting axis of this method, not cost. A reader with one free afternoon and a reader with twenty minutes a day need different answers.",
+      "required": ["hours"],
+      "additionalProperties": false,
+      "properties": {
+        "hours": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Realistic hands-on time, as a range: \"0.25\", \"1-2\", \"4-8\". Per occurrence for recurring channels."
+        },
+        "time_to_first_result": {
+          "type": "string",
+          "description": "Elapsed time between acting and anything visible happening (\"1-2 weeks\", \"up to 3 months\"). Strongly preferred. Without it a reader reads normal latency as failure and quits early."
+        }
+      }
+    },
+    "rules": {
+      "type": "object",
+      "description": "What this venue's own rules page says about self-promotion. The anchor of the whole method. Never fill this from memory or inference.",
+      "required": ["verdict"],
+      "additionalProperties": false,
+      "properties": {
+        "verdict": {
+          "type": "string",
+          "enum": ["open_door", "conditional", "closed", "unwritten", "unverified"],
+          "description": "open_door: explicitly invites maker submissions. conditional: allowed within a stated limit or ratio. closed: banned outright, or banned for this commercial category. unwritten: the rules were read and say nothing about promotion, which is the HIGHEST risk state, not the lowest, because the rule exists in habit and is enforced without a page to point at. unverified: the rules page could not be opened, so this is a task for the reader and not a recommendation."
+        },
+        "rules_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "The exact page the quote was read on. Required whenever verdict is not unverified."
+        },
+        "quote": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Verbatim sentences from the rules page about self-promotion. Not a paraphrase. Required whenever the verdict is open_door, conditional, or closed."
+        },
+        "checked": {
+          "type": "string",
+          "format": "date",
+          "pattern": "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])$",
+          "description": "The date the page was actually read, as a real calendar day. Rules pages change, and a reader needs to know how stale this is. The pattern rejects impossible months and days. It cannot catch 2026-02-31, so anything validating this file should check the date parses too."
+        },
+        "open_source_carveout": {
+          "type": "string",
+          "description": "Verbatim text where a venue bans commercial promotion but permits sharing free or open source work. Worth its own field because it is the door most people never notice, and because it turns a closed verdict into an open one for an MIT or GPL project."
+        },
+        "hard_gates": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Requirements that disqualify a project outright before any time is spent: license restrictions, minimum age since first release, no-proprietary-dependency rules, required documentation or demo. Belongs at the top of a rendered entry, because a gate the reader fails makes the rest irrelevant."
+        }
+      }
+    },
+    "audience_evidence": {
+      "type": "string",
+      "description": "Why this venue is believed to be alive and to contain the target audience, citing something dated that was actually seen on the page. A venue that sounds right and is dead is worse than no venue, because it spends the time budget for nothing."
+    },
+    "trigger": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Required for cadence=recurring. The event in the world that means it is time to act (\"when you ship a release with a user-visible change\", \"when someone asks for a tool that does X\"). Must never be a frequency: \"post monthly\" is a content calendar, and it decays into posting because of the date rather than because there is something to say."
+    },
+    "ban_risk": {
+      "type": "string",
+      "description": "The specific local tripwire that gets an account banned here, taken from the rules that were actually read. Not generic advice."
+    },
+    "pros": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string" },
+      "description": "This method returns pros and cons per venue, never a ranking. A ranked list invites the reader to do number one and stop, which is the behavior that gets people banned from number one."
+    },
+    "cons": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string" },
+      "description": "Required, and non-empty. A venue with no listed downside means it was not looked at hard enough."
+    },
+    "disclosure": {
+      "type": "string",
+      "description": "How the maker identifies themselves when acting here, phrased as part of the action rather than as a footnote. The guardrail in CHANNELS.md is that producing landscape is fine and manufacturing a source never is, so every recommended action carries its own disclosure."
+    },
+    "notes": { "type": "string" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "cadence": { "const": "recurring" } }, "required": ["cadence"] },
+      "then": { "required": ["trigger"] }
+    },
+    {
+      "if": {
+        "properties": {
+          "rules": {
+            "properties": { "verdict": { "enum": ["open_door", "conditional", "closed"] } },
+            "required": ["verdict"]
+          }
+        },
+        "required": ["rules"]
+      },
+      "then": {
+        "properties": {
+          "rules": { "required": ["verdict", "rules_url", "quote", "checked"] }
+        }
+      }
+    },
+    {
+      "$comment": "`unwritten` is also a claim about a page that was read: it asserts the rules were checked and said nothing about promotion. That owes a URL and a date like any other reading, and only the quote is excused, because there is nothing to quote. Without this, a bare {\"verdict\": \"unwritten\"} is valid and a verified absence is indistinguishable from a guess. The distinction matters more here than anywhere else in the schema, since both skills tell readers to treat `unwritten` as the highest-risk verdict. `unverified` requires neither, because it claims the opposite: no page was read, and sometimes no rules page could even be found.",
+      "if": {
+        "properties": {
+          "rules": {
+            "properties": { "verdict": { "const": "unwritten" } },
+            "required": ["verdict"]
+          }
+        },
+        "required": ["rules"]
+      },
+      "then": {
+        "properties": {
+          "rules": { "required": ["verdict", "rules_url", "checked"] }
+        }
+      }
+    }
+  ]
+}

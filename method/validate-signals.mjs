@@ -25,7 +25,7 @@ const LANDSCAPE_KEYS = new Set([
   'existing_solutions',
   'landscape_summary',
 ]);
-const SOLUTION_KEYS = new Set(['name', 'url', 'gap']);
+const SOLUTION_KEYS = new Set(['name', 'url', 'does', 'gap']);
 
 // Deliberately empty. Telling a vendor's marketing page apart from real user
 // demand is the assistant's job during Phase 4 of the sourcing prompt, and the
@@ -87,6 +87,15 @@ function requireString(value, field, where, errors) {
     return false;
   }
   return true;
+}
+
+// `does` is optional in schema.json but still typed there, so an entry that
+// carries it must carry a real one. Allowlisting the key without checking its
+// value let `"does": 12` and `"does": ""` through to the site loader, which
+// trusts this validator and renders whatever it gets.
+function optionalString(value, field, where, errors) {
+  if (value?.[field] === undefined) return;
+  requireString(value, field, where, errors);
 }
 
 function matchesDomain(host, domains) {
@@ -234,6 +243,17 @@ export function validateSignals(data, {stagingDay, vendorDomains = VENDOR_DOMAIN
       if (!Array.isArray(signal.landscape.existing_solutions)) {
         errors.push(`${where} landscape: existing_solutions must be an array`);
       } else {
+        // A one-entry landscape is usually an unfinished search rather than an
+        // empty field. It reads as "we found the obvious competitor and
+        // stopped", which is the shape a reader cannot check for themselves.
+        // A warning, not an error: some gaps really are that empty, and the
+        // rubric asks you to say so in landscape_summary when they are.
+        if (signal.landscape.existing_solutions.length < 2) {
+          warnings.push(
+            `${where} landscape: only ${signal.landscape.existing_solutions.length} existing solution(s). ` +
+            'List every credible option you found, or say in landscape_summary what you searched and why nothing else came back.'
+          );
+        }
         for (const [solutionIndex, solution] of signal.landscape.existing_solutions.entries()) {
           const solutionWhere = `${where} landscape existing_solutions[${solutionIndex}]`;
           if (!isRecord(solution)) {
@@ -244,6 +264,7 @@ export function validateSignals(data, {stagingDay, vendorDomains = VENDOR_DOMAIN
           requireString(solution, 'name', solutionWhere, errors);
           const hasSolutionUrl = requireString(solution, 'url', solutionWhere, errors);
           requireString(solution, 'gap', solutionWhere, errors);
+          optionalString(solution, 'does', solutionWhere, errors);
           if (hasSolutionUrl) {
             try {
               new URL(solution.url);
@@ -294,28 +315,45 @@ export function validateSignalFile(file, {strict = false} = {}) {
 }
 
 export async function runValidationCli(args) {
-  const [file, ...flags] = args;
-  if (!file) {
-    console.error('usage: validate-staging.mjs <path/to/signals.json> [--strict]');
+  // Accept a glob. Using only the first argument let `published/*.json` report
+  // OK while skipping every batch but one.
+  const flags = args.filter(arg => arg.startsWith('--'));
+  const files = args.filter(arg => !arg.startsWith('--'));
+  if (files.length === 0) {
+    console.error('usage: validate-signals.mjs <path/to/signals.json...> [--strict]');
     process.exitCode = 2;
     return;
   }
 
-  const result = validateSignalFile(file, {strict: flags.includes('--strict')});
-  if (result.warnings.length > 0) {
-    console.error(`\n${result.warnings.length} warning(s):`);
-    for (const warning of result.warnings) console.error(`  WARN ${warning}`);
+  const strict = flags.includes('--strict');
+  let total = 0;
+  let failed = false;
+
+  for (const file of files) {
+    const result = validateSignalFile(file, {strict});
+    const label = files.length > 1 ? `${file}: ` : '';
+    if (result.warnings.length > 0) {
+      console.error(`\n${label}${result.warnings.length} warning(s):`);
+      for (const warning of result.warnings) console.error(`  WARN ${warning}`);
+    }
+    if (result.errors.length > 0) {
+      console.error(`\n${label}${result.errors.length} error(s):`);
+      for (const error of result.errors) console.error(`  ERROR ${error}`);
+      failed = true;
+      continue;
+    }
+    if (result.strict && result.warnings.length > 0) {
+      failed = true;
+      continue;
+    }
+    total += result.data.length;
   }
-  if (result.errors.length > 0) {
-    console.error(`\n${result.errors.length} error(s):`);
-    for (const error of result.errors) console.error(`  ERROR ${error}`);
-    process.exitCode = 1;
-    return;
-  }
-  if (result.strict && result.warnings.length > 0) {
+
+  if (failed) {
     process.exitCode = 1;
     return;
   }
 
-  console.error(`\nOK: ${result.data.length} signal(s) validated.`);
+  const scope = files.length > 1 ? ` across ${files.length} file(s)` : '';
+  console.error(`\nOK: ${total} signal(s) validated${scope}.`);
 }

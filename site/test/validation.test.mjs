@@ -17,7 +17,21 @@ function makeSignal() {
       date: '2026-07-24',
     }],
     landscape: {
-      existing_solutions: [],
+      // Two entries because a complete signal has a real landscape. Tests that
+      // care about a thin one set it themselves.
+      existing_solutions: [
+        {
+          name: 'SomeTool',
+          url: 'https://example.com/sometool',
+          does: 'Local-first note taking with an encrypted export.',
+          gap: 'No ingredient parsing or scaling.',
+        },
+        {
+          name: 'OtherTool',
+          url: 'https://example.com/othertool',
+          gap: 'Cloud only, no export.',
+        },
+      ],
       landscape_summary: 'No complete solution.',
     },
     category: 'other',
@@ -86,6 +100,94 @@ test('landscape solution urls must parse, like source urls', () => {
   assert.match(
     validateSignals([invalid], {stagingDay: '2026-07-24'}).errors[0],
     /invalid url "see their website"/,
+  );
+});
+
+test('a thin landscape warns without failing hard validation', () => {
+  // The rubric asks for every credible competitor, not just the closest one.
+  // A one-entry landscape is usually a search that stopped early, but some
+  // gaps really are that empty, so this stays a warning the strict runs catch.
+  const thin = makeSignal();
+  thin.landscape.existing_solutions = [{
+    name: 'SomeTool',
+    url: 'https://example.com/sometool',
+    gap: 'No offline mode.',
+  }];
+
+  const result = validateSignals([thin], {stagingDay: '2026-07-24'});
+  assert.deepEqual(result.errors, []);
+  assert.match(result.warnings.join('\n'), /only 1 existing solution/);
+
+  const empty = makeSignal();
+  empty.landscape.existing_solutions = [];
+  assert.match(
+    validateSignals([empty], {stagingDay: '2026-07-24'}).warnings.join('\n'),
+    /only 0 existing solution/,
+  );
+});
+
+test('solutions may carry a does line, and nothing else new', () => {
+  const signal = makeSignal();
+  signal.landscape.existing_solutions = [
+    {
+      name: 'SomeTool',
+      url: 'https://example.com/sometool',
+      does: 'Local-first note taking with an encrypted export.',
+      gap: 'No ingredient parsing or scaling.',
+    },
+    {
+      name: 'OtherTool',
+      url: 'https://example.com/othertool',
+      gap: 'Cloud only, no export.',
+    },
+  ];
+  assert.deepEqual(
+    validateSignals([signal], {stagingDay: '2026-07-24'}).errors,
+    [],
+  );
+
+  signal.landscape.existing_solutions[0].pricing = '$3/mo';
+  assert.match(
+    validateSignals([signal], {stagingDay: '2026-07-24'}).errors[0],
+    /pricing/,
+  );
+});
+
+test('a does line that is present must be a real one', () => {
+  // `does` is optional, so it was allowlisted without being checked. That let a
+  // number or an empty string reach the site loader, which trusts this
+  // validator and renders whatever it is handed.
+  for (const bad of ['', '   ', 12, null, [], {}]) {
+    const signal = makeSignal();
+    signal.landscape.existing_solutions[0].does = bad;
+    assert.match(
+      validateSignals([signal], {stagingDay: '2026-07-24'}).errors[0] ?? '',
+      /does must be a non-empty string/,
+      `does: ${JSON.stringify(bad)} should have been rejected`,
+    );
+  }
+
+  // Absent stays legal, since the schema marks it optional.
+  const signal = makeSignal();
+  delete signal.landscape.existing_solutions[0].does;
+  assert.deepEqual(
+    validateSignals([signal], {stagingDay: '2026-07-24'}).errors,
+    [],
+  );
+});
+
+test('schema and validator agree on the solution fields', async () => {
+  const schema = JSON.parse(await readFile(
+    new URL('../../method/schema.json', import.meta.url),
+    'utf8',
+  ));
+  const solution = schema.properties.landscape.properties
+    .existing_solutions.items;
+
+  assert.deepEqual(solution.required, ['name', 'url', 'gap']);
+  assert.deepEqual(
+    Object.keys(solution.properties).sort(),
+    ['does', 'gap', 'name', 'url'],
   );
 });
 

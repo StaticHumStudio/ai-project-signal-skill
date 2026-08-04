@@ -19,6 +19,7 @@ export interface Signal {
     existing_solutions: Array<{
       name: string;
       url: string;
+      does?: string;
       gap: string;
     }>;
     landscape_summary: string;
@@ -47,9 +48,13 @@ const publishedDir = path.join(process.cwd(), 'content/published');
 
 let _cache: Signal[] | null = null;
 
+// content/ sits outside src/ so Vite does not watch it. Caching on top of that
+// left a newly added batch invisible until restart, which reads as a broken site.
+const CACHE_ENABLED = !import.meta.env?.DEV;
+
 /** Load all signals from content/published/*.json, sorted by date descending then array position. */
 export function getAllSignals(): Signal[] {
-  if (_cache) return _cache;
+  if (_cache && CACHE_ENABLED) return _cache;
 
   if (!fs.existsSync(publishedDir)) {
     _cache = [];

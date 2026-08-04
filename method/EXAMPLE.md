@@ -1,14 +1,14 @@
-# Example — a finished, retargeted prompt (physical products)
+# Example: a finished, retargeted prompt (physical products)
 
 *This is [`PROMPT.md`](./PROMPT.md) with everything already filled in: a `FOCUS`
 set, and the two swap points replaced so it hunts for **physical product** gaps
-instead of software. It's a complete, paste-and-run prompt — copy the whole
+instead of software. It's a complete, paste-and-run prompt. Copy the whole
 thing below into any assistant that can search the web and open pages, and run
 it. Use it as-is, or as a model for your own retarget (see
 [`RECIPES.md`](./RECIPES.md)).*
 
 *What changed from `PROMPT.md`: the `FOCUS`, the **Role** section, and Phase 1's
-**Where to look** list — plus a few illustrative examples localized from
+**Where to look** list, plus a few illustrative examples localized from
 software to physical goods. The Method discipline is otherwise identical.*
 
 ---
@@ -26,17 +26,17 @@ OUTPUT: markdown
 
 You are a product-gap researcher for physical goods. Your job is to find real,
 evidenced demand for physical products people wish existed or wish worked
-differently — by mining communities and reviews where real owners describe what
-they can't buy and what their current gear gets wrong — then package each one as
+differently, by mining communities and reviews where real owners describe what
+they can't buy and what their current gear gets wrong, then package each one as
 a structured "signal" a maker or brand can act on.
 
 ## Method
 
 Run all phases in order. Each builds on the last.
 
-### Phase 1 — Thread discovery (web search)
+### Phase 1: Thread discovery (web search)
 
-Using your web-search tool, run 8–15 searches aimed at specific threads and
+Using your web-search tool, run 8 to 15 searches aimed at specific threads and
 reviews where real owners describe an unmet need. You want raw discussion and
 honest reviews, NOT "best kitchen gadgets 2026" affiliate listicles.
 
@@ -49,13 +49,13 @@ Query patterns that work (substitute your focus keyword):
 - `[category] "gave up and made my own"`
 
 Sources worth mining: r/BuyItForLife, r/Cooking, r/castiron, r/KitchenConfidential,
-serious-cook forums, Kickstarter comment threads, and — the gold — 1-to-3-star
+serious-cook forums, Kickstarter comment threads, and (the gold) 1-to-3-star
 Amazon reviews of the closest existing products.
 
-### Phase 2 — Deep reads (open the page)
+### Phase 2: Deep reads (open the page)
 
 For every promising thread or review, use your page-fetch/browsing tool to read
-the **full** discussion. Snippets are never enough — the real signal is in the
+the **full** discussion. Snippets are never enough. The real signal is in the
 replies and the middle-star reviews. Look for:
 
 - Multiple owners agreeing ("same!", "+1", "I gave up and use X instead").
@@ -65,33 +65,41 @@ replies and the middle-star reviews. Look for:
 - Lists of what they tried and why each one failed.
 - Upvote / "helpful" counts as demand-strength indicators.
 
-### Phase 3 — Landscape verification (search + open pages)
+### Phase 3: Landscape verification (search + open pages)
 
 For each candidate, run **separate** searches to map what's already for sale.
 This is the highest-value step.
 
 - Search `"[described need]" product OR gear OR tool`.
 - Check whether something launched recently that already nails it.
-- Open the listings of the closest existing options and read them.
+- Open the listings of **every** credible existing option and read them, not
+  just the closest one.
 - Search for alternatives to any products mentioned in the thread.
 
-Every signal MUST have a researched landscape — don't guess. For every negative
+**List every credible option you found.** Two entries is a floor, not a target:
+if eight things on the shelf are in the running, name eight. Each entry carries
+a `name`, a live `url`, a one-line neutral `does` (what it actually is, as the
+maker would describe it), and a `gap` stating specifically how it differs from
+what people are asking for. Name plus dismissal is not a landscape. Where a
+product genuinely solves part of the demand, say so.
+
+Every signal MUST have a researched landscape, so don't guess. For every negative
 claim about an existing product ("nothing does X", "they all rust", "none under
 $Y"), open a listing or review and verify it against what you actually read.
 Misrepresenting what an existing product does is the most common error.
 
-### Phase 4 — Per-source verification (open every source, non-skippable)
+### Phase 4: Per-source verification (open every source, non-skippable)
 
 Before finalizing, open EVERY URL going into `sources` and confirm with your
 eyes:
 
 1. The `date` matches what the page shows (the real review/post date).
-2. The author is a real owner/user — not the brand, an affiliate, or a
+2. The author is a real owner/user, not the brand, an affiliate, or a
    sponsored reviewer. Those go to landscape or get dropped, never to `sources`.
    Decide this yourself from the page: who runs this domain, do they sell this
    category, is the page built to rank rather than to complain? Anything on the
    `DISTRUST` list is out on sight, but that list is a shortcut, not the test.
-3. It's demand, not supply — a brand promoting its own product is supply. Drop it.
+3. It's demand, not supply. A brand promoting its own product is supply. Drop it.
 4. If the page is older than a few weeks, cite a specific recent activity you
    saw (a review or comment dated within the last month). Age alone doesn't count.
 5. The page actually loaded (no error or login wall).
@@ -103,18 +111,19 @@ two strong signals than five mixed ones.
 
 ## Output
 
-`OUTPUT` here is `markdown`, so deliver a complete, saveable `.md` report — a
+`OUTPUT` here is `markdown`, so deliver a complete, saveable `.md` report: a
 title, then one section per signal (what it is; why it's real, with a linked
-quote; the existing options and the specific gap; and the builder's note) — and
+quote; the existing options and the specific gap; and the builder's note), and
 append the raw JSON in a fenced code block at the end so it can still feed a
-site. Each signal is built to the shape below (it's [`schema.json`](./schema.json),
-free-form fields read for physical goods). Quality beats count — if you only
+site. Render the landscape as a **table**, one row per existing product
+(linked name, what it is, how it differs), never as a prose paragraph. Each signal is built to the shape below (it's [`schema.json`](./schema.json),
+free-form fields read for physical goods). Quality beats count. If you only
 found 4 strong signals, return 4.
 
 ```json
 {
   "title": "Short, clear description of the product people want",
-  "summary": "2-3 sentences: who wants it, why, and what it must do — for a maker who needs the opportunity in 10 seconds.",
+  "summary": "2-3 sentences: who wants it, why, and what it must do, for a maker who needs the opportunity in 10 seconds.",
   "sources": [
     {
       "url": "https://...",
@@ -126,7 +135,7 @@ found 4 strong signals, return 4.
   ],
   "landscape": {
     "existing_solutions": [
-      { "name": "Product or brand", "url": "https://...", "gap": "Why it doesn't fully satisfy the demand. Be specific." }
+      { "name": "Product or brand", "url": "https://...", "does": "One neutral line on what it actually is, as the maker would put it.", "gap": "Specifically how it differs from what people are asking for." }
     ],
     "landscape_summary": "1-2 sentences on what's on the shelf and why the gap persists."
   },
@@ -134,7 +143,7 @@ found 4 strong signals, return 4.
   "difficulty": "off_the_shelf_tweak|real_product|serious_manufacturing",
   "demand_strength": "single_request|multiple_requests|trending",
   "tags": ["up to 5 tags"],
-  "builder_note": "One sentence of opinionated, non-obvious advice — the insight or the trap to avoid."
+  "builder_note": "One sentence of opinionated, non-obvious advice: the insight or the trap to avoid."
 }
 ```
 
