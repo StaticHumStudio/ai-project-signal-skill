@@ -33,6 +33,21 @@ const LANDSCAPE_KEYS = new Set([
 ]);
 const SOLUTION_KEYS = new Set(['name', 'url', 'does', 'gap', 'gap_status', 'gap_evidence']);
 
+// Every allowlist above has a matching `additionalProperties: false` object in
+// schema.json, and the two drifting apart is silent: this validator keeps
+// accepting a batch that an external consumer reading the schema rejects (or
+// the reverse). Exported so one test can assert the two sides field for field
+// instead of trusting a hand-copied list. The keys name the schema location.
+export const FIELD_KEY_SETS = Object.freeze({
+  '': SIGNAL_KEYS,
+  'sources': SOURCE_KEYS,
+  'landscape': LANDSCAPE_KEYS,
+  'landscape.existing_solutions': SOLUTION_KEYS,
+  'supportingSource': SUPPORTING_SOURCE_KEYS,
+  'citation': CITATION_KEYS,
+  'issueStatus': ISSUE_STATUS_KEYS,
+});
+
 // Deliberately empty. Telling a vendor's marketing page apart from real user
 // demand is the assistant's job during Phase 4 of the sourcing prompt, and the
 // right domains are different for every focus area, so this ships with no

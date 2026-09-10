@@ -4,7 +4,7 @@ import {tmpdir} from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import {validateSignalFile, validateSignals} from '../../method/validate-signals.mjs';
+import {FIELD_KEY_SETS, validateSignalFile, validateSignals} from '../../method/validate-signals.mjs';
 
 function makeSignal() {
   return {
@@ -417,3 +417,42 @@ for (const url of [
     assert.match(validateSignals([signal], evidenceOptions).errors.join('\n'), /issue_status/);
   });
 }
+
+// The repo's stated invariant is that schema.json and this validator stay
+// aligned. `schema and validator agree on the solution fields` guards one
+// object against a hand-copied list, which catches a schema-side addition and
+// misses a validator-side one. This binds every allowlist to its schema object
+// in both directions, so adding a field to either side alone fails here.
+test('schema and validator allowlists match field for field', async () => {
+  const schema = JSON.parse(await readFile(
+    new URL('../../method/schema.json', import.meta.url),
+    'utf8',
+  ));
+  const schemaObjects = {
+    '': schema,
+    'sources': schema.properties.sources.items,
+    'landscape': schema.properties.landscape,
+    'landscape.existing_solutions':
+      schema.properties.landscape.properties.existing_solutions.items,
+    'supportingSource': schema.definitions.supportingSource,
+    'citation': schema.definitions.citation,
+    'issueStatus': schema.definitions.issueStatus,
+  };
+
+  assert.deepEqual(
+    Object.keys(schemaObjects).sort(),
+    Object.keys(FIELD_KEY_SETS).sort(),
+    'every exported key set needs a schema object to compare against',
+  );
+
+  for (const [location, object] of Object.entries(schemaObjects)) {
+    const where = location || '<signal>';
+    assert.equal(object.additionalProperties, false,
+      `${where}: schema must reject unknown fields`);
+    assert.deepEqual(
+      Object.keys(object.properties).sort(),
+      [...FIELD_KEY_SETS[location]].sort(),
+      `${where}: schema properties and validator allowlist disagree`,
+    );
+  }
+});

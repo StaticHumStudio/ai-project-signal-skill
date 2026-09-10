@@ -35,7 +35,7 @@ Run the complete check before opening a pull request:
 ```bash
 cd site
 npm run check
-npm audit --audit-level=low
+npm audit --omit=dev --audit-level=high
 ```
 
 `npm run check` runs the site's unit tests and the collector's, validates the

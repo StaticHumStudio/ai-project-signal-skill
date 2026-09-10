@@ -39,8 +39,9 @@ refusal. An unattended run without a grant continues without a browser. Read-onl
 approval covers navigation and expanding comments, never posting, messaging,
 purchases, mutating form submissions, or account changes. Follow host sign-in
 and challenge rules. Do not bypass restrictions or export credentials, and
-never cite content you could not read. Mark inaccessible rules unverified. Stop only work that lacks essential
-verified evidence.
+never cite content you could not read. If a venue's rules page stays
+unreadable, mark that venue unverified and tell the user to read it
+themselves.
 
 ## Step 0: Preflight (do this first, every time)
 
