@@ -10,17 +10,17 @@ This is the reverse of [`GUIDED.md`](./GUIDED.md). That one asks *what should I
 make.* This one asks *where do I reach the people who'd want it.* Same engine,
 same evidence discipline, same refusal to guess.
 
-> **Preflight, before you paste this.** Ask the assistant to open one forum
-> rules page and one directory's submission policy and report what it sees. If
-> it cannot read the actual page content, stop. The whole value here is reading
-> venue rules verbatim, and an assistant working from recall will confidently
-> tell you a community welcomes project posts when its sidebar says the
-> opposite. Getting banned is the failure mode. Guessing is how you get there.
+> **Preflight, every run.** Try one forum rules page and one directory
+> submission policy through ordinary retrieval or official APIs and report what
+> is readable.
+> Apply the browser permission gate below before any browser fallback.
+> Continue with accessible evidence and disclose gaps if a route is unavailable.
+> Search snippets and memory cannot replace reading the actual content.
 >
-> **If it fails,** [`../collector/`](../collector) fetches Hacker News, any
-> Discourse forum, and open GitHub issues into a local cache, which covers the
-> "where are these people talking" half. The rules half needs page access, so
-> say plainly which parts you could do.
+> **Local retrieval:** [`../collector/`](../collector) can cache Hacker News,
+> Discourse posts, and open GitHub issues. Hacker News and Discourse need no
+> account setup. GitHub needs the `gh` CLI and its existing authentication.
+> Competitor pages and venue rules still need their own verified retrieval.
 
 ---
 
@@ -37,6 +37,30 @@ Two things you are **not** doing, and should not drift into:
 - **Not a content calendar.** No posting schedule, no "week 3: engage." The
   output is a checklist you grind once and a watchlist you consult when
   something actually happens.
+
+## Browser permission (including preflight)
+
+Use ordinary page retrieval or official APIs first. If required content is
+missing, explain what you need to read and ask explicitly before any browser
+action, including reading an existing tab. State the pages or research-run
+scope and whether an existing signed-in session is included. For example:
+"The replies did not load. May I use your browser for read-only research during
+this run, including your signed-in session if needed, to read these threads?"
+
+Wait for an explicit yes within that scope. A prior explicit grant for this run
+is sufficient. Keep page-only grants to that page and public-only grants out of
+signed-in sessions. Ask before expanding scope, and get a new grant for a later
+run. Availability, ambient tabs, silence, and ambiguous replies are not approval.
+Stop browser activity immediately if permission is revoked.
+
+After refusal or while awaiting an answer, continue independent research through
+permitted nonbrowser routes and disclose gaps. Do not repeatedly ask after a
+refusal. An unattended run without a grant continues without a browser. Read-only
+approval covers navigation and expanding comments, never posting, messaging,
+purchases, mutating form submissions, or account changes. Follow host sign-in
+and challenge rules. Do not bypass restrictions or export credentials, and
+never cite content you could not read. Mark inaccessible rules unverified. Stop only work that lacks essential
+verified evidence.
 
 ## Step 1: Interview
 
@@ -140,7 +164,8 @@ open, that carve-out is a door most people never notice, and finding it is worth
 more than five generic suggestions. Quote it when it exists. Say plainly when it
 doesn't.
 
-If a rules page won't load, **say the venue is unverified and mark it that way
+If a rules page remains unreadable after the permitted retrieval options,
+**say the venue is unverified and mark it that way
 in the output.** Do not fill the gap from memory. An unverified venue is not a
 recommendation, it is a task: "go read this yourself before you post."
 

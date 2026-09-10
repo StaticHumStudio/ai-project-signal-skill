@@ -11,6 +11,21 @@
  * the whole site follows.
  */
 export const siteConfig = {
+  /** Labels for optional research provenance. Legacy entries show none. */
+  evidence: {
+    supportingSources: 'Supporting context',
+    corroboratedBy: 'Current evidence',
+    verifiedGap: 'Verified gap',
+    unverifiedGap: 'Unverified gap',
+    checked: 'Checked',
+    issueState: 'Issue state',
+    closureReasons: {
+      completed: 'Completed',
+      not_planned: 'Not planned',
+      automatic_stale: 'Closed for inactivity',
+      unknown: 'Closure reason unknown',
+    },
+  },
   /** Brand lockup, credit line, and the JSON-LD publisher identity. */
   brand: {
     /**

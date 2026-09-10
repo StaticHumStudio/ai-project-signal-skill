@@ -1,6 +1,8 @@
 ---
 import { safeUrl } from '../utils/safeUrl.js';
 import { withBase } from '../utils/paths.js';
+import { siteConfig } from '../config.js'
+import type { EvidenceCitation, SupportingSource } from '../utils/signals'
 
 interface Props {
   signal: {
@@ -13,12 +15,15 @@ interface Props {
       date: string;
       engagement?: string;
     }>;
+    supporting_sources?: SupportingSource[]
     landscape: {
       existing_solutions: Array<{
         name: string;
         url: string;
         does?: string;
         gap: string;
+        gap_status?: 'verified' | 'unverified'
+        gap_evidence?: EvidenceCitation[]
       }>;
       landscape_summary: string;
     };
@@ -105,6 +110,20 @@ const strengthDots: Record<string, string> = {
           <a href={safeUrl(sol.url)} target="_blank" rel="noopener">{sol.name}</a>
           {sol.does && <span class="landscape-does">{sol.does}</span>}
           <span class="landscape-gap">{sol.gap}</span>
+          {sol.gap_status && (
+            <div class="evidence-details">
+              <span class="source-platform">
+                {sol.gap_status === 'verified' ? siteConfig.evidence.verifiedGap : siteConfig.evidence.unverifiedGap}
+              </span>
+              {sol.gap_evidence?.map(citation => (
+                <div class="source-item">
+                  <a href={safeUrl(citation.url)} target="_blank" rel="noopener" class="source-link">{citation.url}</a>
+                  <span class="source-quote">"{citation.quote}"</span>
+                  <span class="source-date">{siteConfig.evidence.checked} {citation.checked}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       ))}
     </details>
@@ -121,6 +140,43 @@ const strengthDots: Record<string, string> = {
           </a>
           {src.quote && <span class="source-quote">"{src.quote}"</span>}
           {src.date && <span class="source-date">{src.date}</span>}
+        </div>
+      ))}
+    </details>
+  )}
+
+  {!compact && signal.supporting_sources && signal.supporting_sources.length > 0 && (
+    <details class="card-sources">
+      <summary>{siteConfig.evidence.supportingSources} ({signal.supporting_sources.length})</summary>
+      {signal.supporting_sources.map(src => (
+        <div class="source-item">
+          <span class="source-platform">{src.platform}</span>
+          <a href={safeUrl(src.url)} target="_blank" rel="noopener" class="source-link">{src.url}</a>
+          <span class="source-quote">"{src.quote}"</span>
+          <span class="source-date">{src.date}</span>
+          {src.engagement && <span class="landscape-gap">{src.engagement}</span>}
+          {src.issue_status && (
+            <div class="evidence-details">
+              <span class="source-platform">{siteConfig.evidence.issueState}: {src.issue_status.state}</span>
+              {src.issue_status.closure_reason && (
+                <span class="landscape-gap">{siteConfig.evidence.closureReasons[src.issue_status.closure_reason]}</span>
+              )}
+              <span class="source-date">{siteConfig.evidence.checked} {src.issue_status.checked}</span>
+              {src.issue_status.evidence && (
+                <div class="source-item">
+                  <a href={safeUrl(src.issue_status.evidence.url)} target="_blank" rel="noopener" class="source-link">{src.issue_status.evidence.url}</a>
+                  <span class="source-quote">"{src.issue_status.evidence.quote}"</span>
+                  <span class="source-date">{siteConfig.evidence.checked} {src.issue_status.evidence.checked}</span>
+                </div>
+              )}
+            </div>
+          )}
+          <div class="evidence-details">
+            <span class="source-platform">{siteConfig.evidence.corroboratedBy}</span>
+            {src.corroborated_by.map(url => (
+              <a href={safeUrl(url)} target="_blank" rel="noopener" class="source-link">{url}</a>
+            ))}
+          </div>
         </div>
       ))}
     </details>
@@ -369,6 +425,18 @@ const strengthDots: Record<string, string> = {
     font-size: 0.48rem;
     color: var(--dim);
     letter-spacing: 0.08em;
+  }
+
+  .evidence-details {
+    width: 100%;
+    min-width: 0;
+    margin-top: 0.3rem;
+  }
+
+  .evidence-details > .source-link,
+  .evidence-details > .source-date {
+    display: block;
+    margin-top: 0.2rem;
   }
 
   .card-tags {

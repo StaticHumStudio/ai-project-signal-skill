@@ -7,6 +7,7 @@ const SIGNAL_KEYS = new Set([
   'title',
   'summary',
   'sources',
+  'supporting_sources',
   'landscape',
   'category',
   'difficulty',
@@ -21,11 +22,16 @@ const SOURCE_KEYS = new Set([
   'date',
   'engagement',
 ]);
+const SUPPORTING_SOURCE_KEYS = new Set([...SOURCE_KEYS, 'corroborated_by', 'issue_status']);
+const CITATION_KEYS = new Set(['url', 'quote', 'checked']);
+const ISSUE_STATUS_KEYS = new Set(['state', 'checked', 'closure_reason', 'evidence']);
+const ISSUE_STATES = new Set(['open', 'closed', 'unknown']);
+const CLOSURE_REASONS = new Set(['completed', 'not_planned', 'automatic_stale', 'unknown']);
 const LANDSCAPE_KEYS = new Set([
   'existing_solutions',
   'landscape_summary',
 ]);
-const SOLUTION_KEYS = new Set(['name', 'url', 'does', 'gap']);
+const SOLUTION_KEYS = new Set(['name', 'url', 'does', 'gap', 'gap_status', 'gap_evidence']);
 
 // Deliberately empty. Telling a vendor's marketing page apart from real user
 // demand is the assistant's job during Phase 4 of the sourcing prompt, and the
@@ -96,6 +102,146 @@ function requireString(value, field, where, errors) {
 function optionalString(value, field, where, errors) {
   if (value?.[field] === undefined) return;
   requireString(value, field, where, errors);
+}
+
+function requireEvidenceDate(value, field, where, today, errors) {
+  if (!requireString(value, field, where, errors)) return null;
+  const date = parseStrictDate(value[field]);
+  if (!date) {
+    errors.push(`${where}: ${field} must be a real calendar day in YYYY-MM-DD`);
+  } else if (date > today) {
+    errors.push(`${where}: ${field} cannot be in the future after the staging day`);
+  }
+  return date;
+}
+
+function requireEvidenceUrl(value, where, errors) {
+  try {
+    if (typeof value !== 'string' || !/^https?:\/\/[^/\s]/i.test(value) || /\s/.test(value)) {
+      throw new Error('not an absolute HTTP URL');
+    }
+    const url = new URL(value);
+    if (!['http:', 'https:'].includes(url.protocol) || !url.hostname) {
+      throw new Error('not an absolute HTTP URL');
+    }
+    return url;
+  } catch {
+    errors.push(`${where}: url must be an absolute HTTP or HTTPS URL`);
+    return null;
+  }
+}
+
+function validateCitation(citation, where, today, errors) {
+  if (!isRecord(citation)) {
+    errors.push(`${where}: citation must be an object`);
+    return;
+  }
+  rejectUnknownKeys(citation, CITATION_KEYS, where, errors);
+  requireEvidenceUrl(citation.url, where, errors);
+  requireString(citation, 'quote', where, errors);
+  requireEvidenceDate(citation, 'checked', where, today, errors);
+}
+
+function validateIssueStatus(status, where, today, errors) {
+  if (!isRecord(status)) {
+    errors.push(`${where}: issue_status must be an object`);
+    return;
+  }
+  rejectUnknownKeys(status, ISSUE_STATUS_KEYS, where, errors);
+  if (!ISSUE_STATES.has(status.state)) {
+    errors.push(`${where}: state must be open, closed, or unknown`);
+  }
+  requireEvidenceDate(status, 'checked', where, today, errors);
+  if (status.state === 'closed') {
+    if (!CLOSURE_REASONS.has(status.closure_reason)) {
+      errors.push(`${where}: closure_reason must be completed, not_planned, automatic_stale, or unknown`);
+    }
+    if (CLOSURE_REASONS.has(status.closure_reason) && status.closure_reason !== 'unknown'
+      && status.evidence === undefined) {
+      errors.push(`${where}: a known closure_reason requires evidence`);
+    }
+  } else if (status.closure_reason !== undefined || status.evidence !== undefined) {
+    errors.push(`${where}: closure_reason and evidence are only allowed for a closed issue`);
+  }
+  if (status.evidence !== undefined) {
+    validateCitation(status.evidence, `${where} evidence`, today, errors);
+  }
+}
+
+function validateGapEvidence(solution, where, today, errors) {
+  if (solution.gap_status === undefined && solution.gap_evidence === undefined) return;
+  if (!['verified', 'unverified'].includes(solution.gap_status)) {
+    errors.push(`${where}: gap_status must be verified or unverified when gap_evidence is present`);
+  }
+  if (!Array.isArray(solution.gap_evidence)) {
+    errors.push(`${where}: gap_evidence must be an array when gap_status is present`);
+    return;
+  }
+  if (solution.gap_status === 'verified' && solution.gap_evidence.length === 0) {
+    errors.push(`${where}: verified gap requires at least one gap_evidence citation`);
+  }
+  for (const [index, citation] of solution.gap_evidence.entries()) {
+    validateCitation(citation, `${where} gap_evidence[${index}]`, today, errors);
+  }
+}
+
+function validateSupportingSources(signal, where, today, errors) {
+  if (signal.supporting_sources === undefined) return;
+  if (!Array.isArray(signal.supporting_sources)) {
+    errors.push(`${where}: supporting_sources must be an array`);
+    return;
+  }
+  const primarySources = Array.isArray(signal.sources) ? signal.sources : [];
+  for (const [index, source] of signal.supporting_sources.entries()) {
+    const sourceWhere = `${where} supporting_sources[${index}]`;
+    if (!isRecord(source)) {
+      errors.push(`${sourceWhere}: source must be an object`);
+      continue;
+    }
+    rejectUnknownKeys(source, SUPPORTING_SOURCE_KEYS, sourceWhere, errors);
+    for (const field of ['platform', 'quote']) requireString(source, field, sourceWhere, errors);
+    const url = requireEvidenceUrl(source.url, sourceWhere, errors);
+    const host = url?.hostname.replace(/^www\./, '');
+    const isGithubIssue = url && (
+      (host === 'github.com' && /^\/[^/]+\/[^/]+\/issues\/\d+(?:\/|$)/.test(url.pathname))
+      || (host === 'api.github.com' && /^\/repos\/[^/]+\/[^/]+\/issues\/(?:comments\/)?\d+(?:\/|$)/.test(url.pathname))
+    );
+    if (isGithubIssue || source.issue_status !== undefined) {
+      validateIssueStatus(source.issue_status, `${sourceWhere} issue_status`, today, errors);
+    }
+    requireEvidenceDate(source, 'date', sourceWhere, today, errors);
+    if (source.engagement !== undefined && typeof source.engagement !== 'string') {
+      errors.push(`${sourceWhere}: engagement must be a string`);
+    }
+    if (!Array.isArray(source.corroborated_by) || source.corroborated_by.length === 0) {
+      errors.push(`${sourceWhere}: corroborated_by must be a nonempty array of primary source URLs`);
+      continue;
+    }
+    if (new Set(source.corroborated_by).size !== source.corroborated_by.length) {
+      errors.push(`${sourceWhere}: corroborated_by URLs must be unique`);
+    }
+    for (const url of source.corroborated_by) {
+      const referenceWhere = `${sourceWhere} corroborated_by ${JSON.stringify(url)}`;
+      if (!requireEvidenceUrl(url, referenceWhere, errors)) continue;
+      if (url === source.url) {
+        errors.push(`${referenceWhere}: supporting evidence cannot corroborate itself`);
+        continue;
+      }
+      if (signal.supporting_sources.some(supporting => isRecord(supporting) && supporting.url === url)) {
+        errors.push(`${referenceWhere}: cannot corroborate with another supporting source`);
+        continue;
+      }
+      const matches = primarySources.filter(primary => isRecord(primary) && primary.url === url);
+      if (matches.length !== 1) {
+        errors.push(`${referenceWhere}: must reference exactly one primary source`);
+        continue;
+      }
+      const date = requireEvidenceDate(matches[0], 'date', referenceWhere, today, errors);
+      if (date && today - date > FOURTEEN_DAYS) {
+        errors.push(`${referenceWhere}: corroborating source must be within 14 days of the staging day`);
+      }
+    }
+  }
 }
 
 function matchesDomain(host, domains) {
@@ -235,6 +381,8 @@ export function validateSignals(data, {stagingDay, vendorDomains = VENDOR_DOMAIN
       }
     }
 
+    validateSupportingSources(signal, where, today, errors);
+
     if (!isRecord(signal.landscape)) {
       errors.push(`${where}: landscape must be an object`);
     } else {
@@ -265,6 +413,7 @@ export function validateSignals(data, {stagingDay, vendorDomains = VENDOR_DOMAIN
           const hasSolutionUrl = requireString(solution, 'url', solutionWhere, errors);
           requireString(solution, 'gap', solutionWhere, errors);
           optionalString(solution, 'does', solutionWhere, errors);
+          validateGapEvidence(solution, solutionWhere, today, errors);
           if (hasSolutionUrl) {
             try {
               new URL(solution.url);

@@ -35,7 +35,7 @@ Run the complete check before opening a pull request:
 ```bash
 cd site
 npm run check
-npm audit --omit=dev --audit-level=high
+npm audit --audit-level=low
 ```
 
 `npm run check` runs the site's unit tests and the collector's, validates the
@@ -57,6 +57,21 @@ test look convincing.
 Signal batches are JSON arrays containing 1 to 10 objects that match
 `method/schema.json`. Keep the schema, validator, prompt documentation, and
 site loader aligned when changing the format.
+
+New research records include paired competitor `gap_status` and `gap_evidence`
+fields. Older records without either field remain accepted. Historical context
+uses optional `supporting_sources` with fresh primary `corroborated_by` references
+and GitHub `issue_status` when relevant. See [the rubric](method/RUBRIC.md) for
+research requirements and [the schema](method/schema.json) for field shapes.
+The validator checks metadata, dates, and references. It cannot establish that
+quotes prove a claim or that sources are independent.
+
+Test extended evidence with synthetic fixtures under `site/test/fixtures/`, not
+in the published feed. Local checks include a temporary site build to verify
+full and compact rendering, citation links, and escaped researched text.
+Browser consent is an instruction-level gate. Exercise it with supplied results
+in local conversations, including approval, refusal, silence, and revocation.
+A real browser test needs explicit approval for its scope.
 
 `method/VENUES.md` quotes real venue rules pages, and rules pages change. If you
 update an entry, **open the page yourself and re-quote it**, then move that

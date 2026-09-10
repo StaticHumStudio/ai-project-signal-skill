@@ -57,8 +57,9 @@ You never invoke them by name. Say what you're actually after ... *"help me
 work out what to build for solo landlords"*, *"where can I post this without
 getting banned"* ... and the matching one loads itself. Both interview you
 first, so there's nothing to configure, and both refuse to guess: if your
-assistant can't open the pages the research needs, they stop and say so rather
-than handing you fiction (see the preflight check below).
+assistant cannot read required content, they try permitted retrieval options,
+report gaps, and stop any work that still lacks essential evidence (see preflight
+below). Browser fallback needs your explicit approval.
 
 Clone once, then link the skills you want into wherever your tool keeps them:
 
@@ -99,27 +100,31 @@ retarget it to anything using [`RECIPES.md`](./method/RECIPES.md).
 
 ### Preflight: check your assistant can actually read pages
 
-Do this once, before your first run. Ask your assistant to open one Reddit
-thread and one forum thread and report what it sees. **If it cannot read the
-actual page content, stop.** "Can search the web" and "can open a specific
-page on a specific site" are different capabilities, and the second one varies
-by assistant, by harness, and by site. The failure is silent: an assistant
-running on search snippets still produces well-formed, plausible signals, just
-built on fiction. That's the exact failure mode
-[`method/RUBRIC.md`](./method/RUBRIC.md) exists to prevent, and it can only
-prevent it if the pages are actually being opened. Test it, don't assume it.
+Check before each run. Try ordinary page retrieval or an official API on one
+Reddit thread and one forum thread (for channel research, a forum rules page
+and a directory submission policy). Confirm the actual content is readable.
+Search snippets are not enough.
 
-**Reddit is the one worth knowing about up front.** As of 2026-08-02, Reddit's
-`robots.txt` is `Disallow: /` for every user agent, the unauthenticated
-`.json` endpoint returns 403, and Claude Code refuses `reddit.com` outright.
-Other assistants may still reach it (access is a matter of who has a licensing
-agreement, not what the software can do), so check yours on the day. The gap
-matters because Reddit is where most consumer software demand actually gets
-discussed: if your assistant can't open it, your sweep is running on forums,
-and forum populations are self-selecting. Say so in the output rather than
-letting a thin run read as a complete one. The sanctioned way in is Reddit's
-official OAuth API (free for non-commercial use), which this repo leaves to
-you to wire up.
+If replies, rules, or other required content are missing, the assistant can
+ask to use your browser. It must explain what it needs to read, whether the
+scope is one page or this run, and whether your existing signed-in session is
+included. **It waits for your explicit yes before any browser action, including
+reading an existing tab.** A grant already given for this run counts. Page-only
+and public-only grants stay within those limits. Later runs need new consent.
+You can decline or revoke access. Silence and open tabs do not grant access.
+
+Browser research is read-only, including navigation and expanding comments.
+Posting, messaging, purchases, account changes, and bypassing restrictions are
+outside that approval. Without permission, the assistant continues through
+permitted nonbrowser routes and reports the evidence it could not check.
+See [`method/RUBRIC.md`](./method/RUBRIC.md) for the full rule.
+
+**Access varies by host and site.** Earlier checks (2026-08-02) found blocked
+Reddit retrieval and a 403 from its unauthenticated `.json` endpoint. Those
+observations do not establish what your current setup can read. A browser is
+neither a guarantee of access nor permission to bypass restrictions. If a
+community remains inaccessible, disclose the coverage gap and use reachable
+sources. Stop only the work whose essential evidence cannot be verified.
 
 **If it fails, or you'd rather not depend on it:**
 [`collector/`](./collector) is a standard-library Python script that fetches
@@ -144,6 +149,17 @@ Raw **JSON** (matching [`method/schema.json`](./method/schema.json)) comes
 free on top of any of them, and it's what feeds the example site. No account,
 no pipeline, no repo required. An afternoon of research in a couple of
 minutes.
+
+New reports show older discussions separately as supporting context, linked to
+fresh independent evidence that the need remains. Closed GitHub issues include
+checked status and closure context. Competitor gaps come with precise citations
+and a verified or unverified label, so an inconclusive check stays visible.
+
+JSON uses optional `supporting_sources` and paired competitor `gap_status` /
+`gap_evidence` fields. Legacy batches still work without them. The validator
+checks structure, dates, and references. It cannot prove a quote supports a
+claim. The full site cards and detail pages display supplied evidence, while
+compact cards keep their existing layout.
 
 ## Point it at anything
 

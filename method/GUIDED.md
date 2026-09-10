@@ -10,17 +10,16 @@ structured results in the reply.
 [`PROMPT.md`](./PROMPT.md) with [`RECIPES.md`](./RECIPES.md) instead. This
 guided version just does that configuring for you.)*
 
-> **Preflight, before you paste this.** Ask the assistant to open one Reddit
-> thread and one forum thread and report what it sees. If it cannot read the
-> actual page content, stop. This method cannot run on search snippets, and an
-> assistant that tries will hand you confident fiction. Being able to search the
-> web and being able to open a given page are two different capabilities, and
-> the second varies by assistant, by harness, and by site.
+> **Preflight, every run.** Try one Reddit thread and one forum thread
+> through ordinary retrieval or official APIs and report what is readable.
+> Apply the browser permission gate below before any browser fallback.
+> Continue with accessible evidence and disclose gaps if a route is unavailable.
+> Search snippets and memory cannot replace reading the actual content.
 >
-> **If it fails,** [`../collector/`](../collector) fetches Hacker News, any
-> Discourse forum, and open GitHub issues into a local cache first, so the
-> assistant reads real timestamps instead of trying to open pages. Standard
-> library Python, no install, no keys.
+> **Local retrieval:** [`../collector/`](../collector) can cache Hacker News,
+> Discourse posts, and open GitHub issues. Hacker News and Discourse need no
+> account setup. GitHub needs the `gh` CLI and its existing authentication.
+> Competitor pages and venue rules still need their own verified retrieval.
 
 ---
 
@@ -28,6 +27,30 @@ guided version just does that configuring for you.)*
 unmet demand *for this user*, but first you need to learn what they're actually
 hunting for. Work in four steps: **interview → plan → hunt → deliver.** Do not
 skip the interview, and do not skip the verification in the hunt.
+
+## Browser permission (including preflight)
+
+Use ordinary page retrieval or official APIs first. If required content is
+missing, explain what you need to read and ask explicitly before any browser
+action, including reading an existing tab. State the pages or research-run
+scope and whether an existing signed-in session is included. For example:
+"The replies did not load. May I use your browser for read-only research during
+this run, including your signed-in session if needed, to read these threads?"
+
+Wait for an explicit yes within that scope. A prior explicit grant for this run
+is sufficient. Keep page-only grants to that page and public-only grants out of
+signed-in sessions. Ask before expanding scope, and get a new grant for a later
+run. Availability, ambient tabs, silence, and ambiguous replies are not approval.
+Stop browser activity immediately if permission is revoked.
+
+After refusal or while awaiting an answer, continue independent research through
+permitted nonbrowser routes and disclose gaps. Do not repeatedly ask after a
+refusal. An unattended run without a grant continues without a browser. Read-only
+approval covers navigation and expanding comments, never posting, messaging,
+purchases, mutating form submissions, or account changes. Follow host sign-in
+and challenge rules. Do not bypass restrictions or export credentials, and
+never cite content you could not read. Mark inaccessible rules unverified. Stop only work that lacks essential
+verified evidence.
 
 ## Step 1: Interview
 
@@ -131,16 +154,48 @@ Run the research in order; each phase builds on the last.
    actually loaded; and the source proves the *specific* thing the signal
    claims. If a signal has zero verified real sources, **drop it.**
 
-**If you cannot open pages, say so and stop.** If your first few attempts to
-open real threads return errors, blocks, or nothing but search snippets, tell
-the user plainly that you can't run this method and stop. Do not fall back on
-snippets, vendor blogs, or recall. A refusal is a useful answer here; a
-plausible-looking batch built without reading the pages is not.
+**If ordinary retrieval fails, follow the browser permission gate above.**
+Continue independent work through permitted routes if browser access is declined
+or unavailable. Omit sources you cannot read, mark the resulting coverage gaps,
+and stop only work whose essential evidence cannot be verified. Never substitute
+snippets, vendor blogs, or recall for real user evidence.
 
 Non-negotiables (the full set is in [`RUBRIC.md`](./RUBRIC.md)): evidence over
 vibes; a dead or unverified thread is not proof; a date you didn't read off the
 page is not a fact; the gap must be **specific**, not "it's a crowded space".
 Two strong signals beat five shaky ones.
+
+### Supporting context and exact gap evidence
+
+Keep `sources` current. Historical discussions go in optional `supporting_sources`
+with `url`, `platform`, `quote`, original `date`, optional `engagement`, and
+nonempty unique `corroborated_by` URLs. Each must point to exactly one distinct
+primary source in this signal dated within 14 days of the batch date, never in
+the future. No self-reference or supporting-to-supporting reference. Verify
+independent users still describe the same unresolved need. Reposts, one author's
+repeated complaint, and shipping announcements do not qualify. Supporting
+context never increases primary source counts or demand strength.
+
+Supporting GitHub issues and issue comments also need `issue_status` with
+`state: open|closed|unknown` and actual `checked` date. Closed issues require
+`closure_reason: completed|not_planned|automatic_stale|unknown`. A known reason
+requires `evidence: {url, quote, checked}` from the closing record. Unknown reason
+may omit it. Do not infer automatic staleness from a closed or not-planned state.
+Open and unknown states have no closure fields. Completed work is history only
+when fresh independent evidence proves a specific remaining or renewed gap,
+which you explain. Otherwise put it in the landscape or omit it. The collector
+still retrieves only open issues, so verify supporting closed issues separately.
+
+Every new competitor includes `gap_status: verified|unverified` and
+`gap_evidence: [{url, quote, checked}]`. Verified requires a short exact citation
+from the documentation section, pricing page, release note, or maintainer
+statement proving the specific gap. A homepage or missing search result alone
+cannot prove a capability absent. If inconclusive, use `unverified`, allow an
+empty evidence array, and say "I could not verify offline support in the
+documentation checked" rather than asserting absence. Old batches may omit both
+fields. All new supporting and evidence URLs are absolute HTTP or HTTPS, and
+all dates are real and no later than the batch date. Validation checks structure,
+not the truth of a claim or independence of its sources.
 
 ## Step 4: Deliver
 
@@ -165,6 +220,13 @@ free-form). **How you present them is the output format they chose:**
   written by strangers, so an unescaped one means opening the report runs their
   markup. [`RUBRIC.md`](./RUBRIC.md) has the specifics.
 
+In every reader-facing format, show supporting context separately with its
+original date, issue state and closure context when relevant, and links to the
+current corroborating sources. Competitor rows include verified or unverified
+status, exact citation links, short quotes, and check dates. Do not relabel
+legacy gaps without metadata as verified. Escape this researched text in HTML
+and allow only HTTP or HTTPS evidence links.
+
 **However you render it, the landscape is a list, never a paragraph.** One row
 per existing tool, in all three formats: the linked name, what it does, and how
 it differs. In chat and Markdown that's a table or a tight bulleted list. In
@@ -183,7 +245,8 @@ the array, with no preamble, Markdown fence, or summary around it.
 Then offer: *"Want the configured prompt, so you can re-run this exact hunt
 later without the interview?"* If yes, hand them a filled-in, standalone version
 of the sourcing prompt (role + focus + where-to-look + the method above) they
-can save and reuse.
+can save and reuse. Include the browser permission section in that saved prompt
+so each future run retains the same consent gate.
 
 And if a one-off isn't enough, if they'd want this hunting on a schedule,
 offer that too, but only where their setup can actually support it: *"If you can

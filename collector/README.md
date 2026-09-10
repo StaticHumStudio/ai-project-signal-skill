@@ -137,21 +137,24 @@ query.
 
 ## What this deliberately does not do
 
-**It does not touch Reddit.** Reddit's `robots.txt` is `Disallow: /` for every
-user agent, and the free Data API tier is non-commercial only, with terms that
-bar deriving revenue from it and require deleting data outside your approved use
-case. A collector shipped in a public repo would hand that obligation to every
-person who cloned it. If you want Reddit, register your own app, read the
-[Data API Terms](https://redditinc.com/policies/data-api-terms), and decide for
-yourself. The robots check in `collect.py` will refuse Reddit URLs on purpose.
+**It does not touch Reddit.** The robots check in `collect.py` refuses Reddit
+URLs on purpose. This collector does not provide a Reddit API integration.
+Anyone configuring a separate API route must check the current
+[Data API Terms](https://redditinc.com/policies/data-api-terms) and their own
+approved access before using it.
 
-If your assistant can drive a real browser, you already have Reddit without any
-of this, which is the honest answer for most people. Do check, though. As of
-2026-08-02 the unauthenticated `.json` endpoint returns 403, and Claude Code
-refuses `www.reddit.com` and `old.reddit.com` outright, so a run from there is
-working off forums only. Say so in the output. Forum populations select for
-themselves, and a thin run needs to be reported as a thin run rather than
-passed off as a complete sweep.
+A browser may make a page readable, but having browser tools does not guarantee
+Reddit access or grant permission to use the user's session. Use ordinary
+retrieval or official APIs first. Before browser fallback, explain the missing
+content and request explicit approval for the page or run, including signed-in
+reading if needed. Follow the full [browser permission rule](../method/RUBRIC.md#retrieval-and-browser-permission),
+including preflight, refusal, scope, and revocation. Keep collector robots checks
+intact and never bypass restrictions or export browser credentials.
+
+Earlier checks (2026-08-02) found a 403 from Reddit's unauthenticated `.json`
+endpoint and blocked retrieval in some hosts. These are dated observations,
+not guarantees about current access. If the permitted routes remain unreadable,
+use accessible communities and say which coverage is missing.
 
 **It does not scrape.** `collect.py` checks `robots.txt` before every request
 and refuses anything disallowed, including `/search` on stock Discourse, which
@@ -175,3 +178,14 @@ to maintain rather than a collector to write.
 Stack Exchange was probed and works, but it was cut on quality, not access.
 People there ask how to do a thing, not what they wish existed, which is the
 wrong shape of statement for this method.
+
+## Historical supporting evidence
+
+The GitHub collector remains open-issue-only. Retrieve a closed issue separately
+through an official API, ordinary page retrieval, or an explicitly approved
+browser. For new research, use the rubric's `supporting_sources` shape with
+fresh independent primary corroboration, original dates, and checked
+`issue_status`. Known closure reasons need evidence. Unknown reasons may omit it. Cached text does not establish the current
+issue state forever. Check it again and record the actual check date. Closed
+supporting items never increase primary demand counts. See
+[the rubric](../method/RUBRIC.md#historical-supporting-context).

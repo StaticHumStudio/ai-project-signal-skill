@@ -14,28 +14,49 @@ Nothing in the method is specific to software. That is just the criteria this
 repo ships tuned for. It retargets to videos, physical products, local
 services, books, or a single competitor's user base.
 
+## Browser permission (including preflight)
+
+Use ordinary page retrieval or official APIs first. If required content is
+missing, explain what you need to read and ask explicitly before any browser
+action, including reading an existing tab. State the pages or research-run
+scope and whether an existing signed-in session is included. For example:
+"The replies did not load. May I use your browser for read-only research during
+this run, including your signed-in session if needed, to read these threads?"
+
+Wait for an explicit yes within that scope. A prior explicit grant for this run
+is sufficient. Keep page-only grants to that page and public-only grants out of
+signed-in sessions. Ask before expanding scope, and get a new grant for a later
+run. Availability, ambient tabs, silence, and ambiguous replies are not approval.
+Stop browser activity immediately if permission is revoked.
+
+After refusal or while awaiting an answer, continue independent research through
+permitted nonbrowser routes and disclose gaps. Do not repeatedly ask after a
+refusal. An unattended run without a grant continues without a browser. Read-only
+approval covers navigation and expanding comments, never posting, messaging,
+purchases, mutating form submissions, or account changes. Follow host sign-in
+and challenge rules. Do not bypass restrictions or export credentials, and
+never cite content you could not read. Mark inaccessible rules unverified. Stop only work that lacks essential
+verified evidence.
+
 ## Step 0: Preflight (do this first, every time)
 
-**Before any research, confirm you can actually open pages.** Open one Reddit
-thread and one forum thread and report what you see. Being able to search the
-web and being able to fetch a given page are different capabilities, and the
-second varies by harness and by site.
+**Before any research, check page access through ordinary retrieval or an
+official API.** Try one Reddit thread and one forum thread and report what you
+can read. Apply the browser permission gate above before any browser fallback.
+Searching and fetching a given page are different capabilities, and the second
+varies by harness and by site.
 
-Expect Reddit to fail. Its `robots.txt` is `Disallow: /` for every agent, the
-unauthenticated `.json` endpoint returns 403, and some harnesses (Claude Code,
-checked 2026-08-02) refuse the domain outright. Don't work around it. Note it,
-run on what you can reach, and say in the output that Reddit was out, because a
-sweep without it is running on forum populations that select for themselves.
-Discourse forums are the reliable substitute: every install exposes a public
-JSON API, so any topic URL plus `.json` returns structured posts with real
-timestamps.
+Reddit access depends on the host and route. Earlier checks (2026-08-02)
+found blocked retrieval and a 403 from its unauthenticated `.json` endpoint.
+Treat those as dated observations, not a guarantee about today's access. Do
+not bypass restrictions. If it remains unavailable, use reachable communities
+and disclose that coverage gap. Discourse's public JSON API is another ordinary
+retrieval route when the instance permits it.
 
-If you cannot read real page content, **stop and say so.** Do not fall back on
-search snippets, recall, or vendor blogs. An assistant that does will produce a
-well-formed batch of signals that were never sourced: real-looking dates, real-
-looking quotes, and nothing on the page ever said them. That silent failure is
-the single thing this whole method exists to prevent. A refusal is a useful
-answer here. A plausible batch built without reading the pages is not.
+If essential content remains unreadable after the permitted retrieval options,
+**stop and say so for that part of the research.** Continue independent work on
+accessible sources. Search snippets, recall, and vendor blogs cannot replace
+verified user evidence. Drop a signal with no readable demand evidence.
 
 **If retrieval fails, or the user would rather not depend on it:** the bundled
 collector fetches Hacker News, any Discourse forum, and open GitHub issues into
@@ -111,8 +132,16 @@ The short version, with the full set in the rubric:
 - **List every credible competitor**, not just the closest one. Each gets a
   name, a live link, a neutral line on what it actually does, and the specific
   way it differs. Two is a floor. Name plus dismissal is not a landscape.
-- Every negative landscape claim ("X doesn't do Y") gets verified against the
-  page. Misrepresenting an existing solution is the most common error.
+- New competitor entries include `gap_status` and exact `gap_evidence`
+  citations (`url`, short `quote`, actual `checked` date). Verified gaps need
+  proof. Inconclusive checks are unverified and worded as uncertainty, not
+  feature absence. Old records may omit both fields.
+- Historical discussions use separate `supporting_sources`, with original
+  dates and `corroborated_by` links to independent current demand within 14
+  days of the batch date. Supporting GitHub issues include `issue_status` and
+  cited closure reasons. Completed work alone is not unmet demand. The rubric
+  defines the exact fields and exclusions. Support does not increase source
+  counts or demand strength.
 - **Quality over count.** Up to 10, never padded. If a signal has zero verified
   real-user sources after verification, drop the signal.
 
@@ -129,6 +158,13 @@ their own tooling. Offer it at the end rather than leading with it.
 **The landscape renders as a list in all three, never a paragraph.** One row
 per tool: linked name, what it does, how it differs. A table in Markdown, a
 real `<table>` in HTML. `GUIDED.md` step 4 has the full shape of each format.
+
+In every reader-facing format, show supporting context separately with its
+original date, issue state and closure context when relevant, and links to the
+current corroborating sources. Competitor rows include verified or unverified
+status, exact citation links, short quotes, and check dates. Do not relabel
+legacy gaps without metadata as verified. Escape this researched text in HTML
+and allow only HTTP or HTTPS evidence links.
 
 Then offer them the configured prompt so they can re-run the same hunt later
 without the interview.

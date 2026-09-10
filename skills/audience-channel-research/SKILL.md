@@ -18,10 +18,36 @@ user to do number one and stop, which is the behavior that gets people banned
 from number one. Not a content calendar, because a posting schedule decays into
 posting on the first of the month rather than when there's something to say.
 
+## Browser permission (including preflight)
+
+Use ordinary page retrieval or official APIs first. If required content is
+missing, explain what you need to read and ask explicitly before any browser
+action, including reading an existing tab. State the pages or research-run
+scope and whether an existing signed-in session is included. For example:
+"The replies did not load. May I use your browser for read-only research during
+this run, including your signed-in session if needed, to read these threads?"
+
+Wait for an explicit yes within that scope. A prior explicit grant for this run
+is sufficient. Keep page-only grants to that page and public-only grants out of
+signed-in sessions. Ask before expanding scope, and get a new grant for a later
+run. Availability, ambient tabs, silence, and ambiguous replies are not approval.
+Stop browser activity immediately if permission is revoked.
+
+After refusal or while awaiting an answer, continue independent research through
+permitted nonbrowser routes and disclose gaps. Do not repeatedly ask after a
+refusal. An unattended run without a grant continues without a browser. Read-only
+approval covers navigation and expanding comments, never posting, messaging,
+purchases, mutating form submissions, or account changes. Follow host sign-in
+and challenge rules. Do not bypass restrictions or export credentials, and
+never cite content you could not read. Mark inaccessible rules unverified. Stop only work that lacks essential
+verified evidence.
+
 ## Step 0: Preflight (do this first, every time)
 
-**Before any research, confirm you can actually open pages.** Open one forum's
-rules page and one directory's submission policy and report what you see.
+**Before any research, check page access through ordinary retrieval or an
+official API.** Try one forum's rules page and one directory's submission policy
+and report what you can read. Apply the browser permission gate above before
+any browser fallback.
 Searching the web and fetching a given page are different capabilities, and the
 second varies by harness and by site.
 
@@ -31,16 +57,13 @@ when its sidebar says the opposite, and the user finds out by getting banned.
 **Getting banned is the failure mode this method exists to prevent, and guessing
 is how you get there.**
 
-Expect Reddit to fail. Its `robots.txt` is `Disallow: /` for every agent and the
-unauthenticated `.json` endpoint returns 403. That matters more here than it
-does for demand research, because per-subreddit self-promotion rules are strict,
-wildly inconsistent between subreddits, and the single most common place people
-get banned. If you cannot read a subreddit's sidebar, **say so, quote nothing,
-and tell the user to read it themselves.** Never reconstruct a subreddit's rules
-from memory.
-
-If you cannot read real page content at all, **stop and say so.** A refusal is a
-useful answer. A confident list of venues you did not verify is not.
+Reddit access depends on the host and route. Earlier checks (2026-08-02)
+found blocked retrieval and a 403 from its unauthenticated `.json` endpoint.
+Check permitted access for this run. If subreddit rules remain unreadable,
+mark them unverified, quote nothing, and tell the user to read them before
+posting. Never reconstruct rules from memory. Continue with venues whose rules
+you can verify. If no essential evidence is readable, stop and say so for that
+work.
 
 The bundled collector covers the "is this venue alive" half without page access:
 

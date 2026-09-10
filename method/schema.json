@@ -1,61 +1,154 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Demand Signal",
-  "description": "One unmet-software-demand signal produced by a sourcing pass. A signals file is a JSON array of 1 to 10 of these objects. Every source requires a verifiable URL, platform, brief quote, and real publication date. Engagement is optional for recent sources and required by the rubric when an older source needs proof of current activity.",
+  "description": "One unmet-software-demand signal produced by a sourcing pass. A signals file is a JSON array of 1 to 10 of these objects. Primary sources require a verifiable URL, platform, brief quote, and real publication date. Legacy source validation still checks engagement for older primary entries. New research puts historical context in supporting_sources with references to fresh independent primary evidence.",
   "type": "object",
-  "required": ["title", "summary", "sources", "landscape", "category", "difficulty", "demand_strength"],
+  "required": [
+    "title",
+    "summary",
+    "sources",
+    "landscape",
+    "category",
+    "difficulty",
+    "demand_strength"
+  ],
   "additionalProperties": false,
   "properties": {
-    "title": { "type": "string", "minLength": 1 },
-    "summary": { "type": "string", "minLength": 1 },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
     "sources": {
       "type": "array",
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["url", "platform", "quote", "date"],
+        "required": [
+          "url",
+          "platform",
+          "quote",
+          "date"
+        ],
         "additionalProperties": false,
         "properties": {
-          "url": { "type": "string", "format": "uri" },
-          "platform": { "type": "string", "minLength": 1 },
-          "quote": { "type": "string", "minLength": 1 },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "platform": {
+            "type": "string",
+            "minLength": 1
+          },
+          "quote": {
+            "type": "string",
+            "minLength": 1
+          },
           "date": {
             "type": "string",
             "format": "date",
             "pattern": "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])$"
           },
-          "engagement": { "type": "string" }
+          "engagement": {
+            "type": "string"
+          }
         }
       }
     },
     "landscape": {
       "type": "object",
       "description": "Who else is already in this space and how each one differs. List every credible option you found, not just the closest one. A reader should be able to skim this and understand the field without running their own search. An empty list is only valid if landscape_summary says what you searched and why nothing came back.",
-      "required": ["existing_solutions", "landscape_summary"],
+      "required": [
+        "existing_solutions",
+        "landscape_summary"
+      ],
       "additionalProperties": false,
       "properties": {
         "existing_solutions": {
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["name", "url", "gap"],
+            "required": [
+              "name",
+              "url",
+              "gap"
+            ],
             "additionalProperties": false,
             "properties": {
-              "name": { "type": "string", "minLength": 1 },
-              "url": { "type": "string", "format": "uri" },
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "url": {
+                "type": "string",
+                "format": "uri"
+              },
               "does": {
                 "type": "string",
                 "minLength": 1,
                 "description": "Optional but strongly preferred. One neutral line on what this product actually is and does, written as if the maker wrote it. Keeps the list readable as a comparison instead of a list of dismissals."
               },
-              "gap": { "type": "string", "minLength": 1 }
-            }
+              "gap": {
+                "type": "string",
+                "minLength": 1
+              },
+              "gap_status": {
+                "enum": [
+                  "verified",
+                  "unverified"
+                ]
+              },
+              "gap_evidence": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/citation"
+                }
+              }
+            },
+            "dependencies": {
+              "gap_status": [
+                "gap_evidence"
+              ],
+              "gap_evidence": [
+                "gap_status"
+              ]
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "gap_status": {
+                      "const": "verified"
+                    }
+                  },
+                  "required": [
+                    "gap_status"
+                  ]
+                },
+                "then": {
+                  "properties": {
+                    "gap_evidence": {
+                      "minItems": 1
+                    }
+                  }
+                }
+              }
+            ]
           }
         },
-        "landscape_summary": { "type": "string", "minLength": 1 }
+        "landscape_summary": {
+          "type": "string",
+          "minLength": 1
+        }
       }
     },
-    "category": { "type": "string", "minLength": 1 },
+    "category": {
+      "type": "string",
+      "minLength": 1
+    },
     "difficulty": {
       "type": "string",
       "minLength": 1,
@@ -66,7 +159,204 @@
       "minLength": 1,
       "description": "How strong the evidenced demand is. Free-form; common values: early, single_request, multiple_requests, trending, building, moderate, strong."
     },
-    "tags": { "type": "array", "items": { "type": "string" } },
-    "builder_note": { "type": "string" }
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "builder_note": {
+      "type": "string"
+    },
+    "supporting_sources": {
+      "type": "array",
+      "description": "Optional historical context, separate from current demand evidence and primary source counts. New research requires fresh independent corroboration.",
+      "items": {
+        "$ref": "#/definitions/supportingSource"
+      }
+    }
+  },
+  "definitions": {
+    "evidenceUrl": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^[hH][tT][tT][pP][sS]?://[^/\\s]+[^\\s]*$"
+    },
+    "evidenceDate": {
+      "type": "string",
+      "format": "date",
+      "pattern": "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])$",
+      "description": "A real calendar date no later than the batch day. The shared validator checks the batch-relative limit."
+    },
+    "citation": {
+      "type": "object",
+      "required": [
+        "url",
+        "quote",
+        "checked"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "url": {
+          "$ref": "#/definitions/evidenceUrl"
+        },
+        "quote": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "checked": {
+          "$ref": "#/definitions/evidenceDate"
+        }
+      }
+    },
+    "issueStatus": {
+      "type": "object",
+      "required": [
+        "state",
+        "checked"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "enum": [
+            "open",
+            "closed",
+            "unknown"
+          ]
+        },
+        "checked": {
+          "$ref": "#/definitions/evidenceDate"
+        },
+        "closure_reason": {
+          "enum": [
+            "completed",
+            "not_planned",
+            "automatic_stale",
+            "unknown"
+          ]
+        },
+        "evidence": {
+          "$ref": "#/definitions/citation"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "closed"
+              }
+            },
+            "required": [
+              "state"
+            ]
+          },
+          "then": {
+            "required": [
+              "closure_reason"
+            ],
+            "if": {
+              "properties": {
+                "closure_reason": {
+                  "enum": [
+                    "completed",
+                    "not_planned",
+                    "automatic_stale"
+                  ]
+                }
+              },
+              "required": [
+                "closure_reason"
+              ]
+            },
+            "then": {
+              "required": [
+                "evidence"
+              ]
+            }
+          },
+          "else": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "closure_reason"
+                  ]
+                },
+                {
+                  "required": [
+                    "evidence"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "supportingSource": {
+      "type": "object",
+      "required": [
+        "url",
+        "platform",
+        "quote",
+        "date",
+        "corroborated_by"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "url": {
+          "$ref": "#/definitions/evidenceUrl"
+        },
+        "platform": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "quote": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "date": {
+          "$ref": "#/definitions/evidenceDate"
+        },
+        "engagement": {
+          "type": "string"
+        },
+        "corroborated_by": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/evidenceUrl"
+          },
+          "description": "Each URL must resolve to exactly one primary source in this signal, dated within 14 days of the batch day. It cannot reference this or another supporting source. The shared validator checks dates and references. The researcher checks independent authorship and the unresolved need."
+        },
+        "issue_status": {
+          "$ref": "#/definitions/issueStatus"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "url": {
+                "pattern": "^[hH][tT][tT][pP][sS]?://(?:[^/?#\\s]*@)?(?:[wW][wW][wW]\\.)?(?:[gG][iI][tT][hH][uU][bB]\\.[cC][oO][mM](?::\\d+)?/[^/]+/[^/]+/issues/\\d+|[aA][pP][iI]\\.[gG][iI][tT][hH][uU][bB]\\.[cC][oO][mM](?::\\d+)?/repos/[^/]+/[^/]+/issues/(?:comments/)?\\d+)(?:[/?#]|$)"
+              }
+            },
+            "required": [
+              "url"
+            ]
+          },
+          "then": {
+            "required": [
+              "issue_status"
+            ]
+          }
+        }
+      ]
+    }
   }
 }

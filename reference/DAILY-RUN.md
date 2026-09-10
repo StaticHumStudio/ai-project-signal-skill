@@ -29,6 +29,27 @@ ideas just to reach 10.
 2. Check what day of the week it is and use the rotation below to pick
    your focus area and source emphasis.
 
+## Retrieval and browser permission
+
+Use ordinary page retrieval or official APIs first, including during preflight.
+If required replies, source details, or competitor documentation remain missing,
+explain what is missing and ask for explicit browser approval before any browser
+action (including reading existing tabs). State the intended reading action,
+page or whole-run scope, and whether an existing signed-in session is included.
+An explicit grant already given for this run is sufficient within its scope.
+A page-only grant stays on that page, and public-only approval excludes signed-in
+reading. Availability, an open tab, silence, or an ambiguous answer is not consent.
+Each later run needs its own grant. Revocation stops browser activity immediately.
+
+Approval covers reading and navigation needed to read, including expanding
+comments. It does not permit posting, messaging, purchases, or account changes.
+Follow host sign-in and challenge rules. Never bypass restrictions or export
+credentials. After refusal, continue through permitted nonbrowser sources and
+report coverage gaps without repeatedly asking. An unattended run without a
+browser grant must use available nonbrowser routes, record unreadable evidence,
+and finish without waiting indefinitely or inventing approval. Drop any signal
+whose essential evidence remains unreadable.
+
 ## Daily rotation
 
 ### Category (what to look for):
@@ -92,8 +113,9 @@ Key subreddits to mine:
 
 ### PHASE 2: Thread Deep Reads (web_fetch)
 
-For EVERY promising thread found in Phase 1, use web_fetch to read the
-FULL thread content. Search snippets are never enough. The real signal is
+For EVERY promising thread found in Phase 1, read the FULL thread content
+through ordinary retrieval, an official API, or the explicitly approved browser
+fallback above. Search snippets are never enough. The real signal is
 in the replies, not the headline.
 
 When reading threads, look for:
@@ -147,8 +169,9 @@ date without the geographic qualifier.
 
 ### PHASE 4: Per-Source Verification (web_fetch, non-skippable)
 
-Before writing the final JSON, web_fetch EVERY URL going into `sources`.
-For each, confirm with your eyes:
+Before writing the final JSON, verify EVERY cited URL using the retrieval
+sequence above, including `sources`, `supporting_sources`, and gap citations.
+For primary `sources`, confirm with your eyes:
 
 1. **Date** matches what the page actually shows. Set `date` to the
    posted date you read.
@@ -156,24 +179,16 @@ For each, confirm with your eyes:
    Vendor pieces go to landscape or get dropped, never to `sources`.
 3. **Not self-promo.** Show HN / Reddit posts where someone is promoting
    their own product are supply, not demand. Drop from `sources`.
-4. **Recent activity** if the page is more than 14 days old. Look for
-   comments dated in the last ~30 days. If none, drop the source. If
-   there are, name them in `engagement` with a specific date you read
-   ("most recent comment 2026-05-15"). Restating the post age
-   ("posted 25 days before signal date") or total comment count alone
-   does NOT satisfy this requirement -- you must cite a dated recent
-   activity you personally verified on the page.
-5. **Actually loaded.** If web_fetch returned a 429, an error, or a
-   login wall, you can't cite what's on the page. Drop the source.
-6. **GitHub issues: verify open AND on-point.** If the URL is a GitHub
-   issue, check two things: (a) the issue is OPEN... closed issues
-   (status Done, Resolved, Won't Fix, or merged) do not prove unmet
-   demand; drop them. (b) the issue actually requests what you claim
-   it supports. An issue about reading data from platform X is not
-   evidence of write-back demand; an issue about Linux behavior is not
-   evidence of Android demand. Misrepresenting what an issue requests
-   is the most common source error. When in doubt, quote the exact
-   first sentence of the issue body.
+4. **Current demand and history.** Keep `sources` as current unmet-demand
+   evidence. Put older discussions in separate `supporting_sources` only when
+   fresh independent primary evidence confirms the same unresolved need.
+   Keep original publication dates. Follow the evidence contract below.
+5. **Actually loaded.** A failed fetch is not readable evidence. Try permitted
+   retrieval alternatives. If the content remains unreadable, omit it.
+6. **GitHub issues: verify state and claim.** Primary issue sources must be
+   open and request the exact thing claimed. Closed issues may be supporting
+   context under the contract below. A completed feature is not unmet demand.
+   An issue about reading data from platform X does not prove write-back demand.
 7. **Platform match.** Verify that every source is about the same
    platform as your signal. Sources about iOS behavior, Linux bugs, or
    desktop usage don't prove Android demand (and vice versa). If a
@@ -198,13 +213,9 @@ Twitter/Bluesky, ProductHunt, or other non-HN communities.
 
 ## Filtering rules
 
-1. RECENCY: Only signals from the last 2 weeks. Threads can be older ONLY
-   if you VERIFY ongoing demand with recent comments. The `engagement`
-   field must cite a specific recent activity signal you saw on the page
-   (a comment timestamped within the last month, a rising count, a
-   linked active thread). "Wide agreement" / "ongoing demand" without a
-   dated example is not enough. A closed thread with zero replies cannot
-   be cited as ongoing discussion.
+1. RECENCY: Use current demand from the last 2 weeks. Historical discussions
+   belong in `supporting_sources`, linked to independent current demand under
+   the contract below. Recent retrieval does not make an old post recent.
 2. REAL EVIDENCE ONLY: Must link to a real user post. Do not fabricate demand.
    The `date` field is the publication date FROM THE SOURCE PAGE: the HN
    submission time, the Reddit post time, the blog posted-date, or the
@@ -239,6 +250,41 @@ Twitter/Bluesky, ProductHunt, or other non-HN communities.
    the signal. If existing solutions are inadequate, overpriced, or
    privacy-hostile, that IS a valid signal. Explain the gap specifically.
 
+## Evidence contract
+
+Every new competitor entry includes `gap_status` (`verified` or `unverified`)
+and `gap_evidence`, an array of `{url, quote, checked}` citations. A verified gap
+requires at least one exact documentation, pricing, release, or maintainer
+citation supporting the specific claim. Use a short exact quote and the actual
+check date. A homepage or missing search result cannot prove a feature absent.
+For inconclusive research use `unverified`, optionally an empty evidence array,
+and wording such as "I could not verify offline support in the documentation
+checked." Both fields absent remains valid for old batches only.
+
+Optional `supporting_sources` entries have `url`, `platform`, `quote`, original
+`date`, optional `engagement`, and a nonempty unique `corroborated_by` array of
+primary source URLs from the same signal. Each reference must resolve to one
+distinct primary source dated within 14 days of the batch date, never future.
+No self-reference or supporting-to-supporting reference. Verify independent
+users and the same unresolved need. Reposts, repeated complaints from one author,
+and shipping announcements do not establish independent unmet demand. Supporting
+items never increase primary source counts or demand strength.
+
+For a supporting GitHub issue or issue comment, include `issue_status` with
+`state` (`open`, `closed`, `unknown`) and actual `checked` date. A closed issue
+also needs `closure_reason` (`completed`, `not_planned`, `automatic_stale`, or
+`unknown`). Known reasons require `evidence: {url, quote, checked}` from the
+closing event or comment. Do not infer inactivity from `closed` or `not_planned`.
+Unknown reason may omit evidence. Open and unknown states have no closure fields.
+Completed work belongs here only if fresh independent evidence identifies a
+specific remaining or renewed gap, which the report explains. Otherwise use it
+in the landscape or omit it. The collector remains open-issue-only, so retrieve
+closed supporting context separately and verify its current state.
+
+All new supporting and citation URLs must be absolute HTTP or HTTPS URLs.
+Dates must be real and no later than the batch date. Validation checks shape,
+dates, and references, not whether the cited text proves the research claim.
+
 ## Output format
 
 Pure JSON. No markdown wrapping. The file must contain one JSON array with
@@ -264,7 +310,9 @@ Pure JSON. No markdown wrapping. The file must contain one JSON array with
           "name": "App or tool name",
           "url": "https://...",
           "does": "One neutral line on what it actually is, as its maker would put it.",
-          "gap": "Specifically how it differs from what people are asking for."
+          "gap": "I could not verify this capability in the documentation checked.",
+          "gap_status": "unverified",
+          "gap_evidence": []
         }
       ],
       "landscape_summary": "1-2 sentences on the current state and why the gap persists."

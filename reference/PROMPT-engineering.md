@@ -1,4 +1,11 @@
 # Signal: Claude API Prompt Engineering (v2)
+
+> Historical design record. For current research behavior, use
+> [the sourcing rubric](../method/RUBRIC.md) and [the portable prompt](../method/PROMPT.md).
+> Their supporting-evidence and competitor-citation rules supersede the examples
+> below. Browser interaction requires explicit approval for this research run
+> before preflight or other browser actions, including any signed-in reading.
+> The historical fetch instructions below do not grant browser permission.
 ## Demand Signal Sourcing Pipeline
 
 ### Changelog

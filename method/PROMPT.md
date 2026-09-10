@@ -7,17 +7,16 @@ Paste this whole file into any assistant that can search the web and open pages
 and returns the result in its reply. There is no file to write and no repo to
 read.
 
-> **Preflight, before you paste this.** Ask the assistant to open one Reddit
-> thread and one forum thread and report what it sees. If it cannot read the
-> actual page content, stop. This method cannot run on search snippets, and an
-> assistant that tries will hand you confident fiction. "Can search the web" and
-> "can open this specific page" are different capabilities, and the second
-> varies by assistant, by harness, and by site.
+> **Preflight, every run.** Try one Reddit thread and one forum thread
+> through ordinary retrieval or official APIs and report what is readable.
+> Apply the browser permission gate below before any browser fallback.
+> Continue with accessible evidence and disclose gaps if a route is unavailable.
+> Search snippets and memory cannot replace reading the actual content.
 >
-> **If it fails,** [`../collector/`](../collector) fetches Hacker News, any
-> Discourse forum, and open GitHub issues into a local cache first, so the
-> assistant reads real timestamps instead of trying to open pages. Standard
-> library Python, no install, no keys.
+> **Local retrieval:** [`../collector/`](../collector) can cache Hacker News,
+> Discourse posts, and open GitHub issues. Hacker News and Discourse need no
+> account setup. GitHub needs the `gh` CLI and its existing authentication.
+> Competitor pages and venue rules still need their own verified retrieval.
 
 > **Don't want to set anything up?** Paste [`GUIDED.md`](./GUIDED.md) instead.
 > It interviews you in plain language and does all of the configuring below for
@@ -88,6 +87,30 @@ find real, actionable evidence of unmet software demand by mining online
 communities where real users express frustration, wishes, and unmet needs,
 then package each one as a structured "signal" a builder can act on.
 
+## Browser permission (including preflight)
+
+Use ordinary page retrieval or official APIs first. If required content is
+missing, explain what you need to read and ask explicitly before any browser
+action, including reading an existing tab. State the pages or research-run
+scope and whether an existing signed-in session is included. For example:
+"The replies did not load. May I use your browser for read-only research during
+this run, including your signed-in session if needed, to read these threads?"
+
+Wait for an explicit yes within that scope. A prior explicit grant for this run
+is sufficient. Keep page-only grants to that page and public-only grants out of
+signed-in sessions. Ask before expanding scope, and get a new grant for a later
+run. Availability, ambient tabs, silence, and ambiguous replies are not approval.
+Stop browser activity immediately if permission is revoked.
+
+After refusal or while awaiting an answer, continue independent research through
+permitted nonbrowser routes and disclose gaps. Do not repeatedly ask after a
+refusal. An unattended run without a grant continues without a browser. Read-only
+approval covers navigation and expanding comments, never posting, messaging,
+purchases, mutating form submissions, or account changes. Follow host sign-in
+and challenge rules. Do not bypass restrictions or export credentials, and
+never cite content you could not read. Mark inaccessible rules unverified. Stop only work that lacks essential
+verified evidence.
+
 ## Method
 
 Run all phases in order. Each builds on the last.
@@ -123,9 +146,9 @@ r/BuyItForLife, r/cooking, r/homeautomation, r/smallbusiness, r/Entrepreneur.
 
 ### Phase 2: Thread deep reads (open the page)
 
-For every promising thread, use your page-fetch/browsing tool to read the
-**full** thread. Search snippets are never enough. The real signal is in the
-replies, not the headline. Look for:
+For every promising thread, use ordinary retrieval or an official API to read
+the **full** thread. Use a browser only under the permission gate above. Search
+snippets are never enough. The real signal is in the replies, not the headline. Look for:
 
 - Multiple users agreeing ("same!", "+1", "I need this too").
 - Users describing workarounds (proof the need is real enough to hack around).
@@ -164,7 +187,8 @@ when. A regional rollout is not a global requirement.
 
 ### Phase 4: Per-source verification (open every source, non-skippable)
 
-Before finalizing, open EVERY URL going into `sources` and confirm with your
+Before finalizing, verify EVERY cited URL through permitted retrieval, including
+`supporting_sources` and competitor citations. For primary sources, confirm with your
 eyes (full checklist in [`RUBRIC.md`](./RUBRIC.md)):
 
 1. The `date` matches what the page shows (use the real posted date).
@@ -174,16 +198,48 @@ eyes (full checklist in [`RUBRIC.md`](./RUBRIC.md)):
    the `DISTRUST` list is out on sight, but that list is a shortcut, not the
    test.
 3. It's demand, not supply, so drop "Show HN"/self-promo of one's own product.
-4. If the page is older than ~2 weeks, cite a specific recent activity you saw
-   (a comment dated within the last month). Post age or total comment count
-   alone does not count.
+4. Keep current demand in `sources`. Older context follows the supporting
+   evidence rules below, with original dates and fresh independent corroboration.
 5. The page actually loaded (no 429, error, or login wall).
-6. GitHub issues: verify the issue is OPEN and actually requests what you claim.
+6. Primary GitHub issues must be open and request what you claim. Closed
+   supporting issues follow the status and corroboration rules below.
 7. Platform match: an iOS/Linux/desktop source doesn't prove Android demand.
 8. Claim alignment: the source proves the *specific* thing the title claims.
 
 If a signal has zero verified real-user sources after this, **drop the signal**.
 Better to return 2 strong signals than 5 mixed ones.
+
+### Supporting context and exact gap evidence
+
+Keep `sources` current. Historical discussions go in optional `supporting_sources`
+with `url`, `platform`, `quote`, original `date`, optional `engagement`, and
+nonempty unique `corroborated_by` URLs. Each must point to exactly one distinct
+primary source in this signal dated within 14 days of the batch date, never in
+the future. No self-reference or supporting-to-supporting reference. Verify
+independent users still describe the same unresolved need. Reposts, one author's
+repeated complaint, and shipping announcements do not qualify. Supporting
+context never increases primary source counts or demand strength.
+
+Supporting GitHub issues and issue comments also need `issue_status` with
+`state: open|closed|unknown` and actual `checked` date. Closed issues require
+`closure_reason: completed|not_planned|automatic_stale|unknown`. A known reason
+requires `evidence: {url, quote, checked}` from the closing record. Unknown reason
+may omit it. Do not infer automatic staleness from a closed or not-planned state.
+Open and unknown states have no closure fields. Completed work is history only
+when fresh independent evidence proves a specific remaining or renewed gap,
+which you explain. Otherwise put it in the landscape or omit it. The collector
+still retrieves only open issues, so verify supporting closed issues separately.
+
+Every new competitor includes `gap_status: verified|unverified` and
+`gap_evidence: [{url, quote, checked}]`. Verified requires a short exact citation
+from the documentation section, pricing page, release note, or maintainer
+statement proving the specific gap. A homepage or missing search result alone
+cannot prove a capability absent. If inconclusive, use `unverified`, allow an
+empty evidence array, and say "I could not verify offline support in the
+documentation checked" rather than asserting absence. Old batches may omit both
+fields. All new supporting and evidence URLs are absolute HTTP or HTTPS, and
+all dates are real and no later than the batch date. Validation checks structure,
+not the truth of a claim or independence of its sources.
 
 ## Output
 
@@ -221,6 +277,13 @@ be scanned, counted, or checked, which defeats the point of researching them.
 
 Each signal object looks like this:
 
+In every reader-facing format, show supporting context separately with its
+original date, issue state and closure context when relevant, and links to the
+current corroborating sources. Competitor rows include verified or unverified
+status, exact citation links, short quotes, and check dates. Do not relabel
+legacy gaps without metadata as verified. Escape this researched text in HTML
+and allow only HTTP or HTTPS evidence links.
+
 ```json
 {
   "title": "Short, clear description of what people want",
@@ -236,7 +299,7 @@ Each signal object looks like this:
   ],
   "landscape": {
     "existing_solutions": [
-      { "name": "App or tool", "url": "https://...", "does": "One neutral line on what it actually is, as its maker would put it.", "gap": "Specifically how it differs from what people are asking for." }
+      { "name": "App or tool", "url": "https://...", "does": "One neutral line on what it actually is, as its maker would put it.", "gap": "I could not verify this capability in the documentation checked.", "gap_status": "unverified", "gap_evidence": [] }
     ],
     "landscape_summary": "1-2 sentences on the current state and why the gap persists."
   },

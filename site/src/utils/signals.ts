@@ -3,6 +3,27 @@ import path from 'node:path';
 import { validateSignals } from '../../../method/validate-signals.mjs';
 import { claimUniqueSlug, normalizeRouteSource, stableRouteSlug } from './routes.js';
 
+export interface EvidenceCitation {
+  url: string
+  quote: string
+  checked: string
+}
+
+export interface SupportingSource {
+  url: string
+  platform: string
+  quote: string
+  date: string
+  engagement?: string
+  corroborated_by: string[]
+  issue_status?: {
+    state: 'open' | 'closed' | 'unknown'
+    checked: string
+    closure_reason?: 'completed' | 'not_planned' | 'automatic_stale' | 'unknown'
+    evidence?: EvidenceCitation
+  }
+}
+
 export interface Signal {
   title: string;
   summary: string;
@@ -15,12 +36,15 @@ export interface Signal {
     date: string;
     engagement?: string;
   }>;
+  supporting_sources?: SupportingSource[]
   landscape: {
     existing_solutions: Array<{
       name: string;
       url: string;
       does?: string;
       gap: string;
+      gap_status?: 'verified' | 'unverified'
+      gap_evidence?: EvidenceCitation[]
     }>;
     landscape_summary: string;
   };

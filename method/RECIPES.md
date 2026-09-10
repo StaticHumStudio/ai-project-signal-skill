@@ -4,13 +4,12 @@
 interviews you and configures the retarget for you. This file is for driving it
 yourself, or for understanding what the guided prompt is doing under the hood.*
 
-> **Preflight applies to every recipe below.** Before you run any of them, ask
-> the assistant to open one Reddit thread and one forum thread and report what
-> it sees. If it cannot read the actual page content, stop. Retargeting the
-> prompt does not change this: swapping in `r/BuyItForLife` or a hobby forum
-> only matters if the assistant can actually open those pages. An assistant that
-> can't will still return a confident, well-formatted batch, just an invented
-> one.
+> **Preflight applies to every recipe below.** Check ordinary retrieval or
+> official APIs each run and keep the browser permission section in the prompt
+> you retarget. Browser fallback requires an explicit grant for the stated pages
+> or run, including signed-in scope if needed. Existing tabs and silence are not
+> approval. Refusal keeps the run on permitted nonbrowser routes, with gaps
+> reported. Retargeting changes the audience, not the permission or evidence rules.
 
 `PROMPT.md` ships tuned for unmet *software* demand, but the engine underneath
 doesn't care. To aim it somewhere else you change **two things** at the top of

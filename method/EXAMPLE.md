@@ -30,6 +30,37 @@ differently, by mining communities and reviews where real owners describe what
 they can't buy and what their current gear gets wrong, then package each one as
 a structured "signal" a maker or brand can act on.
 
+## Browser permission (including preflight)
+
+Use ordinary page retrieval or official APIs first. If required content is
+missing, explain what you need to read and ask explicitly before any browser
+action, including reading an existing tab. State the pages or research-run
+scope and whether an existing signed-in session is included. For example:
+"The replies did not load. May I use your browser for read-only research during
+this run, including your signed-in session if needed, to read these threads?"
+
+Wait for an explicit yes within that scope. A prior explicit grant for this run
+is sufficient. Keep page-only grants to that page and public-only grants out of
+signed-in sessions. Ask before expanding scope, and get a new grant for a later
+run. Availability, ambient tabs, silence, and ambiguous replies are not approval.
+Stop browser activity immediately if permission is revoked.
+
+After refusal or while awaiting an answer, continue independent research through
+permitted nonbrowser routes and disclose gaps. Do not repeatedly ask after a
+refusal. An unattended run without a grant continues without a browser. Read-only
+approval covers navigation and expanding comments, never posting, messaging,
+purchases, mutating form submissions, or account changes. Follow host sign-in
+and challenge rules. Do not bypass restrictions or export credentials, and
+never cite content you could not read. Mark inaccessible rules unverified. Stop only work that lacks essential
+verified evidence.
+
+## Preflight
+
+For this run, try one Reddit thread and one forum thread through ordinary
+retrieval or official APIs. Report what you can read and apply the permission
+gate above before using a browser. Continue with accessible evidence and
+state coverage gaps. Stop only work whose essential evidence stays unreadable.
+
 ## Method
 
 Run all phases in order. Each builds on the last.
@@ -54,8 +85,9 @@ Amazon reviews of the closest existing products.
 
 ### Phase 2: Deep reads (open the page)
 
-For every promising thread or review, use your page-fetch/browsing tool to read
-the **full** discussion. Snippets are never enough. The real signal is in the
+For every promising thread or review, use ordinary retrieval or an official
+API to read the **full** discussion. Use a browser only under the permission
+gate above. Snippets are never enough. The real signal is in the
 replies and the middle-star reviews. Look for:
 
 - Multiple owners agreeing ("same!", "+1", "I gave up and use X instead").
@@ -90,7 +122,8 @@ Misrepresenting what an existing product does is the most common error.
 
 ### Phase 4: Per-source verification (open every source, non-skippable)
 
-Before finalizing, open EVERY URL going into `sources` and confirm with your
+Before finalizing, verify EVERY cited URL through permitted retrieval, including
+`supporting_sources` and competitor citations. For primary sources, confirm with your
 eyes:
 
 1. The `date` matches what the page shows (the real review/post date).
@@ -100,14 +133,46 @@ eyes:
    category, is the page built to rank rather than to complain? Anything on the
    `DISTRUST` list is out on sight, but that list is a shortcut, not the test.
 3. It's demand, not supply. A brand promoting its own product is supply. Drop it.
-4. If the page is older than a few weeks, cite a specific recent activity you
-   saw (a review or comment dated within the last month). Age alone doesn't count.
+4. Keep current demand in `sources`. Older reviews or discussions follow the
+   supporting evidence rules below, with fresh independent corroboration.
 5. The page actually loaded (no error or login wall).
 6. Claim alignment: the source proves the *specific* thing the title claims. A
    complaint about handle length is not evidence of demand for a nonstick coating.
 
 If a signal has zero verified real-owner sources, **drop the signal**. Better
 two strong signals than five mixed ones.
+
+### Supporting context and exact gap evidence
+
+Keep `sources` current. Historical discussions go in optional `supporting_sources`
+with `url`, `platform`, `quote`, original `date`, optional `engagement`, and
+nonempty unique `corroborated_by` URLs. Each must point to exactly one distinct
+primary source in this signal dated within 14 days of the batch date, never in
+the future. No self-reference or supporting-to-supporting reference. Verify
+independent users still describe the same unresolved need. Reposts, one author's
+repeated complaint, and shipping announcements do not qualify. Supporting
+context never increases primary source counts or demand strength.
+
+Supporting GitHub issues and issue comments also need `issue_status` with
+`state: open|closed|unknown` and actual `checked` date. Closed issues require
+`closure_reason: completed|not_planned|automatic_stale|unknown`. A known reason
+requires `evidence: {url, quote, checked}` from the closing record. Unknown reason
+may omit it. Do not infer automatic staleness from a closed or not-planned state.
+Open and unknown states have no closure fields. Completed work is history only
+when fresh independent evidence proves a specific remaining or renewed gap,
+which you explain. Otherwise put it in the landscape or omit it. The collector
+still retrieves only open issues, so verify supporting closed issues separately.
+
+Every new competitor includes `gap_status: verified|unverified` and
+`gap_evidence: [{url, quote, checked}]`. Verified requires a short exact citation
+from the documentation section, pricing page, release note, or maintainer
+statement proving the specific gap. A homepage or missing search result alone
+cannot prove a capability absent. If inconclusive, use `unverified`, allow an
+empty evidence array, and say "I could not verify offline support in the
+documentation checked" rather than asserting absence. Old batches may omit both
+fields. All new supporting and evidence URLs are absolute HTTP or HTTPS, and
+all dates are real and no later than the batch date. Validation checks structure,
+not the truth of a claim or independence of its sources.
 
 ## Output
 
@@ -119,6 +184,13 @@ site. Render the landscape as a **table**, one row per existing product
 (linked name, what it is, how it differs), never as a prose paragraph. Each signal is built to the shape below (it's [`schema.json`](./schema.json),
 free-form fields read for physical goods). Quality beats count. If you only
 found 4 strong signals, return 4.
+
+In every reader-facing format, show supporting context separately with its
+original date, issue state and closure context when relevant, and links to the
+current corroborating sources. Competitor rows include verified or unverified
+status, exact citation links, short quotes, and check dates. Do not relabel
+legacy gaps without metadata as verified. Escape this researched text in HTML
+and allow only HTTP or HTTPS evidence links.
 
 ```json
 {
@@ -135,7 +207,7 @@ found 4 strong signals, return 4.
   ],
   "landscape": {
     "existing_solutions": [
-      { "name": "Product or brand", "url": "https://...", "does": "One neutral line on what it actually is, as the maker would put it.", "gap": "Specifically how it differs from what people are asking for." }
+      { "name": "Product or brand", "url": "https://...", "does": "One neutral line on what it actually is, as the maker would put it.", "gap": "I could not verify this capability in the documentation checked.", "gap_status": "unverified", "gap_evidence": [] }
     ],
     "landscape_summary": "1-2 sentences on what's on the shelf and why the gap persists."
   },

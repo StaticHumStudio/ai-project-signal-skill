@@ -1,0 +1,62 @@
+{
+  "title": "Evidence example",
+  "summary": "SYNTHETIC example of current demand with historical supporting context.",
+  "sources": [
+    {
+      "url": "https://example.com/current-demand",
+      "platform": "other",
+      "quote": "We still need the same local export workflow.",
+      "date": "2026-09-10"
+    }
+  ],
+  "supporting_sources": [
+    {
+      "url": "https://github.com/example/example/issues/123",
+      "platform": "github",
+      "quote": "Please add a local export workflow.",
+      "date": "2025-02-01",
+      "corroborated_by": [
+        "https://example.com/current-demand"
+      ],
+      "issue_status": {
+        "state": "closed",
+        "checked": "2026-09-10",
+        "closure_reason": "not_planned",
+        "evidence": {
+          "url": "https://github.com/example/example/issues/123#issuecomment-456",
+          "quote": "This feature is outside the scope of this example project.",
+          "checked": "2026-09-10"
+        }
+      }
+    }
+  ],
+  "landscape": {
+    "existing_solutions": [
+      {
+        "name": "ExampleTool",
+        "url": "https://example.com/tool",
+        "does": "Stores and exports example records.",
+        "gap": "Exports require the paid plan.",
+        "gap_status": "verified",
+        "gap_evidence": [
+          {
+            "url": "https://example.com/tool/pricing#exports",
+            "quote": "Export is included in the paid plan.",
+            "checked": "2026-09-10"
+          }
+        ]
+      },
+      {
+        "name": "AnotherExample",
+        "url": "https://example.com/another-tool",
+        "gap": "I could not verify offline support in the documentation checked.",
+        "gap_status": "unverified",
+        "gap_evidence": []
+      }
+    ],
+    "landscape_summary": "SYNTHETIC comparison showing a documented limitation and an unverified capability."
+  },
+  "category": "other",
+  "difficulty": "real_project",
+  "demand_strength": "single_request"
+}
