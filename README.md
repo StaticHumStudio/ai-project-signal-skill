@@ -212,7 +212,7 @@ question so you can answer it is a fabricated source, the exact artifact
 browsable feed. It ships with exactly **one synthetic example signal** so it
 renders out of the box. There is no real signal data in this repo.
 
-You need Node.js 22.12.0 or newer and npm 9.6.5 or newer (`site/.nvmrc`
+You need Node.js 22.19.0 or newer and npm 9.6.5 or newer (`site/.nvmrc`
 selects the supported line if you use `nvm`).
 
 ```bash
