@@ -5,7 +5,7 @@ easier to review and much more likely to land.
 
 ## Before you start
 
-- Use Node.js 22.12.0 or newer and npm 9.6.5 or newer.
+- Use Node.js 22.19.0 or newer and npm 9.6.5 or newer.
 - Use Python 3.9 or newer. `npm run check` runs the collector's tests too, and
   they are standard library `unittest`, so there is nothing to install.
 - Open an issue before a large behavior or schema change so the direction can
